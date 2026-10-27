@@ -5,27 +5,44 @@ import {
   ShieldAlert, ShieldCheck, Award, Zap, RefreshCw, Sparkles, Check, ChevronRight, Compass,
   AlertTriangle, Play, Target, Brain
 } from "lucide-react";
+import { translations, Language, getLocalizedCases } from "../utils/i18n";
 
-const RANKS = [
-  { minXp: 0, title: "Anfänger-Detektiv (Kadett)" },
-  { minXp: 100, title: "Sicherheits-Agent (Ermittler)" },
-  { minXp: 250, title: "Phishing-Fahnder (Inspektor)" },
-  { minXp: 550, title: "Cyber-Forensiker (Kommissar)" },
-  { minXp: 1000, title: "Sicherheits-Meisterdetektiv (Superintendent)" }
-];
+const getLocalizedRanks = (lang: string) => {
+  if (lang === "en") {
+    return [
+      { minXp: 0, title: "Novice Detective (Cadet)" },
+      { minXp: 100, title: "Security Agent (Investigator)" },
+      { minXp: 250, title: "Phishing Hunter (Inspector)" },
+      { minXp: 550, title: "Cyber Forensics Expert (Captain)" },
+      { minXp: 1000, title: "Master Detective (Superintendent)" }
+    ];
+  }
+  return [
+    { minXp: 0, title: "Anfänger-Detektiv (Kadett)" },
+    { minXp: 100, title: "Sicherheits-Agent (Ermittler)" },
+    { minXp: 250, title: "Phishing-Fahnder (Inspektor)" },
+    { minXp: 550, title: "Cyber-Forensiker (Kommissar)" },
+    { minXp: 1000, title: "Sicherheits-Meisterdetektiv (Superintendent)" }
+  ];
+};
 
-export default function Simulator() {
-  const [profile, setProfile] = useState<DetectiveProfile>({
-    xp: 0,
-    score: 0,
-    completedCasesCount: 0,
-    streak: 0,
-    rank: "Anfänger-Detektiv (Kadett)",
-    solvedCaseIds: []
+export default function Simulator({ language = "de" }: { language?: Language }) {
+  const currentCases = getLocalizedCases(language);
+
+  const [profile, setProfile] = useState<DetectiveProfile>(() => {
+    const rawRanks = getLocalizedRanks(language);
+    return {
+      xp: 0,
+      score: 0,
+      completedCasesCount: 0,
+      streak: 0,
+      rank: rawRanks[0].title,
+      solvedCaseIds: []
+    };
   });
 
   const [activeCaseIdx, setActiveCaseIdx] = useState(0);
-  const [currentCase, setCurrentCase] = useState<SimulationCase>(defaultCases[0]);
+  const [currentCase, setCurrentCase] = useState<SimulationCase>(currentCases[0]);
   const [hoveredLinkUrl, setHoveredLinkUrl] = useState<string | null>(null);
   const [userGuess, setUserGuess] = useState<boolean | null>(null);
   const [isRoundSolved, setIsRoundSolved] = useState(false);
@@ -36,6 +53,8 @@ export default function Simulator() {
   const [genDiff, setGenDiff] = useState<"Anfänger" | "Fortgeschritten" | "Experte">("Fortgeschritten");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationError, setGenerationError] = useState("");
+
+  const calculatedRanks = getLocalizedRanks(language);
 
   useEffect(() => {
     const saved = localStorage.getItem("phish_detective_profile_v2");
@@ -48,9 +67,15 @@ export default function Simulator() {
     }
   }, []);
 
+  useEffect(() => {
+    if (activeCaseIdx < currentCases.length) {
+      setCurrentCase(currentCases[activeCaseIdx]);
+    }
+  }, [language, activeCaseIdx]);
+
   const calculateRank = (xp: number) => {
-    let currentRank = RANKS[0].title;
-    for (const rank of RANKS) {
+    let currentRank = calculatedRanks[0].title;
+    for (const rank of calculatedRanks) {
       if (xp >= rank.minXp) {
         currentRank = rank.title;
       }
@@ -111,25 +136,29 @@ export default function Simulator() {
     setUserGuess(null);
     setHoveredLinkUrl(null);
     
-    const nextIdx = (activeCaseIdx + 1) % defaultCases.length;
+    const nextIdx = (activeCaseIdx + 1) % currentCases.length;
     setActiveCaseIdx(nextIdx);
-    setCurrentCase(defaultCases[nextIdx]);
+    setCurrentCase(currentCases[nextIdx]);
   };
 
   const handleRestartProgress = () => {
-    if (confirm("Möchten Sie Ihren gesamten Fortschritt und Ihr Detektiv-Level zurücksetzen?")) {
+    const confirmMsg = language === "en" 
+      ? "Do you really want to clear your entire progress and detective rank?" 
+      : "Möchten Sie Ihren gesamten Fortschritt und Ihr Detektiv-Level zurücksetzen?";
+    if (confirm(confirmMsg)) {
+      const rawRanks = getLocalizedRanks(language);
       const freshProf: DetectiveProfile = {
         xp: 0,
         score: 0,
         completedCasesCount: 0,
         streak: 0,
-        rank: RANKS[0].title,
+        rank: rawRanks[0].title,
         solvedCaseIds: [],
         failedCaseIds: []
       };
       saveProfile(freshProf);
       setActiveCaseIdx(0);
-      setCurrentCase(defaultCases[0]);
+      setCurrentCase(currentCases[0]);
       setIsRoundSolved(false);
       setUserGuess(null);
     }
@@ -139,31 +168,31 @@ export default function Simulator() {
     const skills = [
       {
         id: "sender",
-        name: "ABSENDER-RECHTLICHKEIT",
-        description: "PRÜFUNG VON CO-SENDER ADRESSEN UND DOMAINS.",
+        name: language === "en" ? "SENDER VALIDITY" : "ABSENDER-RECHTLICHKEIT",
+        description: language === "en" ? "AUDITING OF SENDER ADDRESSES AND DOMAINS." : "PRÜFUNG VON CO-SENDER ADRESSEN UND DOMAINS.",
         associatedCases: ["case-paypal", "case-dhl", "case-hr-spear"],
-        tipIfWeak: "TIPP: REINSCHAUEN BEIM DOMAIN-HOSTELEMENT NACH DEM '@'."
+        tipIfWeak: language === "en" ? "TIP: INSPECT THE DOMAIN PORTION AFTER THE '@'." : "TIPP: REINSCHAUEN BEIM DOMAIN-HOSTELEMENT NACH DEM '@'."
       },
       {
         id: "links",
-        name: "LINK-RECHNER-DIAGNOSTIK",
-        description: "ENTLARVUNG VON HOCHRISIKO-TLDS (Z.B. .CN UND .RU).",
+        name: language === "en" ? "LINK DIAGNOSTICS" : "LINK-RECHNER-DIAGNOSTIK",
+        description: language === "en" ? "EXPOSING HIGH-RISK TLDS (E.G. .CN AND .RU)." : "ENTLARVUNG VON HOCHRISIKO-TLDS (Z.B. .CN UND .RU).",
         associatedCases: ["case-paypal", "case-dhl", "case-hr-spear"],
-        tipIfWeak: "TIPP: NUTZEN SIE DAS 'SEZIERMESSER' IN DER LINK-INSPEKTION."
+        tipIfWeak: language === "en" ? "TIP: USE THE 'INSPECTOR' TOOL TO DECONSTRUCT MULTI-LEVEL DOMAINS." : "TIPP: NUTZEN SIE DAS 'SEZIERMESSER' IN DER LINK-INSPEKTION."
       },
       {
         id: "urgency",
-        name: "VETRESISTENZ GEGEN DRUCK",
-        description: "WIDERSTAND GEGEN KÜNSTLICHE ZEITBEDROHUNGEN.",
+        name: language === "en" ? "PRESSURE RESISTANCE" : "VETRESISTENZ GEGEN DRUCK",
+        description: language === "en" ? "RESISTING ARTIFICIAL TIMEOUT THREATS." : "WIDERSTAND GEGEN KÜNSTLICHE ZEITBEDROHUNGEN.",
         associatedCases: ["case-paypal", "case-hr-spear", "case-microsoft"],
-        tipIfWeak: "TIPP: REALE FIRMEN DROHEN SELTEN MIT SPONTANEN 24H-SPERREN."
+        tipIfWeak: language === "en" ? "TIP: LEGITIMATE FIRMS RARELY THREATEN YOU WITH 24-HOUR BANS." : "TIPP: REALE FIRMEN DROHEN SELTEN MIT SPONTANEN 24H-SPERREN."
       },
       {
         id: "social",
-        name: "SOCIAL ENGINE DEFENSE",
-        description: "ABWEHR VON EXTREME SPEAR-PHISHING VERSUCHEN.",
+        name: language === "en" ? "SOCIAL ENGINE DEFENSE" : "SOCIAL ENGINE DEFENSE",
+        description: language === "en" ? "BLOCKING TARGETED SPEAR-PHISHING ATTEMPTS." : "ABWEHR VON EXTREME SPEAR-PHISHING VERSUCHEN.",
         associatedCases: ["case-dhl", "case-amazon", "case-hr-spear"],
-        tipIfWeak: "TIPP: HINTERFRAGEN SIE DRITTLINKS GRUNDSÄTZLICH TELEFONISCH."
+        tipIfWeak: language === "en" ? "TIP: ALWAYS VERIFY SENSITIVE EXECUTIVE ASSIGNMENTS OUT-OF-BAND (PHONE)." : "TIPP: HINTERFRAGEN SIE DRITTLINKS GRUNDSÄTZLICH TELEFONISCH."
       }
     ];
 
@@ -222,11 +251,11 @@ export default function Simulator() {
       const customId = `generated-${Date.now()}`;
       const generatedCase: SimulationCase = {
         id: customId,
-        brand: data.brand || "Generierter Fall",
+        brand: data.brand || (language === "en" ? "Generated Case" : "Generierter Fall"),
         logo: data.logo || "🤖",
-        senderName: data.senderName || "Kundenservice",
+        senderName: data.senderName || (language === "en" ? "Customer Support" : "Kundenservice"),
         senderEmail: data.senderEmail,
-        date: "Zustellung soeben",
+        date: language === "en" ? "Delivered just now" : "Zustellung soeben",
         recipient: "ihre.adresse@beispiel.de",
         subject: data.subject,
         body: data.body,
@@ -246,9 +275,13 @@ export default function Simulator() {
     } catch (err: any) {
       console.error(err);
       if (err.message && err.message.includes("API_KEY_MISSING")) {
-        setGenerationError("AI API-Key fehlt. Generierungs-Features erfordern einen konfigurierten Google Gemini Key.");
+        setGenerationError(language === "en" 
+          ? "AI API-Key is missing. Generation features require a configured Google Gemini Key." 
+          : "AI API-Key fehlt. Generierungs-Features erfordern einen konfigurierten Google Gemini Key.");
       } else {
-        setGenerationError("Schnittstellen-Fehler. Stellen Sie sicher, der Gemini-API-Schlüssel ist gültig.");
+        setGenerationError(language === "en"
+          ? "Interface error. Please make sure the Gemini API key is valid."
+          : "Schnittstellen-Fehler. Stellen Sie sicher, der Gemini-API-Schlüssel ist gültig.");
       }
     } finally {
       setIsGenerating(false);
@@ -269,30 +302,36 @@ export default function Simulator() {
               <Award className="w-5 h-5 text-[#FF5500]" />
             </div>
             <div>
-              <span className="text-[9px] font-mono uppercase text-[#615C54] font-black block">ERMITTLER_STEUERUNG</span>
+              <span className="text-[9px] font-mono uppercase text-[#615C54] font-black block">
+                {language === "en" ? "INVESTIGATOR_HQ" : "ERMITTLER_STEUERUNG"}
+              </span>
               <h3 className="text-sm font-black text-[#1D1B18] uppercase tracking-tight font-mono">{profile.rank}</h3>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4 text-center">
             <div className="bg-white p-3 border-2 border-[#1D1B18] shadow-[2px_2px_0px_#1D1B18]">
-              <span className="text-[9px] font-mono text-[#615C54] uppercase tracking-wider block font-bold">ERFAHRUNG (XP)</span>
+              <span className="text-[9px] font-mono text-[#615C54] uppercase tracking-wider block font-bold">
+                {language === "en" ? "EXPERIENCE (XP)" : "ERFAHRUNG (XP)"}
+              </span>
               <div className="text-base font-black font-mono text-[#FF5500] mt-0.5">{profile.xp} XP</div>
             </div>
             <div className="bg-white p-3 border-2 border-[#1D1B18] shadow-[2px_2px_0px_#1D1B18]">
-              <span className="text-[9px] font-mono text-[#615C54] uppercase tracking-wider block font-bold">PUNKTESTAND</span>
+              <span className="text-[9px] font-mono text-[#615C54] uppercase tracking-wider block font-bold">
+                {language === "en" ? "SCORE" : "PUNKTESTAND"}
+              </span>
               <div className="text-base font-black font-mono text-[#00A3A6] mt-0.5">{profile.score}</div>
             </div>
           </div>
 
           <div className="mt-4 space-y-2 uppercase font-mono text-xs text-[#1D1B18]">
             <div className="flex justify-between">
-              <span>FÄLLE EXAMINIERT</span>
+              <span>{language === "en" ? "CASES EXAMINED" : "FÄLLE EXAMINIERT"}</span>
               <span className="font-bold text-[#1D1B18]">{profile.completedCasesCount}</span>
             </div>
             
             <div className="flex justify-between">
-              <span>SERIE_EFFEKT (STREAK)</span>
+              <span>{language === "en" ? "STREAK EFFECT" : "SERIE_EFFEKT (STREAK)"}</span>
               <span className="font-bold text-[#FF5500] flex items-center gap-1">
                 <Zap className="w-4 h-4 text-[#FF5500]" />
                 {profile.streak}
@@ -303,7 +342,7 @@ export default function Simulator() {
           {/* XP Bar */}
           <div className="mt-4 pt-3 border-t-2 border-[#1D1B18]">
             <div className="flex justify-between text-[9px] font-mono text-[#615C54] mb-1 font-bold uppercase">
-              <span>RANK_PROGRESS REGULATOR</span>
+              <span>{language === "en" ? "RANK PROGRESS STATUS" : "RANK_PROGRESS REGULATOR"}</span>
               <span>
                 {profile.xp} // {profile.xp < 100 ? 100 : profile.xp < 250 ? 250 : profile.xp < 550 ? 550 : profile.xp < 1000 ? 1000 : 2000}
               </span>
@@ -324,27 +363,35 @@ export default function Simulator() {
           <div className="flex items-center justify-between pb-2 border-b-2 border-[#1D1B18]">
             <div className="flex items-center gap-2">
               <Brain className="w-4 h-4 text-[#00A3A6]" />
-              <h4 className="text-xs font-black uppercase text-[#1D1B18] font-mono">📊 STRÄRKEN & SCHWÄCHEN_INDEX</h4>
+              <h4 className="text-xs font-black uppercase text-[#1D1B18] font-mono">
+                {language === "en" ? "📊 SKILLS RADAR & MATRIX" : "📊 STÄRKEN & SCHWÄCHEN_INDEX"}
+              </h4>
             </div>
             <span className="text-[8px] font-mono font-black border-2 border-[#1D1B18] bg-[#1D1B18] text-white px-2 py-0.5 uppercase">
-              {profile.completedCasesCount > 0 ? "LIVE_ANALYSE" : "AUSSTEHEND"}
+              {profile.completedCasesCount > 0 
+                ? (language === "en" ? "LIVE ANALYSING" : "LIVE_ANALYSE") 
+                : (language === "en" ? "PENDING" : "AUSSTEHEND")}
             </span>
           </div>
 
           {profile.completedCasesCount === 0 ? (
             <div className="p-3 bg-white border border-[#1D1B18] text-center space-y-2.5 font-mono text-[10px] uppercase">
               <p className="text-[#615C54] leading-relaxed">
-                Absolvieren Sie Fälle im Simulator, um Ihr persönliches <strong>Stärken- & Schwächenprofil</strong> freizuschalten. Unser System wertet Ihre Ermittlungen live aus.
+                {language === "en" 
+                  ? "Solve cases in the simulator to unlock your personal strengths & weaknesses radar. Your forensic decisions are monitored live."
+                  : "Absolvieren Sie Fälle im Simulator, um Ihr persönliches Stärken- & Schwächenprofil freizuschalten. Unser System wertet Ihre Ermittlungen live aus."}
               </p>
               <div className="flex items-center justify-center gap-1.5 text-[#FF5500] font-black uppercase tracking-wider animate-pulse pt-1">
                 <Target className="w-4 h-4" />
-                ERSTE AKTE ÖFFNEN!
+                {language === "en" ? "OPEN FIRST CASE!" : "ERSTE AKTE ÖFFNEN!"}
               </div>
             </div>
           ) : (
             <div className="space-y-4">
               <p className="text-xs text-[#1D1B18] font-mono uppercase tracking-tight">
-                BASIEREND AUF {profile.completedCasesCount} DURCHGEFÜHRTEN EXAMEN:
+                {language === "en" 
+                  ? `BASED ON ${profile.completedCasesCount} COMPLETED EXAMS:` 
+                  : `BASIEREND AUF ${profile.completedCasesCount} DURCHGEFÜHRTEN EXAMEN:`}
               </p>
 
               <div className="space-y-3.5">
@@ -384,12 +431,12 @@ export default function Simulator() {
                   <div className="space-y-1.5">
                     <span className="text-[9px] font-black uppercase tracking-wider text-[#00A3A6] flex items-center gap-1">
                       <Check className="w-3.5 h-3.5 shrink-0" />
-                      Ermittlungs-Stärken:
+                      {language === "en" ? "Forensic Strengths:" : "Ermittlungs-Stärken:"}
                     </span>
                     <div className="space-y-1">
                       {computeSkills().filter(s => s.percentage >= 80).map(s => (
                         <div key={s.id} className="text-[10px] text-[#1D1B18] bg-[#00A3A6]/10 px-2.5 py-1.5 border border-[#00A3A6] uppercase">
-                          🎯 <strong>{s.name}</strong> IST SEHR GUT GEFESTIGT ({s.percentage}%)
+                          🎯 <strong>{s.name}</strong> {language === "en" ? "IS WELL SECURED" : "IST SEHR GUT GEFESTIGT"} ({s.percentage}%)
                         </div>
                       ))}
                     </div>
@@ -401,7 +448,7 @@ export default function Simulator() {
                   <div className="space-y-1.5">
                     <span className="text-[9px] font-black uppercase tracking-wider text-[#FF5500] flex items-center gap-1">
                       <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-                      Schulungsbedarf / Tipps:
+                      {language === "en" ? "Training Input & Tips:" : "Schulungsbedarf / Tipps:"}
                     </span>
                     <div className="space-y-1.5 flex flex-col gap-1">
                       {computeSkills().filter(s => s.percentage < 80).map(s => (
@@ -425,45 +472,53 @@ export default function Simulator() {
         <div className="bg-[#F4F1EA] border-2 border-[#1D1B18] shadow-[4px_4px_0px_#1D1B18] p-5">
           {!showCaseSetup ? (
             <div className="space-y-3 font-mono">
-              <h4 className="text-xs font-black uppercase text-[#1D1B18]">🤖 CO-AUTHOR: SCENARIO BOOT</h4>
+              <h4 className="text-xs font-black uppercase text-[#1D1B18]">{language === "en" ? "🤖 CO-AUTHOR: SCENARIO BUILDER" : "🤖 CO-AUTHOR: SCENARIO BOOT"}</h4>
               <p className="text-[11px] text-[#615C54] leading-relaxed uppercase">
-                GENERIERE EIN SPEZIALISIERTES PHISHING-PROBE-SZENARIO ÜBER DIE GEMINI KI FÜR BELIEBIGE MARKEN.
+                {language === "en" 
+                  ? "GENERATE A SPECIALIZED PHISHING CHALLENGE VIA GEMINI AI FOR INTEGRATION WITH ARBITRARY BRANDS."
+                  : "GENERIERE EIN SPEZIALISIERTES PHISHING-PROBE-SZENARIO ÜBER DIE GEMINI KI FÜR BELIEBIGE MARKEN."}
               </p>
               <button
                 onClick={() => setShowCaseSetup(true)}
                 className="w-full bg-white hover:bg-[#FAF8F5] border-2 border-[#1D1B18] text-[#1D1B18] font-bold py-2.5 px-3 rounded-none flex items-center justify-center gap-2 text-xs uppercase shadow-[2px_2px_0px_#1D1B18] active:translate-y-0.5"
               >
                 <Sparkles className="w-3.5 h-3.5 text-[#FF5500]" />
-                AUTOR_STEUERUNG BOOTEN
+                {language === "en" ? "BOOT AI scenario WRITER" : "AUTOR_STEUERUNG BOOTEN"}
               </button>
             </div>
           ) : (
             <div className="space-y-4 font-mono">
               <div className="flex justify-between items-center pb-2 border-b-2 border-[#1D1B18]">
-                <span className="text-[10px] font-black uppercase text-[#1D1B18]">KI-PROBE-KONSTRUKTEUR</span>
+                <span className="text-[10px] font-black uppercase text-[#1D1B18]">
+                  {language === "en" ? "AI SCENARIO BUILDER" : "KI-PROBE-KONSTRUKTEUR"}
+                </span>
                 <button 
                   onClick={() => setShowCaseSetup(false)}
                   className="text-[9px] text-[#FF5500] font-black uppercase"
                 >
-                  ABBRECHEN
+                  {language === "en" ? "CANCEL" : "ABBRECHEN"}
                 </button>
               </div>
 
               <div className="space-y-3">
                 <div className="space-y-1">
-                  <label className="text-[9px] font-black text-[#615C54] block uppercase">ZIEL_MARKE (Z.B. PAYPAL, DHL, AMAZON)</label>
+                  <label className="text-[9px] font-black text-[#615C54] block uppercase">
+                    {language === "en" ? "TARGET CHASSIS / BRAND (PayPal, SBB, DHL...)" : "ZIEL_MARKE (Z.B. PAYPAL, DHL, AMAZON)"}
+                  </label>
                   <input
                     type="text"
                     value={genBrand}
                     onChange={(e) => setGenBrand(e.target.value)}
-                    placeholder="PayPal, Netflix, Amazon..."
+                    placeholder="PayPal, PostFinance, Amazon..."
                     className="w-full bg-white border-2 border-[#1D1B18] rounded-none px-2.5 py-1.5 text-xs text-[#1D1B18] font-serif outline-none"
                     disabled={isGenerating}
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[9px] font-black text-[#615C54] block uppercase">LEVEL</label>
+                  <label className="text-[9px] font-black text-[#615C54] block uppercase">
+                    {language === "en" ? "LEVEL" : "LEVEL"}
+                  </label>
                   <div className="grid grid-cols-3 gap-1">
                     {(["Anfänger", "Fortgeschritten", "Experte"] as const).map((diff) => (
                       <button
@@ -477,7 +532,11 @@ export default function Simulator() {
                             : "bg-white border-[#1D1B18] text-[#1D1B18] hover:bg-[#FAF8F5]"
                         }`}
                       >
-                        {diff}
+                        {diff === "Anfänger" 
+                          ? (language === "en" ? "NOVICE" : "ANFÄNGER") 
+                          : diff === "Fortgeschritten" 
+                          ? (language === "en" ? "INTERMEDIATE" : "FORTGESCHRITTEN") 
+                          : (language === "en" ? "EXPERT" : "EXPERTE")}
                       </button>
                     ))}
                   </div>
@@ -497,12 +556,12 @@ export default function Simulator() {
                   {isGenerating ? (
                     <>
                       <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
-                      AUTOR VERFASST AKTE...
+                      {language === "en" ? "AI SCENARIO GENERATING..." : "AUTOR VERFASST AKTE..."}
                     </>
                   ) : (
                     <>
                       <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                      FALL ZUSAMMENSETZEN
+                      {language === "en" ? "ASSEMBLE PHISH CASE" : "FALL ZUSAMMENSETZEN"}
                     </>
                   )}
                 </button>
@@ -513,9 +572,11 @@ export default function Simulator() {
 
         {/* Local Preset Switcher */}
         <div className="bg-[#F4F1EA] border-2 border-[#1D1B18] shadow-[4px_4px_0px_#1D1B18] p-5 space-y-3">
-          <h4 className="text-xs font-black text-[#1D1B18] uppercase tracking-wider font-mono border-b border-[#1D1B18] pb-1.5">📚 LOKALES CHASSIS-BUCH</h4>
+          <h4 className="text-xs font-black text-[#1D1B18] uppercase tracking-wider font-mono border-b border-[#1D1B18] pb-1.5">
+            {language === "en" ? "📚 LOCAL CASE RECORD CHASSIS" : "📚 LOKALES CHASSIS-BUCH"}
+          </h4>
           <div className="space-y-1.5">
-            {defaultCases.map((cs, idx) => (
+            {currentCases.map((cs, idx) => (
               <button
                 key={cs.id}
                 onClick={() => {
@@ -539,7 +600,11 @@ export default function Simulator() {
                 <span className={`font-mono text-[8px] border px-1.5 py-0.5 rounded-none ${
                   currentCase.id === cs.id ? "bg-white text-[#1D1B18] border-white font-black" : "bg-[#ECE8DF] text-slate-500 border-[#1D1B18]"
                 }`}>
-                  {cs.difficulty.toUpperCase()}
+                  {cs.difficulty === "Anfänger" 
+                    ? (language === "en" ? "NOVICE" : "ANFÄNGER") 
+                    : cs.difficulty === "Fortgeschritten" 
+                    ? (language === "en" ? "INTERMEDIATE" : "FORTGESCHRITTEN") 
+                    : (language === "en" ? "EXPERT" : "EXPERTE")}
                 </span>
               </button>
             ))}
@@ -550,7 +615,7 @@ export default function Simulator() {
               onClick={handleRestartProgress}
               className="w-full text-center py-2 px-3 border-2 border-[#1D1B18] bg-[#ECE8DF] hover:bg-[#FF5500] hover:text-white text-[#1D1B18] text-[9.5px] font-mono font-black uppercase transition shadow-[1px_1px_0px_#1D1B18] active:translate-y-0.5"
             >
-              🔄 SPIELFORTSCHRITT ABSÄUBERN
+              {language === "en" ? "🔄 PURGE PROFILE & METRICS" : "🔄 SPIELFORTSCHRITT ABSÄUBERN"}
             </button>
           </div>
         </div>
@@ -568,10 +633,16 @@ export default function Simulator() {
               <span className="w-3 h-3 bg-[#FF5500]"></span>
               <span className="w-3 h-3 bg-white"></span>
               <span className="w-3 h-3 bg-[#00A3A6]"></span>
-              <span className="text-white text-[10px] font-mono font-black ml-2 uppercase tracking-tight">Sicherheits-E-Mail-Posteinlass v3.5</span>
+              <span className="text-white text-[10px] font-mono font-black ml-2 uppercase tracking-tight">
+                {language === "en" ? "Secure Email Ingress Gateway v3.5" : "Sicherheits-E-Mail-Posteinlass v3.5"}
+              </span>
             </div>
             <div className="bg-white border border-[#1D1B18] px-2 py-0.5 text-[8px] font-mono text-[#1D1B18] uppercase tracking-wider font-black">
-              {currentCase.difficulty.toUpperCase()}
+              {currentCase.difficulty === "Anfänger" 
+                ? (language === "en" ? "NOVICE" : "ANFÄNGER") 
+                : currentCase.difficulty === "Fortgeschritten" 
+                ? (language === "en" ? "INTERMEDIATE" : "FORTGESCHRITTEN") 
+                : (language === "en" ? "EXPERT" : "EXPERTE")}
             </div>
           </div>
 
@@ -580,14 +651,18 @@ export default function Simulator() {
             <div className="flex flex-col md:flex-row md:justify-between text-xs">
               <div className="space-y-1">
                 <div>
-                  <span className="text-[#615C54] inline-block w-16">Von:</span>
+                  <span className="text-[#615C54] inline-block w-16">
+                    {language === "en" ? "From:" : "Von:"}
+                  </span>
                   <span className="font-extrabold text-[#1D1B18]">{currentCase.senderName} </span>
                   <span className="text-[#1D1B18] bg-white border border-[#1D1B18] py-0.5 px-2 select-all break-all inline-block">
                     &lt;{currentCase.senderEmail}&gt;
                   </span>
                 </div>
                 <div>
-                  <span className="text-[#615C54] inline-block w-16">An:</span>
+                  <span className="text-[#615C54] inline-block w-16">
+                    {language === "en" ? "To:" : "An:"}
+                  </span>
                   <span className="text-[#1D1B18]">{currentCase.recipient}</span>
                 </div>
               </div>
@@ -597,7 +672,9 @@ export default function Simulator() {
             </div>
 
             <div className="pt-2 border-t border-[#1D1B18]/15">
-              <span className="text-[#615C54] inline-block w-16">Betreff:</span>
+              <span className="text-[#615C54] inline-block w-16">
+                {language === "en" ? "Subject:" : "Betreff:"}
+              </span>
               <span className="text-xs font-black text-[#1D1B18] uppercase">{currentCase.subject}</span>
             </div>
           </div>
@@ -618,7 +695,9 @@ export default function Simulator() {
                   onMouseLeave={() => setHoveredLinkUrl(null)}
                   onClick={(e) => {
                     e.preventDefault();
-                    alert(`Vorsicht! Im Simulator müssen Sie den Link nicht anklicken. Hovern Sie stattdessen darüber, um das echte Ziel unten in der Statusleiste zu prüfen, und fällen Sie dann Ihr Ermittlerurteil.`);
+                    alert(language === "en" 
+                      ? "Caution! You directly clicked a link button. In our simulator, you never click. Hover your selector cursor over the button to evaluate the true URL destination inside the bottom status line first, then arbitrarily make your choice." 
+                      : "Vorsicht! Im Simulator müssen Sie den Link nicht anklicken. Hovern Sie stattdessen darüber, um das echte Ziel unten in der Statusleiste zu prüfen, und fällen Sie dann Ihr Ermittlerurteil.");
                   }}
                   className="bg-white hover:bg-[#FAF8F5] border-2 border-[#1D1B18] text-[#1D1B18] font-mono font-black py-2.5 px-5 rounded-none ml-0 transition flex items-center justify-center gap-1.5 shadow-[3px_3px_0px_#1D1B18] hover:shadow-[1px_1px_0px_#1D1B18] active:translate-y-0.5 uppercase text-xs"
                 >
@@ -632,7 +711,9 @@ export default function Simulator() {
               {hoveredLinkUrl && (
                 <div className="bg-[#1D1B18] border-2 border-[#1D1B18] text-white font-mono px-3 py-1.5 rounded-none shadow-lg flex items-center gap-1.5 tracking-tight">
                   <span className="w-1.5 h-1.5 bg-[#FF5500] animate-pulse"></span>
-                  <span className="text-slate-400 mr-0.5 text-[9px] uppercase font-black">Link-Ziel:</span>
+                  <span className="text-slate-400 mr-0.5 text-[9px] uppercase font-black">
+                    {language === "en" ? "Target Link:" : "Link-Ziel:"}
+                  </span>
                   <span className="break-all select-all font-bold text-[10px] whitespace-normal">{hoveredLinkUrl}</span>
                 </div>
               )}
@@ -644,20 +725,20 @@ export default function Simulator() {
             {!isRoundSolved ? (
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 font-mono">
                 <span className="text-[10px] text-[#615C54] flex items-center gap-1.5 font-bold uppercase">
-                  HOVERN SIE ZUM PRÜFEN UND ENTSCHEIDEN SIE.
+                  {language === "en" ? "HOVER TO INSPECT SENSITIVE LINKS AND ARBITRATE." : "HOVERN SIE ZUM PRÜFEN UND ENTSCHEIDEN SIE."}
                 </span>
                 <div className="flex gap-2 w-full sm:w-auto">
                   <button
                     onClick={() => handleDecision(false)}
                     className="flex-1 sm:flex-none border-2 border-[#1D1B18] bg-[#008080] hover:bg-[#005A5A] text-white font-bold py-2.5 px-5 rounded-none text-xs uppercase shadow-[2px_2px_0px_#1D1B18] active:translate-y-0.5 transition"
                   >
-                    ✅ LEGITIM / KLAR
+                    {language === "en" ? "✅ LEGITIMATE / CLEAN" : "✅ LEGITIM / KLAR"}
                   </button>
                   <button
                     onClick={() => handleDecision(true)}
                     className="flex-1 sm:flex-none border-2 border-[#1D1B18] bg-[#FF5500] hover:bg-[#CC4400] text-white font-bold py-2.5 px-5 rounded-none text-xs uppercase shadow-[2px_2px_0px_#1D1B18] active:translate-y-0.5 transition"
                   >
-                    🚨 INVASIVER PHISH!
+                    {language === "en" ? "🚨 INVASIVE PHISH!" : "🚨 INVASIVER PHISH!"}
                   </button>
                 </div>
               </div>
@@ -671,12 +752,14 @@ export default function Simulator() {
                   </div>
                   <div>
                     <h4 className="text-xs font-black text-[#1D1B18] uppercase">
-                      {isCorrect ? "ERFOLGREICH IDENTIFIZIERT!" : "DIAGNOSE VERABSÄUMT!"}
+                      {isCorrect 
+                        ? (language === "en" ? "SUCCESSFULLY IDENTIFIED!" : "ERFOLGREICH IDENTIFIZIERT!") 
+                        : (language === "en" ? "DIAGNOSTIC LEAKED!" : "DIAGNOSE VERABSÄUMT!")}
                     </h4>
                     <p className="text-[10px] text-[#615C54] uppercase font-bold leading-normal">
                       {isCorrect 
-                        ? "Ihr Verdacht war absolut gerechtfertigt. +50 XP hinzugefügt." 
-                        : "Der Köder wurde geschluckt. Risikoanalyse verbucht (+10 XP)."
+                        ? (language === "en" ? "Spot securely. Added +50 XP to your profile tracker." : "Ihr Verdacht war absolut gerechtfertigt. +50 XP hinzugefügt.") 
+                        : (language === "en" ? "Phishing hook active. Incident logged (+10 XP)." : "Der Köder wurde geschluckt. Risikoanalyse verbucht (+10 XP).")
                       }
                     </p>
                   </div>
@@ -686,7 +769,7 @@ export default function Simulator() {
                   onClick={handleNextCase}
                   className="bg-[#1D1B18] hover:bg-[#FF5500] text-white border-2 border-[#1D1B18] text-xs font-bold py-2 px-4 rounded-none flex items-center gap-1.5 transition"
                 >
-                  NÄCHSTE AKTE
+                  {language === "en" ? "NEXT CASE" : "NÄCHSTE AKTE"}
                   <ChevronRight className="w-4 h-4 text-white" />
                 </button>
               </div>
@@ -700,7 +783,7 @@ export default function Simulator() {
             <div className="flex items-center gap-2 border-b-2 border-[#1D1B18] pb-2">
               <Compass className="w-4 h-4 text-[#FF5500]" />
               <h3 className="text-xs font-black text-[#1D1B18] uppercase tracking-wider font-mono">
-                ERMITTLERBERICHT // BEWEISSTÜCKE & QUELLE
+                {language === "en" ? "FORENSIC CASE NOTES // COLLECTED EVIDENCE" : "ERMITTLERBERICHT // BEWEISSTÜCKE & QUELLE"}
               </h3>
             </div>
 
@@ -709,7 +792,9 @@ export default function Simulator() {
             </p>
 
             <div className="space-y-2.5">
-              <span className="text-[9px] font-mono text-[#615C54] uppercase tracking-wider block font-bold">SPUREN AUS DER AKTE:</span>
+              <span className="text-[9px] font-mono text-[#615C54] uppercase tracking-wider block font-bold">
+                {language === "en" ? "CRITICAL TRACES DISCOVERED:" : "SPUREN AUS DER AKTE:"}
+              </span>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {currentCase.explainingClues && currentCase.explainingClues.map((clue, idx) => (
                   <div 
