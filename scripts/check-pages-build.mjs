@@ -25,9 +25,11 @@ for (const file of files) {
 
 const html = await readFile(path.join(root, 'index.html'), 'utf8');
 assert(html.includes(`href="${base}manifest.json"`), 'Manifest must use the repository path.');
-const assets = [...html.matchAll(/(?:src|href)="([^\"]*\/assets\/[^\"]+)"/g)].map(match => match[1]);
-assert(assets.length > 0, 'No built assets referenced by index.html.');
-for (const asset of assets) {
+const localReferences = [...html.matchAll(/(?:src|href)="([^\"]+)"/g)]
+  .map(match => match[1])
+  .filter(reference => !/^(?:https?:|data:)/.test(reference));
+assert(localReferences.some(reference => reference.includes('/assets/')), 'No built assets referenced by index.html.');
+for (const asset of localReferences) {
   assert(asset.startsWith(base), 'An asset bypasses the repository path.');
   assert(files.includes(path.join(root, asset.slice(base.length))), 'Referenced asset is missing.');
 }
