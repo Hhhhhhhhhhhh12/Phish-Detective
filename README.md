@@ -62,6 +62,44 @@ Das Interface folgt einer exklusiven **Tactile Brutalist Aesthetic** mit klaren,
 
 ## 🚀 Lokale Installation & Betrieb
 
+### GitHub Pages: Trainingsversion ohne Live-KI
+
+Für GitHub Pages gibt es einen eigenen statischen Build:
+
+```bash
+npm ci
+npm run build:pages
+npm run check:pages
+npm run preview:pages
+```
+
+Die lokale Vorschau verwendet den Projektpfad `/Phish-Detective/`. Der Build
+enthält ausschließlich die Browseranwendung; `server.ts`, das Serverbundle
+und dessen Quellkarte werden nicht veröffentlicht. Es werden keine
+Gemini-Schlüssel benötigt oder in die Pages-Version eingebaut.
+`check:pages` prüft die erzeugten Dateipfade und verhindert, dass Serverdateien,
+Umgebungsdateien oder die beiden Live-KI-Endpunkte im Pages-Paket landen.
+
+In dieser Version sind die Live-KI-Analyse eigener Nachrichten und die
+KI-Fallgenerierung deaktiviert. Der Scanner zeigt deutlich gekennzeichnete,
+feste Beispielberichte, der Simulator verwendet die vorbereiteten Fälle.
+Es erfolgen keine Aufrufe an die KI-Endpunkte. Lernfortschritt bleibt lokal
+im Browser. Schriften und App-Icons werden weiterhin von Google Fonts bzw.
+Unsplash geladen; die Trainingsversion ist daher keine vollständig offline
+bereitgestellte Anwendung.
+
+Die vorbereitete Veröffentlichung liegt in `.github/workflows/pages.yml`.
+Sie startet ausschließlich manuell und nur vom Branch `main`; ein Merge
+löst keine Veröffentlichung aus. Nach gesonderter Freigabe in den
+Repository-Einstellungen unter **Pages → Source** die Option **GitHub Actions**
+wählen und den Workflow **Publish training version to GitHub Pages** starten.
+Die vorgesehene Adresse ist
+`https://Hhhhhhhhhhhh12.github.io/Phish-Detective/`. Vor einem Workflow-Start
+müssen technische Prüfung und Veröffentlichung freigegeben sein. An
+believeinme.de werden dafür keine Änderungen vorgenommen.
+
+Die folgenden Schritte betreffen die separate Serverversion mit Live-KI.
+
 Folge diesen einfachen Schritten, um Phish-Detective auf deinem System zu starten:
 
 1. **Abhängigkeiten installieren**:

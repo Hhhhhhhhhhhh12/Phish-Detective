@@ -35,3 +35,9 @@ jobs:
         env:
           # In CI, we use static mock/dummy values if any are strictly required
           GEMINI_API_KEY: "mock_key_for_ci_build"
+
+      - name: Build static GitHub Pages version
+        run: npm run build:pages
+
+      - name: Check static artifact boundaries
+        run: npm run check:pages

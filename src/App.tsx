@@ -28,6 +28,7 @@ import NoirComics from "./components/NoirComics";
 import CyberPet from "./components/CyberPet";
 import PasswordLab from "./components/PasswordLab";
 import { translations, Language } from "./utils/i18n";
+import { isStaticHosting } from "./utils/hosting";
 
 /**
  * @license
@@ -88,7 +89,7 @@ export default function App() {
       case "password": return labels.passwordLab;
       case "simulator": return labels.simulator;
       case "comics": return labels.comics;
-      case "scanner": return labels.aiScan;
+      case "scanner": return isStaticHosting ? (language === "en" ? "Example reports" : "Beispielberichte") : labels.aiScan;
       case "inspector": return labels.urlScan;
       case "handbook": return labels.handbook;
     }
@@ -183,6 +184,14 @@ export default function App() {
       
       {/* Visual background - Simplified, pure soft off-white without busy chaotic screen lines */}
       <div className="absolute inset-0 bg-neutral-100/10 pointer-events-none" />
+
+      {isStaticHosting && (
+        <p role="note" className="relative bg-[#F4F1EA] border-b-2 border-[#1D1B18] px-4 py-2 text-center text-sm text-[#1D1B18]">
+          {language === "en"
+            ? "Training version without live AI. Cases and example reports are prepared in advance."
+            : "Trainingsversion ohne Live-KI. Fälle und Beispielberichte sind vorgegeben."}
+        </p>
+      )}
 
       {activeTab === "landing" ? (
         <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-tr from-[#04080a] via-[#091518] to-slate-950 text-[#FAF8F5] overflow-y-auto w-full">
@@ -622,9 +631,9 @@ export default function App() {
               {/* Simulated Phone Content Area */}
               <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4">
                 
-                {activeTab === "dashboard" && <Dashboard onNavigate={handleTabClick} />}
-                {activeTab === "simulator" && <Simulator />}
-                {activeTab === "scanner" && <Scanner />}
+                {activeTab === "dashboard" && <Dashboard onNavigate={handleTabClick} language={language} />}
+                {activeTab === "simulator" && <Simulator language={language} />}
+                {activeTab === "scanner" && <Scanner language={language} />}
                 {activeTab === "inspector" && <Inspector />}
                 {activeTab === "pet" && <CyberPet />}
                 {activeTab === "password" && <PasswordLab />}
@@ -643,9 +652,9 @@ export default function App() {
         ) : (
           /* Standard Fullscreen Area */
           <main className="min-h-[480px]">
-            {activeTab === "dashboard" && <Dashboard onNavigate={handleTabClick} />}
-            {activeTab === "simulator" && <Simulator />}
-            {activeTab === "scanner" && <Scanner />}
+            {activeTab === "dashboard" && <Dashboard onNavigate={handleTabClick} language={language} />}
+            {activeTab === "simulator" && <Simulator language={language} />}
+            {activeTab === "scanner" && <Scanner language={language} />}
             {activeTab === "inspector" && <Inspector />}
             {activeTab === "pet" && <CyberPet />}
             {activeTab === "password" && <PasswordLab />}

@@ -7,13 +7,15 @@ interface ScannerResultsProps {
   scanResult: EmailScanResult | null;
   errorMode: { active: boolean; message: string; code?: string } | null;
   onTriggerMockAnalysis: (type: "paypal" | "general") => void;
+  exampleLabel?: string;
 }
 
 export default function ScannerResults({
   isScanning,
   scanResult,
   errorMode,
-  onTriggerMockAnalysis
+  onTriggerMockAnalysis,
+  exampleLabel
 }: ScannerResultsProps) {
   const getVerdictBadge = (verdict: string) => {
     switch (verdict) {
@@ -135,7 +137,7 @@ export default function ScannerResults({
                     {badge.text}
                   </span>
                 </div>
-                <h4 className="text-[9px] text-[#615C54] mt-0.5 font-mono uppercase font-black">Echte Forensische Auswertung</h4>
+                <h4 className="text-[9px] text-[#615C54] mt-0.5 font-mono uppercase font-black">{exampleLabel || "Echte Forensische Auswertung"}</h4>
               </div>
             </div>
 
