@@ -1,11 +1,17 @@
-import React, { useState } from "react";
-import { learningModules } from "../cases";
+import React, { useState, useEffect } from "react";
 import { BookOpen, Sparkles, Check } from "lucide-react";
+import { Language, getLocalizedLearningModules } from "../utils/i18n";
 
-export default function Handbook() {
-  const [activeModuleId, setActiveModuleId] = useState(learningModules[0].id);
+export default function Handbook({ language = "de" }: { language?: Language }) {
+  const currentModules = getLocalizedLearningModules(language);
+  const [activeModuleId, setActiveModuleId] = useState(currentModules[0].id);
 
-  const activeModule = learningModules.find(m => m.id === activeModuleId) || learningModules[0];
+  // Sync if modules change
+  useEffect(() => {
+    setActiveModuleId(currentModules[0].id);
+  }, [language]);
+
+  const activeModule = currentModules.find(m => m.id === activeModuleId) || currentModules[0];
 
   return (
     <div className="space-y-6" id="handbook-tab-root">
@@ -13,18 +19,22 @@ export default function Handbook() {
       <div className="border-b border-[#1D1B18] pb-5">
         <h2 className="text-xl font-black text-[#1D1B18] flex items-center gap-2 uppercase font-mono">
           <BookOpen className="w-5 h-5 text-[#FF5500]" />
-          ERMITTLER-HANDBUCH // WISSENSDATENBANK
+          {language === "en" ? "INVESTIGATOR HANDBOOK // KNOWLEDGE BASE" : "ERMITTLER-HANDBUCH // WISSENSDATENBANK"}
         </h2>
         <p className="text-xs text-[#615C54] font-mono mt-1">
-          ANOMALIE-REGISTRIERUNG: TECHNISCHE UND PSYCHOLOGISCHE ANALYSEN ZUR ABWEHR GEZIELTER MANIPULATIONEN.
+          {language === "en" 
+            ? "ANOMALY REGISTER: TECHNICAL AND PSYCHOLOGICAL ANALYSES TO DEFEND TARGETED CYBER OPERATIONS." 
+            : "ANOMALIE-REGISTRIERUNG: TECHNISCHE UND PSYCHOLOGISCHE ANALYSEN ZUR ABWEHR GEZIELTER MANIPULATIONEN."}
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Module Sidebar list - 4 cols */}
         <div className="lg:col-span-4 space-y-2.5">
-          <span className="text-[10px] font-mono font-black uppercase tracking-wider text-[#615C54] block mb-1 px-1">MANUAL_THEMEN CHASSIS:</span>
-          {learningModules.map((module) => (
+          <span className="text-[10px] font-mono font-black uppercase tracking-wider text-[#615C54] block mb-1 px-1">
+            {language === "en" ? "MANUAL THEMES & CATEGORIES:" : "MANUAL_THEMEN CHASSIS:"}
+          </span>
+          {currentModules.map((module) => (
             <button
               key={module.id}
               onClick={() => setActiveModuleId(module.id)}
@@ -51,7 +61,9 @@ export default function Handbook() {
         <div className="lg:col-span-8">
           <div className="bg-[#F4F1EA] border-2 border-[#1D1B18] shadow-[4px_4px_0px_#1D1B18] p-6 space-y-5">
             <div>
-              <span className="text-[9px] font-mono uppercase text-[#00A3A6] font-black tracking-wider block">LEITFADEN-SPEKTRO</span>
+              <span className="text-[9px] font-mono uppercase text-[#00A3A6] font-black tracking-wider block">
+                {language === "en" ? "GUIDELINE SPECTRUM" : "LEITFADEN-SPEKTRO"}
+              </span>
               <h3 className="text-base font-black text-[#1D1B18] uppercase font-mono mt-0.5">{activeModule.title}</h3>
               <p className="text-xs text-[#615C54] mt-1 font-mono uppercase">{activeModule.shortDescription}</p>
             </div>
@@ -63,7 +75,9 @@ export default function Handbook() {
 
             {/* Concrete indicators / clues Checklist */}
             <div className="space-y-3 font-mono">
-              <span className="text-[10px] font-mono font-black uppercase tracking-wider text-[#615C54] block">SICHERHEITS-CHECKLISTE (INDIZIEN):</span>
+              <span className="text-[10px] font-mono font-black uppercase tracking-wider text-[#615C54] block">
+                {language === "en" ? "SECURITY CHECKLIST (KEY CLUES):" : "SICHERHEITS-CHECKLISTE (INDIZIEN):"}
+              </span>
               <div className="space-y-2">
                 {activeModule.clues.map((clue, idx) => (
                   <div 
@@ -81,9 +95,11 @@ export default function Handbook() {
 
             {/* Practical rule of thumb */}
             <div className="border-t-2 border-[#1D1B18]/20 pt-4 flex items-center justify-between gap-4 text-xs text-[#615C54] font-mono uppercase">
-              <span className="flex items-center gap-1.5">
+              <span className="flex items-center gap-1.55">
                 <Sparkles className="w-3.5 h-3.5 text-[#FF5500] shrink-0" />
-                Regel: Im Zweifel gilt: Keine Daten über ungeplante SMS/Links eingeben.
+                {language === "en" 
+                  ? "Rule: When in doubt: Never input credentials or personal data via cold messages." 
+                  : "Regel: Im Zweifel gilt: Keine Daten über ungeplante SMS/Links eingeben."}
               </span>
             </div>
 
