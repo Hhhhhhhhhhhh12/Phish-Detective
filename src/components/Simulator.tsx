@@ -6,6 +6,7 @@ import {
   AlertTriangle, Play, Target, Brain
 } from "lucide-react";
 import { translations, Language, getLocalizedCases } from "../utils/i18n";
+import { liveAiEnabled } from "../utils/hosting";
 
 const getLocalizedRanks = (lang: string) => {
   if (lang === "en") {
@@ -230,6 +231,7 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
   };
 
   const handleGenerateCustomCase = async () => {
+    if (!liveAiEnabled) return;
     setIsGenerating(true);
     setGenerationError("");
     try {
@@ -470,7 +472,18 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
 
         {/* AI Case generator block */}
         <div className="bg-[#F4F1EA] border-2 border-[#1D1B18] shadow-[4px_4px_0px_#1D1B18] p-5">
-          {!showCaseSetup ? (
+          {!liveAiEnabled ? (
+            <div className="space-y-3 font-mono">
+              <h4 className="text-xs font-black uppercase text-[#1D1B18]">
+                {language === "en" ? "Fixed training cases" : "Feste Trainingsfälle"}
+              </h4>
+              <p className="text-[11px] text-[#615C54] leading-relaxed">
+                {language === "en"
+                  ? "This version does not generate new cases with AI. Choose a prepared case from the list below."
+                  : "Diese Version erzeugt keine neuen Fälle per KI. Wähle einen vorbereiteten Fall aus der Liste darunter."}
+              </p>
+            </div>
+          ) : !showCaseSetup ? (
             <div className="space-y-3 font-mono">
               <h4 className="text-xs font-black uppercase text-[#1D1B18]">{language === "en" ? "🤖 CO-AUTHOR: SCENARIO BUILDER" : "🤖 CO-AUTHOR: SCENARIO BOOT"}</h4>
               <p className="text-[11px] text-[#615C54] leading-relaxed uppercase">

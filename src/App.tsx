@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { 
   Shield, 
   Search, 
@@ -20,6 +20,7 @@ import {
   Globe
 } from "lucide-react";
 import Dashboard from "./components/Dashboard";
+import DetectiveIntro from "./components/DetectiveIntro";
 import Scanner from "./components/Scanner";
 import Simulator from "./components/Simulator";
 import Inspector from "./components/Inspector";
@@ -28,6 +29,7 @@ import NoirComics from "./components/NoirComics";
 import CyberPet from "./components/CyberPet";
 import PasswordLab from "./components/PasswordLab";
 import { translations, Language } from "./utils/i18n";
+import { isStaticHosting } from "./utils/hosting";
 
 /**
  * @license
@@ -79,7 +81,20 @@ export default function App() {
   const [petLevel, setPetLevel] = useState(1);
   const [showLockAlert, setShowLockAlert] = useState<{ active: boolean; needed: number; module: string } | null>(null);
 
+  const focusDashboardOnEntry = useRef(false);
   const labels = translations[language];
+
+  const enterDashboard = () => {
+    focusDashboardOnEntry.current = true;
+    setActiveTab("dashboard");
+  };
+
+  useEffect(() => {
+    if (activeTab === "dashboard" && focusDashboardOnEntry.current) {
+      document.getElementById("app-title")?.focus({ preventScroll: true });
+      focusDashboardOnEntry.current = false;
+    }
+  }, [activeTab]);
 
   const getTabLabel = (tab: Exclude<ActiveTab, "landing">): string => {
     switch (tab) {
@@ -88,7 +103,7 @@ export default function App() {
       case "password": return labels.passwordLab;
       case "simulator": return labels.simulator;
       case "comics": return labels.comics;
-      case "scanner": return labels.aiScan;
+      case "scanner": return isStaticHosting ? (language === "en" ? "Example reports" : "Beispielberichte") : labels.aiScan;
       case "inspector": return labels.urlScan;
       case "handbook": return labels.handbook;
     }
@@ -184,32 +199,27 @@ export default function App() {
       {/* Visual background - Simplified, pure soft off-white without busy chaotic screen lines */}
       <div className="absolute inset-0 bg-neutral-100/10 pointer-events-none" />
 
+      {isStaticHosting && (
+        <p role="note" className="relative bg-[#F4F1EA] border-b-2 border-[#1D1B18] px-4 py-2 text-center text-sm text-[#1D1B18]">
+          {language === "en"
+            ? "Training version without live AI. Cases and example reports are prepared in advance."
+            : "Trainingsversion ohne Live-KI. Fälle und Beispielberichte sind vorgegeben."}
+        </p>
+      )}
+
       {activeTab === "landing" ? (
-        <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-tr from-[#04080a] via-[#091518] to-slate-950 text-[#FAF8F5] overflow-y-auto w-full">
+        <div className="detective-landing relative isolate min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-tr from-[#04080a] via-[#091518] to-slate-950 text-[#FAF8F5] overflow-x-hidden overflow-y-auto w-full">
           <style dangerouslySetInnerHTML={{__html: `
-            @keyframes swim {
-              0%, 100% { transform: translateY(0px) rotate(0deg); }
-              33% { transform: translateY(-7px) rotate(1.5deg); }
-              66% { transform: translateY(5px) rotate(-1deg); }
-            }
-            @keyframes fin-wiggle {
-              0%, 100% { transform: rotate(0deg); }
-              50% { transform: rotate(15deg) skewX(5deg); }
-            }
-            @keyframes bubble-rise {
-              0% { transform: translateY(110%) translateX(0); opacity: 0; }
-              10% { opacity: 0.6; }
-              90% { opacity: 0.4; }
-              100% { transform: translateY(-10%) translateX(12px); opacity: 0; }
-            }
             @keyframes ambient-glow {
               0%, 100% { opacity: 0.15; transform: scale(1); }
               50% { opacity: 0.25; transform: scale(1.1); }
             }
-            .aq-swim { animation: swim 6s ease-in-out infinite; }
-            .aq-fin { animation: fin-wiggle 1.2s ease-in-out infinite; transform-origin: left center; }
-            .aq-bubble-1 { animation: bubble-rise 7s ease-in infinite; }
-            .aq-bubble-2 { animation: bubble-rise 9s ease-in infinite; animation-delay: 2.5s; }
+            @media (prefers-reduced-motion: reduce) {
+              .detective-landing *, .detective-landing *::before, .detective-landing *::after {
+                animation: none !important;
+                transition: none !important;
+              }
+            }
           `}} />
 
           {/* Ambient decorative glowing backdrops */}
@@ -290,100 +300,7 @@ export default function App() {
               )}
             </div>
 
-            {/* Highly Polished Animated Glass Aquarium tank (Zero explanatory text clutter) */}
-            <div className="relative h-56 bg-gradient-to-b from-[#081214] via-[#04080a] to-[#010304] border border-[#00A3A6]/20 rounded-xl overflow-hidden flex items-center justify-center select-none shadow-inner group">
-              
-              {/* Scanline reflection overlay */}
-              <div className="absolute inset-x-0 h-[100%] bg-gradient-to-b from-[#00A3A6]/[0.012] via-transparent to-transparent pointer-events-none z-10" />
-
-              {/* Virtual Grid backdrop */}
-              <div className="absolute inset-0 bg-[#00A3A6]/[0.015] bg-[linear-gradient(to_right,#00A3A6_1px,transparent_1px),linear-gradient(to_bottom,#00A3A6_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
-              
-              {/* Soft Aqua light glow glow */}
-              <div className="absolute inset-0 bg-[#00D2FF]/5 animate-pulse filter blur-xl" />
-
-              {/* Vector bubble animations */}
-              <div className="absolute bottom-0 left-1/3 w-4 h-full pointer-events-none">
-                <div className="aq-bubble-1 absolute bottom-0 left-0 w-2.5 h-2.5 rounded-full border border-[#00A3A6]/30 bg-[#00A3A6]/5" />
-              </div>
-              <div className="absolute bottom-0 right-1/3 w-4 h-full pointer-events-none">
-                <div className="aq-bubble-2 absolute bottom-0 left-0 w-2 h-2 rounded-full border border-[#00A3A6]/20 bg-[#00A3A6]/5" />
-              </div>
-
-              {/* High Polished Animated central vector pet */}
-              <svg viewBox="0 0 320 180" className="w-52 h-full relative z-10 transform scale-110 group-hover:scale-115 transition-transform duration-700">
-                <g className="aq-swim" transform="translate(45, 15)">
-                  
-                  {/* Underglowing backdrop shape */}
-                  <ellipse cx="110" cy="70" rx="40" ry="14" fill="#00D2FF" fillOpacity="0.08" className="blur-md" />
-
-                  {/* High level crown indicator */}
-                  {petLevel >= 5 && (
-                    <g transform="translate(50, 15)" stroke="#FBBF24" fill="none" strokeWidth="1.5" className="animate-pulse">
-                      <circle cx="40" cy="12" r="16" strokeDasharray="3,3" />
-                    </g>
-                  )}
-
-                  {/* Fish Body wire mesh outline */}
-                  <path 
-                    d={petLevel >= 5 
-                      ? "M 50,70 Q 110,25 180,70 Q 110,115 50,70 Z" 
-                      : "M 55,70 C 85,35 145,35 175,70 C 145,105 85,105 55,70 Z"
-                    } 
-                    fill={petLevel >= 5 ? "#061314" : petLevel >= 4 ? "#1C0D05" : "#0D1819"} 
-                    stroke={petLevel >= 4 ? "#FF5500" : "#00A3A6"} 
-                    strokeWidth="2.5" 
-                  />
-
-                  {/* High quality skin contours */}
-                  <path d="M 85,50 Q 115,50 145,55" stroke={petLevel >= 4 ? "#FFaa66" : "#44e3e6"} strokeWidth="1.5" strokeOpacity="0.6" strokeDasharray="2,3" fill="none" />
-
-                  {/* Tail with wiggle rotation keyframe */}
-                  <g className="aq-fin" style={{ transformOrigin: "175px 70px" }}>
-                    <path 
-                      d="M 175,70 L 210,35 L 202,70 L 210,105 Z" 
-                      fill={petLevel >= 4 ? "#501A02" : "#082526"} 
-                      stroke={petLevel >= 4 ? "#FF5500" : "#00A3A6"} 
-                      strokeWidth="2" 
-                    />
-                  </g>
-
-                  {/* Pectoral Fin */}
-                  <path d="M 95,78 Q 110,95 105,100 Q 98,90 95,78" fill="#113334" stroke={petLevel >= 4 ? "#FF5500" : "#00A3A6"} strokeWidth="1.5" />
-
-                  {/* Responsive Eye glows */}
-                  <circle cx="80" cy="60" r="3.5" fill={petLevel >= 4 ? "#FF5500" : "#00E5FF"} className="animate-pulse" />
-                  <circle cx="79" cy="59" r="1" fill="#FAF8F5" />
-
-                  {/* Sunglasses for level 3 */}
-                  {petLevel >= 3 && (
-                    <g fill="#111" stroke={petLevel >= 4 ? "#FF5500" : "#00E5FF"} strokeWidth="1">
-                      <polygon points="68,54 84,54 81,64 69,64" />
-                      <line x1="84" y1="56" x2="87" y2="56" strokeWidth="1.5" />
-                      <line x1="68" y1="54" x2="60" y2="56" />
-                    </g>
-                  )}
-
-                  {/* Crown hat for level 5 */}
-                  {petLevel >= 5 && (
-                    <g fill="#FBBF24" stroke="#D97706" strokeWidth="1" transform="translate(68, 26)">
-                      <path d="M 0,15 L 24,11 L 22,8 L 1,12 Z" />
-                      <polygon points="5,12 19,9 17,2 7,4" />
-                    </g>
-                  )}
-                </g>
-              </svg>
-
-              {/* Status information */}
-              <div className="absolute top-3 left-3 text-[8px] font-mono text-[#00A3A6]/80 tracking-widest uppercase">
-                {labels.mutStage}_{petLevel} // {petName.toUpperCase()}
-              </div>
-              <div className="absolute bottom-3 right-3 text-[8px] font-mono text-emerald-400 tracking-widest uppercase animate-pulse flex items-center gap-1 z-20">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0" />
-                {labels.statusLive}
-              </div>
-            </div>
-
+            <DetectiveIntro language={language} onComplete={enterDashboard}>
             {/* Live Pet Status & Progress Summary Card */}
             <div className="bg-[#1C1A18] border border-zinc-800 p-4 text-left space-y-3 text-zinc-100 rounded-xl relative overflow-hidden">
               <div className="absolute top-0 right-0 w-24 h-24 bg-[#FF5500]/5 rounded-full blur-xl pointer-events-none" />
@@ -429,19 +346,10 @@ export default function App() {
               </div>
             </div>
 
-            {/* Tactile start CTA button */}
-            <div className="space-y-3 pt-2">
-              <button
-                onClick={() => setActiveTab("dashboard")}
-                className="w-full bg-[#FF5500] hover:bg-[#FAF8F5] hover:text-[#1D1B18] text-[#FAF8F5] border border-transparent hover:border-[#1D1B18] py-4 px-6 text-xs font-black font-mono uppercase tracking-widest shadow-[0_4px_25px_rgba(255,85,0,0.25)] hover:shadow-none active:translate-y-0.5 transition-all duration-150 rounded-xl"
-              >
-                {labels.startCta}
-              </button>
-              
-              <div className="flex justify-between items-center text-[7.5px] font-mono text-zinc-500 uppercase tracking-wider">
-                <span>{labels.systemCard}</span>
-                <span>{labels.coreModule}</span>
-              </div>
+            </DetectiveIntro>
+            <div className="flex justify-between items-center text-[7.5px] font-mono text-zinc-500 uppercase tracking-wider">
+              <span>{labels.systemCard}</span>
+              <span>{labels.coreModule}</span>
             </div>
 
           </div>
@@ -457,7 +365,7 @@ export default function App() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-lg font-black font-sans tracking-tight text-[#1D1B18] uppercase">PHISH DETECTIVE</h1>
+                <h1 id="app-title" tabIndex={-1} className="text-lg font-black font-sans tracking-tight text-[#1D1B18] uppercase focus:outline-none">PHISH DETECTIVE</h1>
                 <span className="text-[9px] bg-[#1D1B18] text-[#FAF8F5] font-mono font-bold px-1.5 py-0.5 tracking-wider uppercase">
                   TE-2.0 {language.toUpperCase()}
                 </span>
@@ -622,9 +530,9 @@ export default function App() {
               {/* Simulated Phone Content Area */}
               <div className="flex-1 overflow-y-auto px-4 py-2 space-y-4">
                 
-                {activeTab === "dashboard" && <Dashboard onNavigate={handleTabClick} />}
-                {activeTab === "simulator" && <Simulator />}
-                {activeTab === "scanner" && <Scanner />}
+                {activeTab === "dashboard" && <Dashboard onNavigate={handleTabClick} language={language} />}
+                {activeTab === "simulator" && <Simulator language={language} />}
+                {activeTab === "scanner" && <Scanner language={language} />}
                 {activeTab === "inspector" && <Inspector />}
                 {activeTab === "pet" && <CyberPet />}
                 {activeTab === "password" && <PasswordLab />}
@@ -643,9 +551,9 @@ export default function App() {
         ) : (
           /* Standard Fullscreen Area */
           <main className="min-h-[480px]">
-            {activeTab === "dashboard" && <Dashboard onNavigate={handleTabClick} />}
-            {activeTab === "simulator" && <Simulator />}
-            {activeTab === "scanner" && <Scanner />}
+            {activeTab === "dashboard" && <Dashboard onNavigate={handleTabClick} language={language} />}
+            {activeTab === "simulator" && <Simulator language={language} />}
+            {activeTab === "scanner" && <Scanner language={language} />}
             {activeTab === "inspector" && <Inspector />}
             {activeTab === "pet" && <CyberPet />}
             {activeTab === "password" && <PasswordLab />}

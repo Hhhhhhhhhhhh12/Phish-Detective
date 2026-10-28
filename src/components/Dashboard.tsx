@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Shield, Sparkles, KeyRound, Award, Zap, Flame, Play, Terminal, HelpCircle, ChevronRight, BookOpen, AlertTriangle, Eye, ArrowRight, CheckCircle2, GitBranch, GitPullRequest, RotateCw, ExternalLink, Check } from "lucide-react";
 import { motion } from "motion/react";
 import { translations, Language } from "../utils/i18n";
+import { isStaticHosting } from "../utils/hosting";
 
 interface DashboardProps {
   onNavigate: (tab: "simulator" | "scanner" | "inspector" | "comics" | "pet" | "password" | "handbook") => void;
@@ -154,9 +155,11 @@ export default function Dashboard({ onNavigate, language = "de" }: DashboardProp
     {
       id: "scanner" as const,
       requiredXp: 280,
-      title: language === "en" ? "AI Phish Scanner" : "AI Phish-Scanner",
-      subtitle: language === "en" ? "Vulnerability Analyzer" : "Der automatische Forensiker",
-      description: language === "en" 
+      title: isStaticHosting ? (language === "en" ? "Example reports" : "Beispielberichte") : (language === "en" ? "AI Phish Scanner" : "AI Phish-Scanner"),
+      subtitle: isStaticHosting ? (language === "en" ? "Fixed training examples" : "Feste Trainingsbeispiele") : (language === "en" ? "Vulnerability Analyzer" : "Der automatische Forensiker"),
+      description: isStaticHosting
+        ? (language === "en" ? "Explore prepared phishing reports. Live analysis of your own messages is unavailable in this version." : "Untersuche vorbereitete Phishing-Berichte. Eigene Nachrichten können in dieser Version nicht live analysiert werden.")
+        : language === "en"
         ? "Copy-paste suspicious headers or code directly into the AI terminal for instant forensic evaluation."
         : language === "ch"
         ? "Kopiere verdächtige Texte oder Quellcode in das Terminal für AI-Analysen."
@@ -166,7 +169,7 @@ export default function Dashboard({ onNavigate, language = "de" }: DashboardProp
       xpReward: 300,
       badge: language === "en" ? "CHAPTER 5 (Lock: 280 XP)" : "KAPITEL 5 (Sperre: 280 XP)",
       badgeColor: "bg-[#00A3A6]/10 border-[#00A3A6] text-[#008080]",
-      statsText: "Gemini AI Intel Engine",
+      statsText: isStaticHosting ? (language === "en" ? "No live AI" : "Ohne Live-KI") : "Gemini AI Intel Engine",
     },
     {
       id: "inspector" as const,
