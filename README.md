@@ -62,6 +62,16 @@ Das Interface folgt einer exklusiven **Tactile Brutalist Aesthetic** mit klaren,
 
 ## 🚀 Lokale Installation & Betrieb
 
+### Detective-Intro und START
+
+Der Startbildschirm zeigt die bestätigte Außenansicht mit dem Fischdetektiv.
+Erst **START** spielt den kurzen POV auf Brief, Haken und Schnur ab; danach
+öffnet sich das Dashboard. Überspringen, ein direkter Einstieg bei reduzierter
+Bewegung und ein Standbild bei nicht verfügbarem Intro sind vorgesehen.
+Ton ist standardmäßig aus. Die Medien liegen lokal unter
+`public/media/detective/` und verwenden den jeweiligen App-Unterpfad.
+Gestaltung, Herkunft und der aktuelle Prüfstatus stehen in [docs/INTRO.md](docs/INTRO.md).
+
 ### GitHub Pages: Trainingsversion ohne Live-KI
 
 Für GitHub Pages gibt es einen eigenen statischen Build:

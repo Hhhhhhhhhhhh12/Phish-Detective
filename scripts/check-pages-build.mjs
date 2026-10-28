@@ -49,4 +49,15 @@ assert.equal(manifest.start_url, './', 'App launch must stay inside the reposito
 assert.equal(manifest.scope, './', 'App scope must stay inside the repository path.');
 assert(files.includes(path.join(root, 'sw.js')), 'Service worker file is missing.');
 
+for (const name of ['intro.mp4', 'pov.mp4', 'poster.jpg']) {
+  const file = path.join(root, 'media', 'detective', name);
+  assert(files.includes(file), `Detective media is missing: ${name}`);
+  const data = await readFile(file);
+  if (name.endsWith('.mp4')) {
+    assert.equal(data.subarray(4, 8).toString(), 'ftyp', `Invalid MP4 media: ${name}`);
+  } else {
+    assert(data[0] === 0xff && data[1] === 0xd8, `Invalid JPEG poster: ${name}`);
+  }
+}
+
 console.log(`Pages artifact verified: ${files.length} files; repository paths valid; no server outputs or live AI endpoints.`);
