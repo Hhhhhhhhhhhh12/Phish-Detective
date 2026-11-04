@@ -1,22 +1,13 @@
-# 🕵️‍♂️ Phish Detective - Gamifiziertes Cyber-Security & Aquarium-Training
+# Phish Detective
 
-<div align="center">
+[![CI-Status](https://github.com/Hhhhhhhhhhhh12/Phish-Detective/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Hhhhhhhhhhhh12/Phish-Detective/actions/workflows/ci.yml)
+[![Lizenz: MIT](https://img.shields.io/badge/License-MIT-gray?style=flat-square)](./LICENSE)
 
-[![CI Build & Verification](https://img.shields.io/badge/CI__Pipeline-Passing-00A3A6?style=flat-square&logo=github-actions&logoColor=white)](https://github.com/hennekeholst/phish-detective/actions)
-[![TypeScript Linter](https://img.shields.io/badge/TypeScript-Strict_Typecheck-00E5FF?style=flat-square&logo=typescript&logoColor=black)](https://github.com/hennekeholst/phish-detective)
-[![Unit Tests](https://img.shields.io/badge/Tests-Vitest_Passing-FF5500?style=flat-square&logo=vitest&logoColor=white)](https://github.com/hennekeholst/phish-detective)
-[![Node Engine Support](https://img.shields.io/badge/Node.js-v20_%2F_v22-2ea44f?style=flat-square&logo=node.js&logoColor=white)](https://github.com/hennekeholst/phish-detective)
-[![License: MIT](https://img.shields.io/badge/License-MIT-gray?style=flat-square)](./LICENSE)
-[![Framework](https://img.shields.io/badge/Frontend-React_19_&_Vite-61DAFB?style=flat-square&logo=react&logoColor=black)](https://github.com/hennekeholst/phish-detective)
-[![Tailwind CSS](https://img.shields.io/badge/Styles-Tailwind_CSS_v4-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white)](https://github.com/hennekeholst/phish-detective)
+**[Öffentliche Trainingsdemo öffnen](https://hhhhhhhhhhhh12.github.io/Phish-Detective/)**
 
-</div>
+Phish Detective ist eine technische Arbeitsprobe für interaktives Security-Awareness-Training. Die React-/TypeScript-App zeigt anhand vorbereiteter Fälle, wie sich Absender, Linkziele und typische Phishing-Signale beurteilen lassen. Das Passwortlabor veranschaulicht Passwortstärke mit einer lokalen Heuristik. Im Dashboard lassen sich Module für eine kurze Vorführung über die XP-Freischaltung direkt öffnen.
 
-Herzlich willkommen bei **Phish Detective**, dem interaktiven, liebevoll per Hand gestalteten Hub für Cybersicherheits-Aufklärung! 
-
-Dieses Web-Applet verwandelt trockenes IT-Sicherheitswissen in eine lebendige, spielerische Lernerfahrung (Gamification). Anstatt stumpfer Multiple-Choice-Fragen trainieren die Nutzer die Abwehrkräfte ihres eigenen digitalen Hausfisches im simulierten Aquarium, decken Phishing-Domänen im Hochgeschwindigkeits-Reaktionstest auf, analysieren Live-Szenarien und steuern interaktive Ermittlungs-Comics.
-
----
+Die Arbeitsprobe zeigt die Umsetzung interaktiver Lernmodule mit lokal gespeichertem Fortschritt, die Trennung von statischem Frontend und KI-Backend sowie eine GitHub-Actions-Pipeline mit Typprüfung, Tests und einer Prüfung des Veröffentlichungsartefakts. Die öffentliche Version enthält feste Beispielberichte. Die Analyse eigener Nachrichten und die KI-Fallgenerierung stehen in der separaten Serverversion zur Verfügung.
 
 ## 🎨 Designphilosophie & visuelle Identität
 
@@ -34,8 +25,8 @@ Das Interface folgt einer exklusiven **Tactile Brutalist Aesthetic** mit klaren,
 - **Karteikarten-Leitner-Engine**: Falsch beantwortete Sicherheitsbegriffe wandern zurück in vordere Fächer und werden systematisch wiederholt, bis sie perfekt verinnerlicht wurden.
 
 ### 2. 🔑 Das Passwort-Lab
-- **Live-Entropie-Rechner**: Erlebe visuell in Echtzeit, warum extreme Länge und Phrasen-Kompilation über reine Zeichenketten-Komplexität siegen.
-- **Brute-Force-Takedown**: Ein interaktiver Simulator knackt schwache Passwörter live und demonstriert die Fragilität unzureichender Verschlüsselungen.
+- **Stärkeschätzung**: Bewertet Länge, Zeichenklassen und vorhersehbare Muster direkt im Browser.
+- **Brute-Force-Simulation**: Veranschaulicht den möglichen Aufwand eines Angriffs anhand geschätzter Werte.
 
 ### 3. 📧 Der E-Mail-Simulator
 - **Scharfer Posteingang**: Untersuche realistische Phishing-, Spearphishing- und CEO-Fraud-Mails im Detail.
@@ -44,9 +35,9 @@ Das Interface folgt einer exklusiven **Tactile Brutalist Aesthetic** mit klaren,
 ### 4. 🎬 Die Interactive Noir-Comics
 - **Entscheidung-Sagas**: Steuere die Schicksale von "Phish", dem tollpatschigen Anti-Held. Falsche Cyber-Entscheidungen führen zu katastrophalem Server-Chaos (sichtbar durch schmelzende Server-Racks und rot glühende Warnlichter); richtige Antworten führen zum sicheren Hafen.
 
-### 5. 🤖 Der AI Phish-Scanner (Powered by Gemini)
-- **Automatische Forensik**: Kopiere beliebigen Quellcode von E-Mails, SMS-Vorlagen oder unbekannten Links in das Terminal.
-- **Intelligente Analyse**: Das integrierte Gemini-Modell zerlegt den Text in Echtzeit und warnt vor versteckten Social-Engineering-Mustern.
+### 5. 🤖 Beispielberichte und KI-Scanner
+- **Trainingsdemo**: Zwei gekennzeichnete Beispielberichte erläutern typische Warnsignale und mögliche nächste Schritte.
+- **Separate Serverversion**: Ein Express-Backend übermittelt eingegebenen Text an Gemini, wenn lokal ein API-Schlüssel konfiguriert ist.
 
 ---
 
@@ -54,8 +45,8 @@ Das Interface folgt einer exklusiven **Tactile Brutalist Aesthetic** mit klaren,
 
 - **Frontend**: React 19, TypeScript, **Motion** (für extrem geschmeidige Animationen und Übergänge)
 - **Styling**: **Tailwind CSS v4** (hochmoderne Utility-First Styles)
-- **Backend**: Express-Proxy-Server zur Absicherung vertraulicher System-APIs
-- **KI-Integration**: `@google/genai` (Modernstes und sicheres Google Gemini SDK)
+- **Backend der Serverversion**: Express mit serverseitigem Gemini-Zugriff
+- **KI-Integration der Serverversion**: Google Gemini SDK (`@google/genai`)
 - **Icons**: `lucide-react` (Präzise, einheitliche Vektorsymbole)
 
 ---
@@ -83,30 +74,19 @@ npm run check:pages
 npm run preview:pages
 ```
 
-Die lokale Vorschau verwendet den Projektpfad `/Phish-Detective/`. Der Build
-enthält ausschließlich die Browseranwendung; `server.ts`, das Serverbundle
-und dessen Quellkarte werden nicht veröffentlicht. Es werden keine
-Gemini-Schlüssel benötigt oder in die Pages-Version eingebaut.
-`check:pages` prüft die erzeugten Dateipfade und verhindert, dass Serverdateien,
-Umgebungsdateien oder die beiden Live-KI-Endpunkte im Pages-Paket landen.
+Die lokale Vorschau verwendet den Projektpfad `/Phish-Detective/`.
+`check:pages` erlaubt nur das gebaute Frontend, Manifest, Service Worker und
+die Intro-Medien. Es prüft die Pfade, sucht in Textdateien nach bekannten
+Schlüsselmustern und blockiert die beiden Live-KI-Endpunkte im Artefakt.
 
-In dieser Version sind die Live-KI-Analyse eigener Nachrichten und die
-KI-Fallgenerierung deaktiviert. Der Scanner zeigt deutlich gekennzeichnete,
-feste Beispielberichte, der Simulator verwendet die vorbereiteten Fälle.
-Es erfolgen keine Aufrufe an die KI-Endpunkte. Lernfortschritt bleibt lokal
-im Browser. Schriften und App-Icons werden weiterhin von Google Fonts bzw.
-Unsplash geladen; die Trainingsversion ist daher keine vollständig offline
-bereitgestellte Anwendung.
+Die öffentliche Version zeigt vorbereitete Fälle und feste Beispielberichte.
+Der Lernfortschritt bleibt lokal im Browser. Google Fonts und Unsplash
+liefern weiterhin Schriften bzw. App-Icons. Die Demo setzt eine
+Internetverbindung voraus.
 
-Die vorbereitete Veröffentlichung liegt in `.github/workflows/pages.yml`.
-Sie startet ausschließlich manuell und nur vom Branch `main`; ein Merge
-löst keine Veröffentlichung aus. Nach gesonderter Freigabe in den
-Repository-Einstellungen unter **Pages → Source** die Option **GitHub Actions**
-wählen und den Workflow **Publish training version to GitHub Pages** starten.
-Die vorgesehene Adresse ist
-`https://Hhhhhhhhhhhh12.github.io/Phish-Detective/`. Vor einem Workflow-Start
-müssen technische Prüfung und Veröffentlichung freigegeben sein. An
-believeinme.de werden dafür keine Änderungen vorgenommen.
+Veröffentlichungen laufen über [Publish training version to GitHub Pages](https://github.com/Hhhhhhhhhhhh12/Phish-Detective/actions/workflows/pages.yml).
+Die Pages-Quelle ist GitHub Actions. Der Workflow startet nach Freigabe
+manuell von `main` und lädt ausschliesslich das geprüfte Verzeichnis `dist` hoch.
 
 Die folgenden Schritte betreffen die separate Serverversion mit Live-KI.
 
@@ -142,12 +122,7 @@ Folge diesen einfachen Schritten, um Phish-Detective auf deinem System zu starte
 
 ## ⚙️ CI/CD Prüfpipelines & Repository-Qualität (GitHub Actions)
 
-Das Projekt verfügt über eine professionelle, einheitliche **GitHub Actions CI-Prüfpipeline** (`.github/workflows/ci.yml`), um Codestabilität und fehlerfreie Deployment-Builds sicherzustellen. Bei jedem Push oder Pull-Request werden automatisch folgende Kontrollen auf virtuellen Ubuntu-Runnern ausgeführt:
-
-1. **Linting & Check**: Führt statische TypeScript-Typenprüfungen durch (`npm run lint` bzw. `tsc --noEmit`), um logische Programmierfehler vorzubeugen.
-2. **Automatisierte Unit Tests**: Validiert Kernalgorithmen (wie die Passwort-Entropie-Modelle im Labor) mit der integrierten Vitest Suite (`npm run test` bzw. `vitest run`).
-3. **Kompilierungs-Validierung**: Prüft das vollständige Bündeln des React-Clients und des Express-Backend-Proxys für den produktiven Betrieb (`npm run build`), um fehlerhafte Bundles frühzeitig zu verhindern.
-
----
-
-*Erstellt mit Hingabe und handgefertigter Präzision im AI Studio Workspace.*
+Die [CI-Pipeline](.github/workflows/ci.yml) prüft Pull Requests und Pushes auf
+die dort konfigurierten Branches mit Node.js 22. Sie führt die TypeScript-Prüfung
+und die Vitest-Tests zur Passwortbewertung aus, baut die Server- und
+Trainingsversion und prüft den Inhalt des Pages-Artefakts.

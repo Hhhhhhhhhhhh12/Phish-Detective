@@ -44,12 +44,11 @@ GitHub Pages. Vor START ist kein POV-Videoelement mit einer Quelle vorhanden.
 Der Pages-Artefaktprüfer kontrolliert auch die drei Mediendateien und Dateiköpfe.
 Zusätzliche Bibliotheken, Tracking oder API-Aufrufe werden nicht benötigt.
 
-## Stand und Freigabegrenzen
+## Veröffentlichungsstand
 
-Diese Umsetzung baut auf dem noch offenen Pages-PR #2 auf. Sie ist separat
-versioniert und nicht gemergt oder veröffentlicht. Die lokale technische Prüfung
-wurde am 28.10.2026 separat freigegeben und durchgeführt. Die visuelle Abnahme
-der Einbindung bleibt offen. believeinme.de bleibt unverändert.
+Das Intro ist Teil von [PR #2](https://github.com/Hhhhhhhhhhhh12/Phish-Detective/pull/2)
+und seit dem [Pages-Lauf vom 28.10.2026](https://github.com/Hhhhhhhhhhhh12/Phish-Detective/actions/runs/40782608771)
+in der öffentlichen Trainingsdemo enthalten.
 
 ## Lokale Prüfung am 28.10.2026
 
