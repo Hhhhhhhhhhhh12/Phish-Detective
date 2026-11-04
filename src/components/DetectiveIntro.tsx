@@ -88,7 +88,7 @@ export default function DetectiveIntro({ language, onComplete, children }: Props
 
   return (
     <section
-      className="space-y-6"
+      className="space-y-3 md:space-y-6"
       aria-label={english ? "Detective introduction" : "Detektiv-Intro"}
       onKeyDown={(event) => {
         if (phase === "pov" && event.key === "Escape") {
@@ -152,9 +152,7 @@ export default function DetectiveIntro({ language, onComplete, children }: Props
         )}
       </div>
 
-      {children}
-
-      <div className="space-y-3 pt-2">
+      <div className="space-y-3 md:pt-2">
         {phase === "pov" ? (
           <button
             ref={skipRef}
@@ -191,6 +189,7 @@ export default function DetectiveIntro({ language, onComplete, children }: Props
           </button>
         </div>
       </div>
+      {children}
     </section>
   );
 }
