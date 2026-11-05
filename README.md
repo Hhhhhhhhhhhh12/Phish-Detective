@@ -7,7 +7,7 @@
 
 Phish Detective ist eine technische Arbeitsprobe für interaktives Security-Awareness-Training. Die React-/TypeScript-App zeigt anhand vorbereiteter Fälle, wie sich Absender, Linkziele und typische Phishing-Signale beurteilen lassen. Das Passwortlabor veranschaulicht Passwortstärke mit einer lokalen Heuristik. Im Dashboard lassen sich Module für eine kurze Vorführung über die XP-Freischaltung direkt öffnen.
 
-Die Arbeitsprobe zeigt die Umsetzung interaktiver Lernmodule mit lokal gespeichertem Fortschritt, die Trennung von statischem Frontend und KI-Backend sowie eine GitHub-Actions-Pipeline mit Typprüfung, Tests und einer Prüfung des Veröffentlichungsartefakts. Die öffentliche Version enthält feste Beispielberichte. Die Analyse eigener Nachrichten und die KI-Fallgenerierung stehen in der separaten Serverversion zur Verfügung.
+Die Trainingsanwendung enthält vorbereitete Fälle und feste Beispielberichte. Der Lernfortschritt wird lokal im Browser gespeichert. Die GitHub-Actions-Pipeline prüft Typen, Tests und den Inhalt des Veröffentlichungsartefakts.
 
 ## 🎨 Designphilosophie & visuelle Identität
 
@@ -35,9 +35,8 @@ Das Interface folgt einer exklusiven **Tactile Brutalist Aesthetic** mit klaren,
 ### 4. 🎬 Die Interactive Noir-Comics
 - **Entscheidung-Sagas**: Steuere die Schicksale von "Phish", dem tollpatschigen Anti-Held. Falsche Cyber-Entscheidungen führen zu katastrophalem Server-Chaos (sichtbar durch schmelzende Server-Racks und rot glühende Warnlichter); richtige Antworten führen zum sicheren Hafen.
 
-### 5. 🤖 Beispielberichte und KI-Scanner
+### 5. Beispielberichte
 - **Trainingsdemo**: Zwei gekennzeichnete Beispielberichte erläutern typische Warnsignale und mögliche nächste Schritte.
-- **Separate Serverversion**: Ein Express-Backend übermittelt eingegebenen Text an Gemini, wenn lokal ein API-Schlüssel konfiguriert ist.
 
 ---
 
@@ -45,8 +44,6 @@ Das Interface folgt einer exklusiven **Tactile Brutalist Aesthetic** mit klaren,
 
 - **Frontend**: React 19, TypeScript, **Motion** (für extrem geschmeidige Animationen und Übergänge)
 - **Styling**: **Tailwind CSS v4** (hochmoderne Utility-First Styles)
-- **Backend der Serverversion**: Express mit serverseitigem Gemini-Zugriff
-- **KI-Integration der Serverversion**: Google Gemini SDK (`@google/genai`)
 - **Icons**: `lucide-react` (Präzise, einheitliche Vektorsymbole)
 
 ---
@@ -88,35 +85,19 @@ Veröffentlichungen laufen über [Publish training version to GitHub Pages](http
 Die Pages-Quelle ist GitHub Actions. Der Workflow startet nach Freigabe
 manuell von `main` und lädt ausschliesslich das geprüfte Verzeichnis `dist` hoch.
 
-Die folgenden Schritte betreffen die separate Serverversion mit Live-KI.
+### Lokal entwickeln
 
-Folge diesen einfachen Schritten, um Phish-Detective auf deinem System zu starten:
+```bash
+npm ci
+npm run dev
+```
 
-1. **Abhängigkeiten installieren**:
-   ```bash
-   npm install
-   ```
+Für eine Vorschau des lokalen Builds:
 
-2. **Umgebungsvariablen konfigurieren**:
-   Erstelle eine `.env` Datei im Stammverzeichnis (analog zu `.env.example`):
-   ```env
-   GEMINI_API_KEY=dein_gemini_api_key
-   ```
-
-3. **Entwicklungs-Server starten**:
-   ```bash
-   npm run dev
-   ```
-
-4. **Kompilieren (Production Build)**:
-   ```bash
-   npm run build
-   ```
-
-5. **Produktions-Modus ausführen**:
-   ```bash
-   npm run start
-   ```
+```bash
+npm run build
+npm start
+```
 
 ---
 
@@ -124,5 +105,5 @@ Folge diesen einfachen Schritten, um Phish-Detective auf deinem System zu starte
 
 Die [CI-Pipeline](.github/workflows/ci.yml) prüft Pull Requests und Pushes auf
 die dort konfigurierten Branches mit Node.js 22. Sie führt die TypeScript-Prüfung
-und die Vitest-Tests zur Passwortbewertung aus, baut die Server- und
-Trainingsversion und prüft den Inhalt des Pages-Artefakts.
+und die Vitest-Tests zur Passwortbewertung aus, baut die lokale Fassung und die
+Pages-Trainingsversion und prüft den Inhalt des Pages-Artefakts.
