@@ -1,8 +1,5 @@
 {
   "name": "Phish Detective",
-  "description": "Ein interaktiver Phishing-Simulator, Analyzer und Aufklärungs-Tool zur Abwehr von Social-Engineering und betrügerischen E-Mails/SMS/Links.",
-  "requestFramePermissions": [],
-  "majorCapabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
+  "description": "Interaktives Sicherheitstraining mit vorbereiteten Fällen und Beispielberichten zu Phishing und Social Engineering.",
+  "requestFramePermissions": []
 }

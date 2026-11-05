@@ -29,7 +29,6 @@ import NoirComics from "./components/NoirComics";
 import CyberPet from "./components/CyberPet";
 import PasswordLab from "./components/PasswordLab";
 import { translations, Language } from "./utils/i18n";
-import { isStaticHosting } from "./utils/hosting";
 
 /**
  * @license
@@ -103,7 +102,7 @@ export default function App() {
       case "password": return labels.passwordLab;
       case "simulator": return labels.simulator;
       case "comics": return labels.comics;
-      case "scanner": return isStaticHosting ? (language === "en" ? "Example reports" : "Beispielberichte") : labels.aiScan;
+      case "scanner": return language === "en" ? "Example reports" : "Beispielberichte";
       case "inspector": return labels.urlScan;
       case "handbook": return labels.handbook;
     }
@@ -199,13 +198,11 @@ export default function App() {
       {/* Visual background - Simplified, pure soft off-white without busy chaotic screen lines */}
       <div className="absolute inset-0 bg-neutral-100/10 pointer-events-none" />
 
-      {isStaticHosting && (
-        <p role="note" className="relative bg-[#F4F1EA] border-b-2 border-[#1D1B18] px-4 py-2 text-center text-sm text-[#1D1B18]">
-          {language === "en"
-            ? "Training version without live AI. Cases and example reports are prepared in advance."
-            : "Trainingsversion ohne Live-KI. Fälle und Beispielberichte sind vorgegeben."}
-        </p>
-      )}
+      <p role="note" className="relative bg-[#F4F1EA] border-b-2 border-[#1D1B18] px-4 py-2 text-center text-sm text-[#1D1B18]">
+        {language === "en"
+          ? "Training version without live AI. Cases and example reports are prepared in advance."
+          : "Trainingsversion ohne Live-KI. Fälle und Beispielberichte sind vorgegeben."}
+      </p>
 
       {activeTab === "landing" ? (
         <div className="detective-landing relative isolate min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-tr from-[#04080a] via-[#091518] to-slate-950 text-[#FAF8F5] overflow-x-hidden overflow-y-auto w-full">

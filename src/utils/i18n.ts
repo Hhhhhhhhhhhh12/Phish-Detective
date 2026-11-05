@@ -23,7 +23,6 @@ export const translations = {
     passwordLab: "Passwort-Lab",
     simulator: "Simulator",
     comics: "Noir-Comics",
-    aiScan: "AI Scan",
     urlScan: "URL Scan",
     handbook: "Handbuch",
     cheatsOn: "🔓 CHEATS: AN (ALLES OFFEN)",
@@ -96,19 +95,6 @@ export const translations = {
     pwdTip2: "Benutze niemals dasselbe Passwort für mehr als einen Dienst (Verwende einen Passwort-Manager).",
     pwdTip3: "Aktiviere Zwei-Faktor-Authentifizierung (2FA) wo immer möglich.",
 
-    // AI Scanner
-    scanTitle: "AI FORENSIC SCANNERS // GEMINI INTEGRATION",
-    scanSubtitle: "Kopiere den Quellcode oder Text einer verdächtigen Mail:",
-    scanningBtn: "Analysiere Code...",
-    scanNowBtn: "AI Forensik starten",
-    scanPlaceholder: "Füge hier den Mailtext, Betreff oder HTML Code ein (z.B. 'Sehr geehrte Bankkunde, verifizieren Sie Ihr Konto sofort...').",
-    scanResultTitle: "DIAGNOSE-PROTOKOLL DER KÜNSTLICHEN INTELLIGENZ",
-    phishScore: "Phishing-Wahrscheinlichkeit",
-    verdict: "Urteil",
-    verdictSafe: "ABSOLUT SICHER",
-    verdictMedium: "VERDÄCHTIG / MANUELLE PRÜFUNG EMPFOHLEN",
-    verdictDanger: "HOCHGRADIG GEFÄHRLICH / PHISHING",
-
     // URL Inspector
     inspectTitle: "URL SEZIERMESSER // ANATOMIE DER DOMAIN",
     inspectSubtitle: "Prüfe unbekannte Weblinks risikofrei in Einzelteilen",
@@ -154,7 +140,6 @@ export const translations = {
     passwordLab: "Password Lab",
     simulator: "Simulator",
     comics: "Noir Comics",
-    aiScan: "AI Scan",
     urlScan: "URL Scan",
     handbook: "Handbook",
     cheatsOn: "🔓 CHEATS: ON (ALL UNLOCKED)",
@@ -226,19 +211,6 @@ export const translations = {
     pwdTip2: "Do not recycle secrets across different services (Utilize a modern password vault).",
     pwdTip3: "Enable Multi-Factor Authentication (MFA) on all valuable accounts.",
 
-    // AI Scanner
-    scanTitle: "AI FORENSIC SCANNERS // GEMINI COPMILOT",
-    scanSubtitle: "Examine a suspicious web or email source code:",
-    scanningBtn: "Examining structures...",
-    scanNowBtn: "Analyze with Gemini Co-Pilot",
-    scanPlaceholder: "Inject raw email source, text block or HTML structures (e.g. 'Dear customers, billing failure, authorize immediate action...').",
-    scanResultTitle: "INTELLIGENT COMPLIANCE REPORT",
-    phishScore: "Phishing Assessment Index",
-    verdict: "Verdict",
-    verdictSafe: "ENHANCED SIGNATURE: SAFE",
-    verdictMedium: "SUSPICIOUS / ELEVATE TO MANUAL REVIEW",
-    verdictDanger: "CRITICAL ALERT / MALICIOUS PATTERNS DETECTED",
-
     // URL Inspector
     inspectTitle: "URL ANALYSER // LINK ANATOMY DECONSTRUCTOR",
     inspectSubtitle: "Dissect suspicious web domains without risking infections",
@@ -284,7 +256,6 @@ export const translations = {
     passwordLab: "Passwort-Lab",
     simulator: "Simulator",
     comics: "Noir-Comics",
-    aiScan: "AI Scan",
     urlScan: "URL Scan",
     handbook: "Handbuch",
     cheatsOn: "🔓 CHEATS: AN (ALLES OFFEN)",
@@ -355,19 +326,6 @@ export const translations = {
     pwdTip1: "Nutze Passsätze mit 4 oder mehr zufälligen Wörtern (z.B. 'fisch-tastatur-kaffee-sicherheit').",
     pwdTip2: "Benutze niemals dasselbe Passwort für mehr als einen Dienst (Verwende einen Passwort-Manager).",
     pwdTip3: "Aktiviere Zwei-Faktor-Authentifizierung (2FA) wo immer möglich.",
-
-    // AI Scanner
-    scanTitle: "AI FORENSIC SCANNERS // GEMINI INTEGRATION",
-    scanSubtitle: "Kopiere den Quellcode oder Text einer verdächtigen Mail:",
-    scanningBtn: "Analysiere Code...",
-    scanNowBtn: "AI Forensik starten",
-    scanPlaceholder: "Füge hier den Mailtext, Betreff oder HTML Code ein (z.B. 'Sehr geehrte Bankkunden, verifizieren Sie Ihr Konto sofort...').",
-    scanResultTitle: "DIAGNOSE-PROTOKOLL DER KÜNSTLICHEN INTELLIGENZ",
-    phishScore: "Phishing-Wahrscheinlichkeit",
-    verdict: "Urteil",
-    verdictSafe: "ABSOLUT SICHER",
-    verdictMedium: "VERDÄCHTIG / MANUELLE PRÜFUNG EMPFOHLEN",
-    verdictDanger: "HOCHGRADIG GEFÄHRLICH / PHISHING",
 
     // URL Inspector
     inspectTitle: "URL SEZIERMESSER // ANATOMIE DER DOMAIN",

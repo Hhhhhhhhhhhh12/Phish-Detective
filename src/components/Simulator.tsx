@@ -2,11 +2,10 @@ import React, { useState, useEffect } from "react";
 import { defaultCases } from "../cases";
 import { SimulationCase, DetectiveProfile } from "../types";
 import { 
-  ShieldAlert, ShieldCheck, Award, Zap, RefreshCw, Sparkles, Check, ChevronRight, Compass,
+  ShieldAlert, ShieldCheck, Award, Zap, Check, ChevronRight, Compass,
   AlertTriangle, Play, Target, Brain
 } from "lucide-react";
 import { translations, Language, getLocalizedCases } from "../utils/i18n";
-import { liveAiEnabled } from "../utils/hosting";
 
 const getLocalizedRanks = (lang: string) => {
   if (lang === "en") {
@@ -48,13 +47,6 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
   const [userGuess, setUserGuess] = useState<boolean | null>(null);
   const [isRoundSolved, setIsRoundSolved] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [showCaseSetup, setShowCaseSetup] = useState(false);
-
-  const [genBrand, setGenBrand] = useState("");
-  const [genDiff, setGenDiff] = useState<"Anfänger" | "Fortgeschritten" | "Experte">("Fortgeschritten");
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [generationError, setGenerationError] = useState("");
-
   const calculatedRanks = getLocalizedRanks(language);
 
   useEffect(() => {
@@ -228,66 +220,6 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
         percentage
       };
     });
-  };
-
-  const handleGenerateCustomCase = async () => {
-    if (!liveAiEnabled) return;
-    setIsGenerating(true);
-    setGenerationError("");
-    try {
-      const response = await fetch("/api/generate-scenario", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          brand: genBrand.trim() || undefined,
-          difficulty: genDiff
-        })
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Fehler beim Generieren des Szenarios.");
-      }
-
-      const customId = `generated-${Date.now()}`;
-      const generatedCase: SimulationCase = {
-        id: customId,
-        brand: data.brand || (language === "en" ? "Generated Case" : "Generierter Fall"),
-        logo: data.logo || "🤖",
-        senderName: data.senderName || (language === "en" ? "Customer Support" : "Kundenservice"),
-        senderEmail: data.senderEmail,
-        date: language === "en" ? "Delivered just now" : "Zustellung soeben",
-        recipient: "ihre.adresse@beispiel.de",
-        subject: data.subject,
-        body: data.body,
-        links: data.links || [],
-        isPhishing: data.isPhishing,
-        difficulty: genDiff,
-        explainingClues: data.explainingClues,
-        detailedExplanation: data.detailedExplanation
-      };
-
-      setCurrentCase(generatedCase);
-      setIsRoundSolved(false);
-      setUserGuess(null);
-      setHoveredLinkUrl(null);
-      setShowCaseSetup(false);
-
-    } catch (err: any) {
-      console.error(err);
-      if (err.message && err.message.includes("API_KEY_MISSING")) {
-        setGenerationError(language === "en" 
-          ? "AI API-Key is missing. Generation features require a configured Google Gemini Key." 
-          : "AI API-Key fehlt. Generierungs-Features erfordern einen konfigurierten Google Gemini Key.");
-      } else {
-        setGenerationError(language === "en"
-          ? "Interface error. Please make sure the Gemini API key is valid."
-          : "Schnittstellen-Fehler. Stellen Sie sicher, der Gemini-API-Schlüssel ist gültig.");
-      }
-    } finally {
-      setIsGenerating(false);
-    }
   };
 
   return (
@@ -470,117 +402,17 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
           )}
         </div>
 
-        {/* AI Case generator block */}
         <div className="bg-[#F4F1EA] border-2 border-[#1D1B18] shadow-[4px_4px_0px_#1D1B18] p-5">
-          {!liveAiEnabled ? (
-            <div className="space-y-3 font-mono">
-              <h4 className="text-xs font-black uppercase text-[#1D1B18]">
-                {language === "en" ? "Fixed training cases" : "Feste Trainingsfälle"}
-              </h4>
-              <p className="text-[11px] text-[#615C54] leading-relaxed">
-                {language === "en"
-                  ? "This version does not generate new cases with AI. Choose a prepared case from the list below."
-                  : "Diese Version erzeugt keine neuen Fälle per KI. Wähle einen vorbereiteten Fall aus der Liste darunter."}
-              </p>
-            </div>
-          ) : !showCaseSetup ? (
-            <div className="space-y-3 font-mono">
-              <h4 className="text-xs font-black uppercase text-[#1D1B18]">{language === "en" ? "🤖 CO-AUTHOR: SCENARIO BUILDER" : "🤖 CO-AUTHOR: SCENARIO BOOT"}</h4>
-              <p className="text-[11px] text-[#615C54] leading-relaxed uppercase">
-                {language === "en" 
-                  ? "GENERATE A SPECIALIZED PHISHING CHALLENGE VIA GEMINI AI FOR INTEGRATION WITH ARBITRARY BRANDS."
-                  : "GENERIERE EIN SPEZIALISIERTES PHISHING-PROBE-SZENARIO ÜBER DIE GEMINI KI FÜR BELIEBIGE MARKEN."}
-              </p>
-              <button
-                onClick={() => setShowCaseSetup(true)}
-                className="w-full bg-white hover:bg-[#FAF8F5] border-2 border-[#1D1B18] text-[#1D1B18] font-bold py-2.5 px-3 rounded-none flex items-center justify-center gap-2 text-xs uppercase shadow-[2px_2px_0px_#1D1B18] active:translate-y-0.5"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-[#FF5500]" />
-                {language === "en" ? "BOOT AI scenario WRITER" : "AUTOR_STEUERUNG BOOTEN"}
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4 font-mono">
-              <div className="flex justify-between items-center pb-2 border-b-2 border-[#1D1B18]">
-                <span className="text-[10px] font-black uppercase text-[#1D1B18]">
-                  {language === "en" ? "AI SCENARIO BUILDER" : "KI-PROBE-KONSTRUKTEUR"}
-                </span>
-                <button 
-                  onClick={() => setShowCaseSetup(false)}
-                  className="text-[9px] text-[#FF5500] font-black uppercase"
-                >
-                  {language === "en" ? "CANCEL" : "ABBRECHEN"}
-                </button>
-              </div>
-
-              <div className="space-y-3">
-                <div className="space-y-1">
-                  <label className="text-[9px] font-black text-[#615C54] block uppercase">
-                    {language === "en" ? "TARGET CHASSIS / BRAND (PayPal, SBB, DHL...)" : "ZIEL_MARKE (Z.B. PAYPAL, DHL, AMAZON)"}
-                  </label>
-                  <input
-                    type="text"
-                    value={genBrand}
-                    onChange={(e) => setGenBrand(e.target.value)}
-                    placeholder="PayPal, PostFinance, Amazon..."
-                    className="w-full bg-white border-2 border-[#1D1B18] rounded-none px-2.5 py-1.5 text-xs text-[#1D1B18] font-serif outline-none"
-                    disabled={isGenerating}
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label className="text-[9px] font-black text-[#615C54] block uppercase">
-                    {language === "en" ? "LEVEL" : "LEVEL"}
-                  </label>
-                  <div className="grid grid-cols-3 gap-1">
-                    {(["Anfänger", "Fortgeschritten", "Experte"] as const).map((diff) => (
-                      <button
-                        key={diff}
-                        type="button"
-                        onClick={() => setGenDiff(diff)}
-                        disabled={isGenerating}
-                        className={`text-[8px] font-black font-mono uppercase py-1 px-1 rounded-none border-2 transition ${
-                          genDiff === diff 
-                            ? "bg-[#1D1B18] border-[#1D1B18] text-white" 
-                            : "bg-white border-[#1D1B18] text-[#1D1B18] hover:bg-[#FAF8F5]"
-                        }`}
-                      >
-                        {diff === "Anfänger" 
-                          ? (language === "en" ? "NOVICE" : "ANFÄNGER") 
-                          : diff === "Fortgeschritten" 
-                          ? (language === "en" ? "INTERMEDIATE" : "FORTGESCHRITTEN") 
-                          : (language === "en" ? "EXPERT" : "EXPERTE")}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {generationError && (
-                  <div className="text-[9px] text-[#FF5500] bg-rose-500/5 border border-rose-500/20 p-2 uppercase font-mono">
-                    ⚠️ {generationError}
-                  </div>
-                )}
-
-                <button
-                  onClick={handleGenerateCustomCase}
-                  disabled={isGenerating}
-                  className="w-full bg-[#1D1B18] hover:bg-[#FF5500] disabled:bg-[#1D1B18]/30 text-white py-2.5 px-3 rounded-none text-xs font-black uppercase flex items-center justify-center gap-1.5 transition"
-                >
-                  {isGenerating ? (
-                    <>
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin text-white" />
-                      {language === "en" ? "AI SCENARIO GENERATING..." : "AUTOR VERFASST AKTE..."}
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-                      {language === "en" ? "ASSEMBLE PHISH CASE" : "FALL ZUSAMMENSETZEN"}
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          )}
+          <div className="space-y-3 font-mono">
+            <h4 className="text-xs font-black uppercase text-[#1D1B18]">
+              {language === "en" ? "Fixed training cases" : "Feste Trainingsfälle"}
+            </h4>
+            <p className="text-[11px] text-[#615C54] leading-relaxed">
+              {language === "en"
+                ? "This version does not generate new cases with AI. Choose a prepared case from the list below."
+                : "Diese Version erzeugt keine neuen Fälle per KI. Wähle einen vorbereiteten Fall aus der Liste darunter."}
+            </p>
+          </div>
         </div>
 
         {/* Local Preset Switcher */}
@@ -598,7 +430,6 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
                   setIsRoundSolved(false);
                   setUserGuess(null);
                   setHoveredLinkUrl(null);
-                  setShowCaseSetup(false);
                 }}
                 className={`w-full text-left p-2.5 rounded-none flex items-center justify-between text-[11px] font-mono border-2 transition ${
                   currentCase.id === cs.id 
