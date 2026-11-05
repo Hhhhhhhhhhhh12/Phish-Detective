@@ -227,7 +227,7 @@ export default function App() {
           <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-[#FF5500]/10 rounded-full blur-[120px] pointer-events-none" style={{ animation: "ambient-glow 12s ease-in-out infinite", animationDelay: "2s" }} />
 
           {/* Title Area */}
-          <div className="text-center mb-6 space-y-2 max-w-xl px-4 relative z-10">
+          <div className="text-center mb-4 md:mb-6 space-y-2 max-w-xl px-4 relative z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-teal-500/10 border border-teal-500/20 rounded-full text-[10px] uppercase font-mono tracking-wider text-teal-400">
               <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-ping" />
               {labels.systemUnit}
@@ -245,7 +245,7 @@ export default function App() {
           </div>
 
           {/* Visual Beautiful Container Frame */}
-          <div className="w-full max-w-lg bg-[#141210]/95 border border-zinc-800 p-6 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.8),0_0_40px_rgba(1,1,1,0.5)] rounded-2xl space-y-6 relative z-10 backdrop-blur-xl">
+          <div className="w-full max-w-lg bg-[#141210]/95 border border-zinc-800 p-4 md:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.8),0_0_40px_rgba(1,1,1,0.5)] rounded-2xl space-y-4 md:space-y-6 relative z-10 backdrop-blur-xl">
             
             {/* Top Language Selectors (Interactive Entry Panel) */}
             <div className="space-y-2">
@@ -281,19 +281,19 @@ export default function App() {
 
               {/* Dynamic Swiss Region Active Information Banner */}
               {language === "ch" && (
-                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-2.5 rounded-lg text-[10px] font-mono text-center flex items-center justify-center gap-1.5 animate-fade-in uppercase font-bold">
+                <div className="hidden sm:flex bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-2.5 rounded-lg text-[10px] font-mono text-center items-center justify-center gap-1.5 animate-fade-in uppercase font-bold">
                   <span>🇨🇭</span>
                   <span>{labels.chModeBadge}</span>
                 </div>
               )}
               {language === "en" && (
-                <div className="bg-blue-500/10 border border-blue-500/20 text-blue-400 p-2.5 rounded-lg text-[10px] font-mono text-center flex items-center justify-center gap-1.5 animate-fade-in uppercase font-bold">
+                <div className="hidden sm:flex bg-blue-500/10 border border-blue-500/20 text-blue-400 p-2.5 rounded-lg text-[10px] font-mono text-center items-center justify-center gap-1.5 animate-fade-in uppercase font-bold">
                   <span>🇬🇧</span>
                   <span>INTERNATIONAL MODE: All simulators and guides localized with USD &amp; English</span>
                 </div>
               )}
               {language === "de" && (
-                <div className="bg-orange-500/10 border border-orange-500/20 text-orange-400 p-2.5 rounded-lg text-[10px] font-mono text-center flex items-center justify-center gap-1.5 animate-fade-in uppercase font-bold">
+                <div className="hidden sm:flex bg-orange-500/10 border border-orange-500/20 text-orange-400 p-2.5 rounded-lg text-[10px] font-mono text-center items-center justify-center gap-1.5 animate-fade-in uppercase font-bold">
                   <span>🇩🇪</span>
                   <span>STANDARD-MODUS: DHL, PayPal, Gehaltsabrechnungen und Euro-Kurse geladen</span>
                 </div>

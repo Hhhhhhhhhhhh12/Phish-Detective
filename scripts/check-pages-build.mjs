@@ -4,24 +4,48 @@ import path from 'node:path';
 
 const root = path.resolve('dist');
 const base = '/Phish-Detective/';
+const mediaFiles = ['intro.mp4', 'pov.mp4', 'poster.jpg'];
+const expectedFiles = new Set([
+  'index.html',
+  'manifest.json',
+  'sw.js',
+  ...mediaFiles.map(name => `media/detective/${name}`),
+]);
+const builtAsset = /^assets\/index-[\w-]+\.(?:js|css)$/;
+const credentialPatterns = [
+  /AIza[0-9A-Za-z_-]{35}/,
+  /(?:gh[pousr]_[0-9A-Za-z]{36}|github_pat_[0-9A-Za-z_]{82})/,
+  /-----BEGIN (?:[A-Z0-9]+ )*PRIVATE KEY-----/,
+];
 
 async function listFiles(directory) {
   const files = [];
   for (const entry of await readdir(directory, {withFileTypes: true})) {
-    assert(!entry.isSymbolicLink(), 'Pages artifacts must not contain symbolic links.');
     const name = path.join(directory, entry.name);
     if (entry.isDirectory()) files.push(...await listFiles(name));
-    else files.push(name);
+    else {
+      assert(entry.isFile(), 'Pages artifacts may contain only regular files and directories.');
+      files.push(name);
+    }
   }
   return files;
 }
 
 const files = await listFiles(root);
+let applicationScripts = 0;
 for (const file of files) {
-  const name = path.basename(file);
-  assert(!name.startsWith('.env'), 'Pages must not publish environment files.');
-  assert(!/^server\.(?:[cm]?js|ts)(?:\.map)?$/.test(name), 'Pages must not publish server files.');
+  const relative = path.relative(root, file).split(path.sep).join('/');
+  assert(expectedFiles.has(relative) || builtAsset.test(relative), `Unexpected Pages artifact file: ${relative}`);
+  if (relative.startsWith('media/')) continue;
+  if (relative.startsWith('assets/') && relative.endsWith('.js')) applicationScripts += 1;
+
+  const content = await readFile(file, 'utf8');
+  for (const endpoint of ['/api/analyze', '/api/generate-scenario']) {
+    assert(!content.includes(endpoint), `Static file contains a live AI endpoint: ${relative}`);
+  }
+  assert(!credentialPatterns.some(pattern => pattern.test(content)), `Potential credential found in ${relative}`);
 }
+assert(applicationScripts > 0, 'No application JavaScript found.');
 
 const html = await readFile(path.join(root, 'index.html'), 'utf8');
 assert(html.includes(`href="${base}manifest.json"`), 'Manifest must use the repository path.');
@@ -33,15 +57,11 @@ for (const asset of localReferences) {
   assert(asset.startsWith(base), 'An asset bypasses the repository path.');
   assert(files.includes(path.join(root, asset.slice(base.length))), 'Referenced asset is missing.');
 }
-
-const scripts = files.filter(file => file.endsWith('.js') && file.includes(`${path.sep}assets${path.sep}`));
-assert(scripts.length > 0, 'No application JavaScript found.');
-for (const script of scripts) {
-  const text = await readFile(script, 'utf8');
-  for (const endpoint of ['/api/analyze', '/api/generate-scenario']) {
-    assert(!text.includes(endpoint), 'Static JavaScript still contains a live AI endpoint.');
+for (const file of files) {
+  const relative = path.relative(root, file).split(path.sep).join('/');
+  if (builtAsset.test(relative)) {
+    assert(localReferences.includes(`${base}${relative}`), `Unreferenced Pages asset: ${relative}`);
   }
-  assert(!/AIza[0-9A-Za-z_-]{35}/.test(text), 'Static JavaScript contains a Google API key pattern.');
 }
 
 const manifest = JSON.parse(await readFile(path.join(root, 'manifest.json'), 'utf8'));
@@ -49,7 +69,7 @@ assert.equal(manifest.start_url, './', 'App launch must stay inside the reposito
 assert.equal(manifest.scope, './', 'App scope must stay inside the repository path.');
 assert(files.includes(path.join(root, 'sw.js')), 'Service worker file is missing.');
 
-for (const name of ['intro.mp4', 'pov.mp4', 'poster.jpg']) {
+for (const name of mediaFiles) {
   const file = path.join(root, 'media', 'detective', name);
   assert(files.includes(file), `Detective media is missing: ${name}`);
   const data = await readFile(file);
@@ -60,4 +80,4 @@ for (const name of ['intro.mp4', 'pov.mp4', 'poster.jpg']) {
   }
 }
 
-console.log(`Pages artifact verified: ${files.length} files; repository paths valid; no server outputs or live AI endpoints.`);
+console.log(`Pages artifact verified: ${files.length} allowed files; valid repository paths; no known credential patterns or live AI endpoints.`);
