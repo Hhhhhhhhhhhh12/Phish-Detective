@@ -301,8 +301,8 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
             status: "suspicious"
           },
           {
-            target: "Look-alike Subdomain",
-            text: "The email domain '@dhl-delivery-storno.com' isn't DHL's property. The word 'dhl' is only added as a helper, but the root domain is different.",
+            target: "Look-alike sender domain",
+            text: "The sender domain in this prepared example differs from the independently known provider address. The word 'dhl' inside a domain does not establish ownership; no ownership lookup was performed.",
             status: "suspicious"
           },
           {
@@ -335,18 +335,18 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         difficulty: "Experte",
         explainingClues: [
           {
-            target: "Sender Domain Integrity",
+            target: "Displayed sender domain",
             text: "In this prepared case, the displayed sender uses the provider’s domain. A visible From address alone is not an authentication check.",
             status: "safe"
           },
           {
             target: "No Coercive Urgency",
-            text: "There is no threat or deadline. It explicitly reassuring: 'If you did not request this, you can safely ignore this email.'",
+            text: "This example has no threat or deadline. That is consistent with the prepared legitimate case, but a calm tone alone does not authenticate a real message.",
             status: "safe"
           },
           {
-            target: "Validated Link Direction",
-            text: "Both visible anchor and mouse-hover target direct directly to the official HTTPS Microsoft panel 'account.microsoft.com'.",
+            target: "Link target in this example",
+            text: "The prepared link target is 'account.microsoft.com'. A matching displayed target or HTTPS does not by itself authenticate a real message; open the account independently when unsure.",
             status: "safe"
           }
         ],
@@ -375,21 +375,21 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         explainingClues: [
           {
             target: "Personalized Salutation",
-            text: "The invoice mentions your real name ('John Doe'). Amazon stores registration names and uses personalized greeting lines.",
+            text: "The prepared invoice uses the fictional recipient name 'John Doe'. A personal greeting can also appear in phishing and does not authenticate the sender.",
             status: "safe"
           },
           {
-            target: "Sanitized Asset Metrics",
-            text: "It cites the exact last four digits of your active financial instrument (**4821). Phishing bots rarely hold this granular metadata.",
+            target: "Displayed card digits",
+            text: "The example includes fictional card-ending digits (**4821). Such partial details may also be known to an attacker and are not proof of authenticity.",
             status: "safe"
           },
           {
             target: "In-Portal Redirection",
-            text: "The email redirects you to the main Amazon.com portal rather than pushing external bank interfaces, directing to secure HTTPS servers.",
+            text: "The prepared link target is 'www.amazon.com/gp/primecentral'. A familiar target or HTTPS alone does not verify a message. Check the invoice through an independently opened customer account.",
             status: "safe"
           }
         ],
-        detailedExplanation: "This email is completely LEGITIMATE. It includes personalized customer strings, lists account-linked bank card indicators, and guides cleanly to Amazon's center."
+        detailedExplanation: "This prepared case represents a legitimate invoice with fictional customer details. A name, card-ending digits and familiar link text do not authenticate a real message. Verify an unexpected charge in the independently opened customer account."
       },
       {
         id: "case-hr-spear",
@@ -414,17 +414,17 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         explainingClues: [
           {
             target: "Company spear target",
-            text: "This is Spear-Phishing: attackers cloned an existing corporate colleague and HR executive name to gain confidence.",
+            text: "This prepared spear-phishing case uses an alleged HR colleague's name to build trust. A displayed personal name does not authenticate the sender.",
             status: "suspicious"
           },
           {
             target: "Manipulative corporate domain",
-            text: "The return path is '@company-internal-oauth.com', while your organization resides on '@company.com'. Fake sites merge company terms with tags like '-oauth' or '-secure'.",
+            text: "The displayed sender domain is 'company-internal-oauth.com', while the expected portal in this case uses 'company.com'. Added terms such as '-oauth' do not establish a corporate connection; no mail headers or ownership records were checked.",
             status: "suspicious"
           },
           {
             target: "Credential Harvesting",
-            text: "The target link guides to a fake Microsoft sign-in page. Inputting corporate credentials logs them onto the hacker's servers directly.",
+            text: "The prepared case describes an imitation sign-in page. Entering credentials could expose them; access to further systems would depend on account permissions and additional protections. The target website is not opened here.",
             status: "suspicious"
           }
         ],
@@ -458,16 +458,16 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
           },
           {
             target: "Sketchy IT Origin",
-            text: "Sender is 'admin@global-mfa-verify.com' rather than internal IT. Genuine IT services use official subdomains on the corporate registry.",
+            text: "The displayed sender 'admin@global-mfa-verify.com' differs from the expected company portal in this prepared case. IT can also use external service providers; confirm the request through a known IT contact. Domain ownership and age were not checked.",
             status: "suspicious"
           },
           {
             target: "Coerced mobile approval",
-            text: "Never click approve on authorization pushes you didn't trigger himself. IT never demands validating unfamiliar payloads.",
+            text: "Never approve an authentication request you did not initiate. Reject unexpected requests and contact IT through a known channel, even if a message claims that approval is required.",
             status: "suspicious"
           }
         ],
-        detailedExplanation: "MFA Fatigue (Push Spamming) mixed with custom spear-phishing. Scammers who bought your password spam security pushes, hoping you will blindly authorize access to bypass 2FA barriers."
+        detailedExplanation: "This prepared case combines MFA fatigue with spear-phishing: repeated sign-in requests and a false IT instruction aim to obtain your approval. Reject unexpected requests and report them through the established IT channel."
       },
       {
         id: "case-ai-ceo-emergency",
@@ -496,8 +496,8 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
             status: "suspicious"
           },
           {
-            target: "Generative Audio Cloak",
-            text: "Citing 'AI Voice-memo' tries to build trust. Modern deepfake platforms can replicate any voice from public videos with terrifying accuracy.",
+            target: "Claimed voice-message approval",
+            text: "The message claims approval through a voice note. No recording is provided or verified in this exercise. A voice message can be imitated or manipulated; verify the payment through the established approval process and a known independent contact.",
             status: "suspicious"
           },
           {
@@ -530,22 +530,22 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         difficulty: "Anfänger",
         explainingClues: [
           {
-            target: "Risky TLD Ending",
+            target: "Generic .info domain suffix",
             text: "The target in this example differs from the independently known tax service address. A suffix alone does not establish ownership or trust.",
             status: "suspicious"
           },
           {
             target: "iCal calendar vector",
-            text: "This is Calendar Spam. Attackers inject links directly into shared calendars to bypass email client spam filters.",
+            text: "Calendar invitations can carry misleading links. Depending on the calendar settings, an unsolicited invitation may appear as an event or notification; it does not prove that the organiser is trustworthy.",
             status: "suspicious"
           },
           {
             target: "Unsolicited government cash",
-            text: "Government bodies never deposit tax returns via random links in shared virtual calendar files.",
+            text: "An unexpected refund promise in a calendar invitation should be checked through an independently known government contact or portal. Do not rely on the supplied link when entering banking details.",
             status: "suspicious"
           }
         ],
-        detailedExplanation: "Calendar Hijacking. Attackers send calendar invites that auto-populate into your electronic calendar, bypassing spam defenses and redirecting you to phishing banking portals."
+        detailedExplanation: "This prepared calendar-phishing case uses an invitation to promote a false refund. Depending on the calendar settings, such invitations may appear automatically. A calendar entry does not authenticate the organiser or its links."
       }
     ];
   }
@@ -576,7 +576,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         explainingClues: [
           {
             target: "Absenderdomain",
-            text: "Die E-Mail kommt von '@postfinance-secure-verify.ch.info'. Eine echte Nachricht kommt immer direkt von 'postfinance.ch'. Der Angreifer nutzt eine gefälschte Domain, die nur auf '.info' endet, um Sie zu täuschen.",
+            text: "Die Absenderadresse im Übungsfall weicht von der unabhängig bekannten Anbieteradresse ab. Der enthaltene Markenname und die Endung '.info' belegen weder Zugehörigkeit noch Betrug. Eine sichtbare Absenderadresse allein bestätigt keine Echtheit.",
             status: "suspicious"
           },
           {
@@ -586,7 +586,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
           },
           {
             target: "Verschleierter Link",
-            text: "Das Link-Label tut vertrauenswürdig, aber der eigentliche Link im Hintergrund führt auf die gefälschte ausländische Domain 'postfinance-secure-verify.ch.info'.",
+            text: "Das Linkziel des Übungsfalls lautet 'postfinance-secure-verify.ch.info' und weicht vom angezeigten Anbieterziel ab. Aus dem Domainnamen lässt sich kein Serverstandort ableiten.",
             status: "suspicious"
           },
           {
@@ -620,7 +620,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         explainingClues: [
           {
             target: "Niedrige Gebühr (CHF)",
-            text: "Ein minimaler Betrag wie CHF 2.45 lässt niemanden Verdacht schöpfen. Aber Achtung: Es geht den Dieben nicht um zwei Franken, sondern um Ihre wertvollen Kreditkartendaten!",
+            text: "Ein kleiner Betrag wie CHF 2.45 kann die Hemmschwelle senken. Der vorbereitete Fall soll zeigen, wie eine Zahlungsaufforderung zur Preisgabe von Kreditkartendaten verleiten kann.",
             status: "suspicious"
           },
           {
@@ -634,7 +634,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
             status: "suspicious"
           }
         ],
-        detailedExplanation: "Das berüchtigte Schweizer 'Post-Zoll-Phishing'. Kriminelle nutzen das hohe Vertrauen in 'Die Post' aus, um über kleine Scheinbeträge die gesamte Kreditkarte leerzuräumen."
+        detailedExplanation: "Dieser vorbereitete Fall zeigt Paket-Phishing: Eine kleine angebliche Gebühr soll zur Preisgabe von Kreditkartendaten verleiten. Prüfe eine unerwartete Gebühr über die unabhängig geöffnete Anbieter-App oder einen bekannten Kontakt."
       },
       {
         id: "case-microsoft",
@@ -658,18 +658,18 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         difficulty: "Experte",
         explainingClues: [
           {
-            target: "Offizieller Absender",
-            text: "Die Absenderadresse '@accountprotection.microsoft.com' ist die zertifizierte Domäne von Microsoft für Logins und Codes.",
+            target: "Angezeigte Absenderdomain",
+            text: "Im vorbereiteten Fall wird die Absenderdomain 'accountprotection.microsoft.com' angezeigt. Die sichtbare Adresse allein ist kein Echtheitsnachweis; Header oder Absenderauthentifizierung werden hier nicht geprüft.",
             status: "safe"
           },
           {
             target: "Kein Handlungsdruck",
-            text: "Die E-Mail droht nicht. Es heisst sogar explizit, dass man sie einfach ignorieren kann, falls man den Code nicht angefordert hat.",
+            text: "Dieser Fall enthält weder eine Drohung noch eine Frist. Das passt zur vorbereiteten legitimen Nachricht, beweist für sich allein aber keine Echtheit. Auch Phishing kann ohne Zeitdruck formuliert sein.",
             status: "safe"
           },
           {
-            target: "Sichere URL",
-            text: "Sowohl die angezeigte als auch die reale Ziel-URL zeigen auf die echte Microsoft Page under 'account.microsoft.com'.",
+            target: "Linkziel im Beispiel",
+            text: "Das vorbereitete Linkziel lautet 'account.microsoft.com'. Ein passender sichtbarer Link oder HTTPS allein bestätigt keine Echtheit einer realen Nachricht; öffne das Konto bei Zweifeln unabhängig.",
             status: "safe"
           }
         ],
@@ -697,22 +697,22 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         difficulty: "Anfänger",
         explainingClues: [
           {
-            target: "Echter Schweizer Name",
-            text: "Die Mail spricht den Nutzer mit dem realem Namen an ('Beat Tobler'), was unüblich für Massen-Phishing ist.",
+            target: "Persönliche Anrede",
+            text: "Die vorbereitete Rechnung nennt den fiktiven Empfänger 'Beat Tobler'. Auch Phishing kann eine persönliche Anrede enthalten; der Name bestätigt keinen echten Absender.",
             status: "safe"
           },
           {
             target: "Kartenziffern",
-            text: "Die Abrechnung nennt die korrekten letzten 4 Stellen der Karte (**4821), die nur Amazon bekannt sind.",
+            text: "Das Beispiel enthält fiktive Endziffern eines Zahlungsmittels (**4821). Solche Teilinformationen können auch Angreifern bekannt sein und beweisen keine Echtheit.",
             status: "safe"
           },
           {
-            target: "Echte Amazon Domain",
+            target: "Linkziel im Beispiel",
             text: "Das Linkziel des vorbereiteten Falls lautet amazon.de. Das bestätigt keine Echtheit einer realen Nachricht; öffne das Kundenkonto bei Zweifeln unabhängig.",
             status: "safe"
           }
         ],
-        detailedExplanation: "Eine echte Rechnung von Amazon Prime. Schweizer Kundendaten stimmen, Zahlungsmittel ist maskiert vorhanden und die Links weisen keinerlei Fehler auf."
+        detailedExplanation: "Dieser vorbereitete Fall stellt eine legitime Rechnung mit fiktiven Kundendaten dar. Name, Endziffern und vertrauter Linktext beweisen keine Echtheit einer realen Nachricht. Prüfe unerwartete Abbuchungen im unabhängig geöffneten Kundenkonto."
       },
       {
         id: "case-hr-spear",
@@ -737,17 +737,17 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         explainingClues: [
           {
             target: "Spear-Phishing bei Bundesbetrieben",
-            text: "Angreifer nutzen den Namen von SBB-Personalverantwortlichen und richten sich gezielt an Schweizer Angestellte, um hohes Vertrauen zu erzwingen.",
+            text: "Der vorbereitete Fall verwendet den Namen einer angeblichen Personalverantwortlichen, um Vertrauen aufzubauen. Ein angezeigter Personenname bestätigt weder eine echte Person noch ihre Zugehörigkeit zum Betrieb.",
             status: "suspicious"
           },
           {
             target: "Mitarbeiterumfrage-Fake",
-            text: "Die angebliche SBB-Domain lautet '@sbb-mitarbeiter-login.ch.info', was ein Betrugs-Portal auf '.info' ist, statt der echten sbb.ch Registratur.",
+            text: "Die Absenderdomain im Übungsfall lautet 'sbb-mitarbeiter-login.ch.info' und unterscheidet sich vom erwarteten Portal 'sbb.ch'. Der Markenname und die Endung allein bestätigen weder Zugehörigkeit noch Betrug; prüfe den Auftrag über einen bekannten internen Kontakt.",
             status: "suspicious"
           },
           {
             target: "Credential Harvesting",
-            text: "Wer auf den Link klickt, landet auf einer gefälschten Office365-Maske, um die SBB-Mitarbeiter-Logins direkt abzufangen. Damit dringen Angreifer ins Bundesnetz ein.",
+            text: "Der vorbereitete Fall beschreibt eine nachgeahmte Anmeldeseite. Die Eingabe könnte Zugangsdaten preisgeben; welche Systeme betroffen wären, hängt von Kontorechten und zusätzlichen Schutzmassnahmen ab. Die Zielseite wird hier nicht geöffnet.",
             status: "suspicious"
           }
         ],
@@ -781,7 +781,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
           },
           {
             target: "Falsche IT-Adresse",
-            text: "Das Portal 'mitarbeiter-mfa-portal.ch' gehört nicht zur IT eures Schweizer Betriebs. Echte IT-Abteilungen nutzen nur interne Firmen-Domains.",
+            text: "Das Portal 'mitarbeiter-mfa-portal.ch' weicht vom erwarteten Firmenportal des Übungsfalls ab. IT kann auch externe Dienstleister nutzen; bestätige die Anfrage über einen bekannten IT-Kontakt. Eigentum und Alter der Domain wurden nicht geprüft.",
             status: "suspicious"
           },
           {
@@ -819,8 +819,8 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
             status: "suspicious"
           },
           {
-            target: "KI-Cloned Sprachnotiz",
-            text: "Kriminelle klonen Chef-Stimmen täuschend echt mit künstlicher Intelligenz (Deepfakes), um Finanzabteilungen mit hoher Glaubwürdigkeit zu manipulieren.",
+            target: "Behauptete Freigabe per Sprachnotiz",
+            text: "Die Nachricht behauptet eine Freigabe per Sprachnotiz. Im Übungsfall liegt keine geprüfte Aufnahme vor. Sprache kann nachgeahmt oder manipuliert sein; prüfe den Zahlungsauftrag über den vorgesehenen Freigabeprozess und einen unabhängig bekannten Kontakt.",
             status: "suspicious"
           },
           {
@@ -829,7 +829,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
             status: "suspicious"
           }
         ],
-        detailedExplanation: "Der finanzielle Chef-Betrug (CEO Fraud) adaptiert mit Deepfakes. Verifizieren Sie bei solchen Zahlungen (hier CHF 14'500) immer über ein zweites, unbeteiligtes Schweizer Organ."
+        detailedExplanation: "Dieser vorbereitete Fall zeigt einen angeblichen Zahlungsauftrag der Geschäftsführung. Verifiziere ungewöhnliche Zahlungen über den vorgesehenen Freigabeprozess und einen unabhängig bekannten Kontakt; eine behauptete Sprachnotiz ist keine geprüfte Freigabe."
       },
       {
         id: "case-cal-invite",
@@ -853,22 +853,22 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         difficulty: "Anfänger",
         explainingClues: [
           {
-            target: "Webdomain auf '.info'",
-            text: "Der angebliche offizielle Link verweist auf eine billige '.info' Domain. Schweizer Bundesbehörden nutzen ausschliesslich '.admin.ch'.",
+            target: "Generische Domain-Endung .info",
+            text: "Das Linkziel des Übungsfalls weicht von der unabhängig bekannten Behördenadresse ab. '.info' ist eine generische Domain-Endung; sie belegt weder Eigentum noch Echtheit oder Betrug.",
             status: "suspicious"
           },
           {
             target: "Kalender-Spam (iCal)",
-            text: "Die Angreifer umgehen herkömmliche E-Mail-Spamfilter, indem sie eine Kalendereinladung schicken, die sich automatisch in Ihr Handy einbucht.",
+            text: "Kalendereinladungen können irreführende Links enthalten. Je nach Kalendereinstellungen können unerwünschte Einladungen als Termin oder Benachrichtigung erscheinen; das bestätigt keinen vertrauenswürdigen Organisator.",
             status: "suspicious"
           },
           {
             target: "Unerwartete Gelder von Behörden",
-            text: "Die ESTV zahlt Steuern niemals formlos über TWINT-Direktlinks aus, die in unbestellten Kalenderdateien verschickt werden.",
+            text: "Prüfe die unerwartete Erstattungszusage über einen unabhängig bekannten Behördenkontakt oder ein selbst geöffnetes Portal. Der zugesandte TWINT-Link und die Kalendereinladung bestätigen keine echte Auszahlung.",
             status: "suspicious"
           }
         ],
-        detailedExplanation: "Ein klassisches Schweizer Kalender-Phishing. Spamer tragen sich in Ihren Online-Kalender ein. Die angebliche Steuerverwaltung (ESTV) will Ihre e-Banking Daten stehlen."
+        detailedExplanation: "Dieser vorbereitete Fall zeigt Kalender-Phishing: Eine Einladung im Namen der Steuerverwaltung wirbt mit einer falschen Erstattungszusage. Der Eintrag bestätigt weder einen echten Behördenkontakt noch ein vertrauenswürdiges Linkziel."
       }
     ];
   }
@@ -947,7 +947,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         },
         {
           target: "Absenderbereich",
-          text: "Der Domainbereich der E-Mail lautet '@dhl-bestellung-storno.de'. Das Wort 'dhl' wurde nur als Sub-Wort davorgehängt. Die wirkliche Domain ist 'dhl-bestellung-storno.de', welche nicht zu DHL gehört.",
+          text: "Die Absenderdomain im Übungsfall lautet 'dhl-bestellung-storno.de' und weicht von der unabhängig bekannten Anbieteradresse ab. Das Wort 'dhl' darin belegt keine Zugehörigkeit; Eigentum oder Registrierung wurden nicht geprüft.",
           status: "suspicious"
         },
         {
@@ -981,16 +981,16 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
       explainingClues: [
         {
           target: "Absender-E-Mail",
-          text: "Der Absender '@accountprotection.microsoft.com' ist die offizielle und zertifizierte Domain von Microsoft für Systemnachrichten und Sicherheitscodes.",
+          text: "Im vorbereiteten Fall wird die Absenderdomain 'accountprotection.microsoft.com' angezeigt. Die sichtbare Adresse allein ist kein Echtheitsnachweis; Header oder Absenderauthentifizierung werden hier nicht geprüft.",
           status: "safe"
         },
         {
           target: "Kein Handlungszwang",
-          text: "Es gibt keinen Zwang, auf einen Link zu klicken. Es heißt sogar explizit: 'Wenn Sie diesen Code nicht angefordert haben, ignorieren Sie diese E-Mail.' Phishing-Mails würden Sie drängen, das Passwort sofort zu ändern.",
+          text: "Dieser Fall enthält weder eine Drohung noch eine Frist. Das passt zur vorbereiteten legitimen Nachricht, beweist für sich allein aber keine Echtheit. Auch Phishing kann ohne Zeitdruck formuliert sein.",
           status: "safe"
         },
         {
-          target: "Sicherer Link",
+          target: "Linkziel im Beispiel",
           text: "Im Übungsfall verweisen Linktext und Ziel auf account.microsoft.com. Das ist kein allgemeines Sicherheitszertifikat für Nachrichten mit diesem sichtbaren Text.",
           status: "safe"
         }
@@ -1020,21 +1020,21 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
       explainingClues: [
         {
           target: "Persönliche Anrede",
-          text: "Die E-Mail spricht den Nutzer mit vollem Namen an ('Max Mustermann'). Amazon kennt Ihre Daten im System und personalisiert offizielle Rechnungsmails.",
+          text: "Die vorbereitete Rechnung nennt den fiktiven Empfänger 'Max Mustermann'. Auch Phishing kann eine persönliche Anrede enthalten; der Name bestätigt keinen echten Absender.",
           status: "safe"
         },
         {
           target: "Sensible Teil-Informationen",
-          text: "Es werden die korrekten letzten 4 Ziffern Ihres Kontos/Zahlungsmittels genannt (**4821). Phisher wissen diese Zahlen in der Regel nicht.",
+          text: "Das Beispiel enthält fiktive Endziffern eines Zahlungsmittels (**4821). Solche Teilinformationen können auch Angreifern bekannt sein und beweisen keine Echtheit.",
           status: "safe"
         },
         {
           target: "Standard-Verweis",
-          text: "Die Mail leitet Sie nicht auf eine Zahlungsseite, sondern verweist auf den regulären Amazon-Kontobereich. Der Link führt direkt zu 'amazon.de' über eine sichere HTTPS-Verbindung.",
+          text: "Das vorbereitete Linkziel lautet 'www.amazon.de/gp/primecentral'. Ein vertrautes Ziel oder HTTPS allein verifiziert keine Nachricht. Prüfe die Rechnung im unabhängig geöffneten Kundenkonto.",
           status: "safe"
         }
       ],
-      detailedExplanation: "Diese E-Mail ist LEGITIM. Sie enthält Ihren echten Namen, verweist auf existierende Bank-Sperrendungen zur Identifikation und lotst Sie ohne emotionalen Druck auf die echte Amazon-Webpräsenz."
+      detailedExplanation: "Dieser vorbereitete Fall stellt eine legitime Rechnung mit fiktiven Kundendaten dar. Name, Endziffern und vertrauter Linktext beweisen keine Echtheit einer realen Nachricht. Prüfe unerwartete Abbuchungen im unabhängig geöffneten Kundenkonto."
     },
     {
       id: "case-hr-spear",
@@ -1059,7 +1059,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
       explainingClues: [
         {
           target: "Spear-Phishing (Gezielt)",
-          text: "Die Angreifer haben den Namen eines echten Kollegen oder der HR-Leitung nachgeahmt ('Anna Weber') und richten sich an Mitarbeiter der Firma. Das nennt sich Spear-Phishing.",
+          text: "Der vorbereitete Fall verwendet den Namen einer angeblichen HR-Kollegin ('Anna Weber'), um Vertrauen aufzubauen. Ein angezeigter Personenname bestätigt keinen echten Absender. Solche gezielten Täuschungen heissen Spear-Phishing.",
           status: "suspicious"
         },
         {
@@ -1108,12 +1108,12 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         },
         {
           target: "Gefälschte IT-Domain",
-          text: "Die Adresse 'it-operations@company-mfa-portal.com' imitiert die interne IT. Eine echte IT würde eine interne Subdomain (z.B. '@company.com') nutzen, nicht eine neu registrierte Domain wie 'company-mfa-portal.com'.",
+          text: "Die angezeigte Adresse 'it-operations@company-mfa-portal.com' weicht vom erwarteten Firmenportal des Übungsfalls ab. IT kann auch externe Dienstleister nutzen; bestätige die Anfrage über einen bekannten IT-Kontakt. Eigentum und Alter der Domain wurden nicht geprüft.",
           status: "suspicious"
         },
         {
           target: "Fremdsitzung-Bestätigung",
-          text: "Bestätigen Sie NIEMALS einen MFA-Push auf Ihrem Handy, den Sie nicht selbst ausgelöst haben. Echte IT-Teams fordern Sie niemals auf, verdächtige Anfragen absichtlich durchzuwinken!",
+          text: "Bestätigen Sie NIEMALS einen MFA-Push, den Sie nicht selbst ausgelöst haben. Lehnen Sie unerwartete Anfragen ab und kontaktieren Sie die IT über einen bekannten Weg, auch wenn eine Nachricht zur Freigabe auffordert.",
           status: "suspicious"
         }
       ],
@@ -1146,8 +1146,8 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
           status: "suspicious"
         },
         {
-          target: "AI-Erhöhte Glaubwürdigkeit",
-          text: "Die Erwähnung einer 'KI-Sprachnotiz' soll Zweifel zerstreuen. Moderne deep-learning Systeme machen CEO-Stimmen täuschend echt nach!",
+          target: "Behauptete Freigabe per Sprachnotiz",
+          text: "Die Nachricht behauptet eine Freigabe per Sprachnotiz. Im Übungsfall liegt keine geprüfte Aufnahme vor. Sprache kann nachgeahmt oder manipuliert sein; prüfe den Zahlungsauftrag über den vorgesehenen Freigabeprozess und einen unabhängig bekannten Kontakt.",
           status: "suspicious"
         },
         {
@@ -1180,22 +1180,22 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
       difficulty: "Anfänger",
       explainingClues: [
         {
-          target: "Länderendung .info",
+          target: "Generische Domain-Endung .info",
           text: "Die Zieladresse des Übungsfalls ist nicht die unabhängig bekannte Behördenadresse. Die Endung allein ist kein Nachweis für Echtheit oder Betrug.",
           status: "suspicious"
         },
         {
           target: "iCal Phishing-Vektor",
-          text: "Dies ist Kalender-Spam. Angreifer injecten Phishing-Links direkt in Ihren Terminkalender, um klassische E-Mail-Spam-Filter zu umgehen.",
+          text: "Kalendereinladungen können irreführende Links enthalten. Je nach Kalendereinstellungen können unerwünschte Einladungen als Termin oder Benachrichtigung erscheinen; das bestätigt keinen vertrauenswürdigen Organisator.",
           status: "suspicious"
         },
         {
           target: "Unerwartete Geldauszahlungen",
-          text: "Behörden fordern niemals zur Bankdaten-Eingabe über formlose Links in Termineinladungen auf.",
+          text: "Prüfe eine unerwartete Erstattungszusage in einer Kalendereinladung über einen unabhängig bekannten Behördenkontakt oder ein selbst geöffnetes Portal. Verlasse dich bei der Eingabe von Bankdaten nicht allein auf den zugesandten Link.",
           status: "suspicious"
         }
       ],
-      detailedExplanation: "Dies ist 'iCal/Calendar Phishing'. Angreifer senden Kalendereinladungen an E-Mail-Adressen. Die Kalender-Software trägt diese automatisch im Kalender ein und schickt eine Benachrichtigung. Der Link führt auf eine gefälschte Bank-Anmeldeseite."
+      detailedExplanation: "Dieser vorbereitete Fall zeigt Kalender-Phishing: Eine Einladung wirbt mit einer falschen Erstattungszusage. Je nach Kalendereinstellungen können solche Einladungen automatisch erscheinen. Ein Kalendereintrag verifiziert weder den Organisator noch seine Links."
     }
   ];
 };

@@ -372,7 +372,7 @@ export default function App() {
                 </span>
               </div>
               <p className="text-[10px] text-[#615C54] font-mono leading-none mt-1">
-                {language === "en" ? "Interactive learning suite & secure cyber gamification" : "Spielführung &amp; interaktive Cyberaufklärung"}
+                {language === "en" ? "Interactive learning & cyber awareness" : "Spielführung & interaktive Cyberaufklärung"}
               </p>
             </div>
           </div>
@@ -574,8 +574,8 @@ export default function App() {
             © 2026 PHISH DETECTIVE. INTEGRATIVE SYSTEM CONTROL.
           </div>
           <div className="flex gap-4">
-            <span className="hover:text-[#1D1B18] transition select-none cursor-pointer">MODEL: TE-SYS-8</span>
-            <span className="hover:text-[#1D1B18] transition select-none cursor-pointer">BUILD: PASS_01</span>
+            <span>{language === "en" ? "TRAINING PROTOTYPE" : "TRAININGSPROTOTYP"}</span>
+            <span>{language === "en" ? "PROGRESS STORED LOCALLY" : "FORTSCHRITT LOKAL"}</span>
           </div>
         </footer>
 
