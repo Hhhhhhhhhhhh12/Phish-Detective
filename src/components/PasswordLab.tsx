@@ -1,364 +1,255 @@
-import React, { useState } from "react";
-import { Shield, Sparkles, KeyRound, AlertTriangle, Eye, EyeOff, Check, AlertCircle, RefreshCw } from "lucide-react";
-import { motion } from "motion/react";
-import { evaluatePassword as calculatePasswordStrength } from "../utils/passwordStrength";
+import React, { useEffect, useRef, useState } from "react";
+import { Sparkles, KeyRound, Eye, EyeOff, AlertCircle, RefreshCw } from "lucide-react";
+import { evaluatePassword } from "../utils/passwordStrength";
 
-const SYSTEM_WORDS = [
-  "Regenschirm", "Kaffeetasse", "Balkontür", "Katzenfell", "Waldspaziergang",
-  "Nordsee", "Abenteuer", "Sicherheitsnetz", "Zahnrad", "Lieblingsbuch",
-  "Wolkenbruch", "Zirkuszelt", "Abendlicht", "Sonnenschein", "Schlüsselbund"
+// These are public teaching examples, deliberately not a password generator.
+const TRAINING_EXAMPLES = [
+  "H0f_f@r!",
+  "12345678901234567890",
+  "regenschirm-kiesel-zebra-nebel",
 ];
+const ILLUSTRATION_STAGES = [
+  "Beispiel: Häufige Kennwörter können zuerst ausprobiert werden.",
+  "Beispiel: Bekannte Wörter und Wiederholungen machen Versuche vorhersehbarer.",
+  "Reale Angriffe hängen unter anderem von Versuchslimits und der Speicherung beim Dienst ab.",
+];
+const COMPLETE_MESSAGE = "Illustration beendet. Es wurde kein Kennwort geknackt oder auf Sicherheit geprüft.";
 
 export default function PasswordLab() {
   const [showIntro, setShowIntro] = useState(false);
   const [password, setPassword] = useState("");
   const [showPass, setShowPass] = useState(false);
-  const [entropyResult, setEntropyResult] = useState<{
-    score: number; // 0 to 4
-    crackTime: string;
-    level: "Schwach" | "Mittel" | "Sehr Stark";
-    feedback: string[];
-  } | null>(null);
-
-  const [simulatedGuessProgress, setSimulatedGuessProgress] = useState(0);
+  const [exampleIndex, setExampleIndex] = useState(0);
+  const [illustrationProgress, setIllustrationProgress] = useState(0);
   const [isSimulating, setIsSimulating] = useState(false);
-  const [tickerText, setTickerText] = useState("Bereit");
+  const [tickerText, setTickerText] = useState("Bereit für eine Lernillustration.");
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const evaluation = password ? evaluatePassword(password) : null;
 
-  // Multiwords passphrase generator
-  const generatePassphrase = () => {
-    const shuffled = [...SYSTEM_WORDS].sort(() => 0.5 - Math.random());
-    const selected = shuffled.slice(0, 4);
-    // Add numbers or separators
-    const num = Math.floor(1000 + Math.random() * 9000);
-    const result = `${selected.join("-")}-${num}!`;
-    setPassword(result);
-    evaluatePassword(result);
+  useEffect(() => () => {
+    if (intervalRef.current !== null) clearInterval(intervalRef.current);
+  }, []);
+
+  const resetIllustration = () => {
+    if (intervalRef.current !== null) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    setIsSimulating(false);
+    setIllustrationProgress(0);
+    setTickerText("Bereit für eine Lernillustration.");
   };
 
-  const evaluatePassword = (val: string) => {
-    if (!val) {
-      setEntropyResult(null);
-      return;
-    }
-    const result = calculatePasswordStrength(val);
-    setEntropyResult(result);
+  const changeExample = (value: string) => {
+    resetIllustration();
+    setPassword(value);
+  };
+
+  const chooseTrainingExample = () => {
+    changeExample(TRAINING_EXAMPLES[exampleIndex]);
+    setExampleIndex((exampleIndex + 1) % TRAINING_EXAMPLES.length);
   };
 
   const handleRunSimulation = () => {
-    if (!password) return;
+    if (!password || intervalRef.current !== null) return;
     setIsSimulating(true);
-    setSimulatedGuessProgress(0);
-    setTickerText("Hacker-Cluster bootet...");
-
-    let steps = 0;
-    const interval = setInterval(() => {
-      steps += 8;
-      setSimulatedGuessProgress(prev => Math.min(100, prev + 12));
-      
-      // Random garbage characters mimicking brute-forcing
-      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
-      let mockWord = "";
-      for (let i = 0; i < Math.min(16, password.length); i++) {
-        mockWord += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      setTickerText(`Prüfe Kombinationen: ${mockWord}`);
-
-      if (steps >= 100) {
-        clearInterval(interval);
+    setIllustrationProgress(0);
+    setTickerText(ILLUSTRATION_STAGES[0]);
+    let step = 0;
+    // A fixed educational animation, independent of the entered example.
+    // It never tries guesses, sends the input, or derives a cracking result.
+    intervalRef.current = setInterval(() => {
+      step += 1;
+      setIllustrationProgress(Math.min(100, step * 10));
+      if (step >= 10) {
+        clearInterval(intervalRef.current!);
+        intervalRef.current = null;
         setIsSimulating(false);
-        setSimulatedGuessProgress(100);
-        
-        if (entropyResult && entropyResult.level === "Sehr Stark") {
-          setTickerText("💥 Timeout! Angreifer bricht nach Billionen Fehlversuchen erschöpft ab.");
-        } else {
-          setTickerText("🔓 Geknackt! Passwort kompromittiert.");
-        }
+        setTickerText(COMPLETE_MESSAGE);
+      } else {
+        setTickerText(ILLUSTRATION_STAGES[Math.min(2, Math.floor(step / 3))]);
       }
-    }, 120);
+    }, 350);
   };
 
   if (showIntro) {
     return (
       <div className="space-y-6 animate-fade-in" id="password-lab-introduction">
-        {/* Header Info */}
         <div className="border-b border-[#1D1B18] pb-5">
           <h2 className="text-xl font-black text-[#1D1B18] flex items-center gap-2 uppercase">
             <KeyRound className="w-5 h-5 text-[#FF5500]" />
-            KENNWORT-STÄRKEMESSER // BRIEFING
+            KENNWORT-LABOR // BRIEFING
           </h2>
-          <p className="text-xs text-[#615C54] font-mono mt-1">
-            VORBEREITUNG &amp; WISSENS-ÜBERTRAGUNG: DAS GEHEIMNIS DER PASSWORT-ENTROPIE.
-          </p>
+          <p className="text-xs text-[#615C54] font-mono mt-1">LÄNGE, VORHERSEHBARKEIT UND DIE GRENZEN EINER LERNHEURISTIK.</p>
         </div>
 
-        {/* Informative briefing panels */}
         <div className="bg-[#FAF8F5] border-2 border-[#1D1B18] shadow-[4px_4px_0px_#1D1B18] p-6 text-left space-y-6 max-w-4xl mx-auto">
-          
           <div className="space-y-2">
-            <div className="inline-flex gap-1.5 bg-[#FF5500] text-white text-[9px] font-mono font-bold px-2 py-0.5 uppercase">
-              🔥 DIE ENTSCHEIDENDE ERKENNTNIS
-            </div>
-            <h3 className="text-lg font-black uppercase text-[#1D1B18]">Länge schlägt Wirrwarr!</h3>
+            <div className="inline-flex gap-1.5 bg-[#FF5500] text-white text-[9px] font-mono font-bold px-2 py-0.5 uppercase">DIE WICHTIGSTE UNTERSCHEIDUNG</div>
+            <h3 className="text-lg font-black uppercase text-[#1D1B18]">Länger hilft, wenn die Auswahl schwer zu erraten ist.</h3>
             <p className="text-xs md:text-sm text-[#2E2C29] leading-relaxed">
-              Viele Webseiten zwingen uns dazu, kryptische Zeichen-Puzzles zu erfinden (z.B. <code className="font-mono bg-[#ECE8DF] px-1.5 py-0.5 border border-[#1D1B18]">K@z$1!</code>). 
-              Doch diese Konstruktionen sind extrem schwer zu merken und für spezialisierte Hacker-Cluster ein Kinderspiel! 
-              <strong> Der Grund:</strong> Botnetze prüfen gängige Zeichenersetzungen (wie <code className="font-mono text-[11px] bg-[#ECE8DF] px-1.5 py-0.5">a ➔ @</code> oder <code className="font-mono text-[11px] bg-[#ECE8DF] px-1.5 py-0.5">s ➔ $</code>) in Millisekunden ab.
+              Eine Heuristik ist eine vereinfachte Faustregel. Dieses Labor betrachtet Zeichenlänge und einige auffällige Muster.
+              Es kennt weder die Entstehung eines Kennworts noch dessen Wiederverwendung oder Bekanntheit aus Datenlecks.
+              Aus der Zeichenfolge allein lässt sich keine belastbare Knackzeit ableiten.
             </p>
           </div>
 
-          {/* Interactive Illustration Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-            
-            {/* Bad approach card */}
-            <div className="border-2 border-red-500 bg-red-50/40 p-4 space-y-3">
-              <div className="flex justify-between items-center text-[9px] font-mono text-red-600 font-extrabold uppercase">
-                <span>❌ FALSCHER WEG: KURZ &amp; WIRR</span>
-                <span>CRACK-ZEIT: SOFORT</span>
-              </div>
-              <div className="bg-white p-3 border border-red-500 font-mono text-center">
-                <span className="text-sm font-black tracking-widest text-[#1D1B18]">H0f_f@r!</span>
-                <span className="text-[10px] text-red-600 block mt-1 font-bold">[ 8 ZEICHEN ]</span>
-              </div>
+            <div className="border-2 border-[#FF5500] bg-orange-50/40 p-4 space-y-3">
+              <h4 className="text-[10px] font-mono text-[#FF5500] font-extrabold uppercase">KURZES BEISPIEL MIT SONDERZEICHEN</h4>
+              <div className="bg-white p-3 border border-[#FF5500] font-mono text-center text-sm font-black tracking-widest text-[#1D1B18]">H0f_f@r!</div>
               <p className="text-[11px] text-[#615C54] leading-relaxed">
-                Hacker nutzen Wörterbücher und permutieren Zeichen. Ein 8-Zeichen-Kennwort liefert zu wenig Entropie 
-                und wird innerhalb von Sekunden ausgehebelt, obwohl es Sonderzeichen besitzt.
+                Acht Zeichen bieten weniger Auswahlmöglichkeiten als ein längeres, ähnlich zufällig gewähltes Kennwort.
+                Bekannte Ersetzungen wie „a“ durch „@“ sind vorhersehbar. Eine Mischung von Zeichenarten allein belegt keine Stärke.
               </p>
             </div>
-
-            {/* Good approach card */}
-            <div className="border-2 border-emerald-500 bg-emerald-50/40 p-4 space-y-3">
-              <div className="flex justify-between items-center text-[9px] font-mono text-emerald-600 font-extrabold uppercase">
-                <span>✅ BESSERER WEG: SATZ-PHRASE (XKCD)</span>
-                <span>CRACK-ZEIT: TRILLIONEN JAHRE</span>
-              </div>
-              <div className="bg-white p-3 border border-emerald-500 font-mono text-center">
-                <span className="text-xs font-black text-emerald-600 tracking-tight block">kaffeetasse-balkontür-regenschirm-wald</span>
-                <span className="text-[10px] text-[#2E2C29] block mt-1 font-bold">[ 38 ZEICHEN ]</span>
-              </div>
+            <div className="border-2 border-[#00A3A6] bg-teal-50/40 p-4 space-y-3">
+              <h4 className="text-[10px] font-mono text-[#007D80] font-extrabold uppercase">LÄNGERES WORTBEISPIEL</h4>
+              <div className="bg-white p-3 border border-[#00A3A6] font-mono text-center text-xs font-black text-[#1D1B18] break-words">regenschirm-kiesel-zebra-nebel</div>
               <p className="text-[11px] text-[#615C54] leading-relaxed">
-                Kombiniere vier willkürliche Alltagsbegriffe aneinander. Es ist kinderleicht im Gedächtnis zu behalten, 
-                aber für Computer unmöglich, alle Wortvariationen blind durchzurechnen.
+                Mehrere zufällig und unabhängig ausgewählte Wörter können eine längere Passphrase bilden.
+                Eine bekannte Redewendung, eine kleine feste Wortliste oder dieses veröffentlichte Beispiel ist keine verlässliche Auswahl für ein echtes Konto.
               </p>
             </div>
-
           </div>
 
-          {/* Core Formula Diagram */}
-          <div className="p-4 bg-[#E5E1D8] border border-[#1D1B18] text-[11px] font-mono uppercase space-y-2 text-[#615C54]">
-            <div className="text-xs text-[#1D1B18] font-black">📊 MATHEMATISCHES GESETZ DER ENTROPIE:</div>
-            <p className="leading-snug">
-              Jedes hinzugefügte Zeichen erhöht die Such-Komplexität für Generische Angreifer um den Faktor des Zeichensatzes. 
-              <strong> Länge ist der ultimative Hebel der Cybersicherheit.</strong>
+          <div className="p-4 bg-[#E5E1D8] border border-[#1D1B18] text-xs space-y-2 text-[#615C54] leading-relaxed">
+            <h4 className="text-xs text-[#1D1B18] font-black font-mono uppercase">WAS DIE ANGRIFFSDAUER BEEINFLUSST</h4>
+            <p>
+              Bei einer Anmeldung begrenzen Dienste oft die Zahl der Versuche. Werden gespeicherte Passwort-Hashes gestohlen,
+              hängt ein Offline-Angriff auch von deren Schutzverfahren und der verfügbaren Rechenleistung ab.
+              Ein Hash ist ein aus dem Kennwort berechneter Prüfwert. Das Labor kennt diese Bedingungen nicht.
             </p>
+            <p>Länge schützt ausserdem nicht vor Phishing. Ein einzigartiges Kennwort pro Dienst und zusätzliche Anmeldefaktoren verringern unterschiedliche Risiken.</p>
           </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 pt-3 justify-end">
-            <button
-              onClick={() => setShowIntro(false)}
-              className="bg-[#1D1B18] hover:bg-[#FF5500] text-white border-2 border-[#1D1B18] py-3.5 px-6 font-mono font-bold text-xs uppercase tracking-wider transition shadow-[3px_3px_0px_#FFA500]"
-            >
-              [ 🔬 LAB-MESSGERÄT STARTEN ]
+          <p className="text-[11px] text-[#615C54] leading-relaxed">
+            Fachliche Grundlage: <a className="underline underline-offset-2" href="https://pages.nist.gov/800-63-4/sp800-63b/passwords/" target="_blank" rel="noopener noreferrer">NIST SP 800-63B-4: Strength of Passwords</a>.
+            Die hier verwendete kleine Musterprüfung ist keine NIST-Konformitätsprüfung.
+          </p>
+          <div className="flex justify-end pt-3">
+            <button onClick={() => setShowIntro(false)} className="bg-[#1D1B18] hover:bg-[#FF5500] text-white border-2 border-[#1D1B18] py-3.5 px-6 font-mono font-bold text-xs uppercase tracking-wider transition shadow-[3px_3px_0px_#FFA500]">
+              Zurück zu den Trainingsbeispielen
             </button>
           </div>
-
         </div>
-
       </div>
     );
   }
 
   return (
     <div className="space-y-6" id="password-lab-root">
-      
-      {/* Header Info */}
       <div className="border-b border-[#1D1B18] pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-black text-[#1D1B18] flex items-center gap-2 uppercase">
             <KeyRound className="w-5 h-5 text-[#FF5500]" />
-            KENNWORT-STÄRKEMESSER // SECURE-KEY LAB
+            KENNWORT-LABOR // TRAININGSBEISPIELE
           </h2>
-          <p className="text-xs text-[#615C54] font-mono mt-1">
-            ANALYSATOR FÜR DRUCKFESTIGKEIT UND ENTROPIE-DIAGNOSTIK BEI DEZENTRALER VERTEIDIGUNG.
-          </p>
+          <p className="text-xs text-[#615C54] font-mono mt-1">LOKALE BEOBACHTUNGEN ZU LÄNGE UND MUSTERN.</p>
         </div>
-        <button
-          onClick={() => setShowIntro(true)}
-          className="text-xs text-[#FF5500] hover:underline font-mono uppercase font-bold self-start mt-1"
-        >
-          [ 📖 Erläuterung ansehen ]
+        <button onClick={() => { resetIllustration(); setShowIntro(true); }} className="text-xs text-[#FF5500] hover:underline font-mono uppercase font-bold self-start mt-1">
+          [ Erläuterung ansehen ]
         </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        
-        {/* Input & Evaluation section (7 cols) */}
-        <div className="lg:col-span-7 bg-[#F4F1EA] border-2 border-[#1D1B18] shadow-[4px_4px_0px_#1D1B18] p-5 space-y-4">
-          <h3 className="text-xs font-black text-[#1D1B18] uppercase tracking-wider font-mono border-b-2 border-[#1D1B18] pb-2">
-            🔑 CHASSIS_WERTE // KENN_WORT DIAGNOSTIK
-          </h3>
+      <p id="password-lab-privacy" className="border-2 border-[#FF5500] bg-orange-50 p-4 text-xs text-[#1D1B18] leading-relaxed">
+        <strong>Nur erfundene Trainingsbeispiele eingeben, keine echten Kennwörter oder Zugangstoken.</strong>{" "}
+        Das Labor speichert oder versendet diese Eingabe nicht. Die Anzeige bewertet weder die Sicherheit eines Kontos noch eine reale Knackzeit.
+      </p>
 
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div className="lg:col-span-7 bg-[#F4F1EA] border-2 border-[#1D1B18] shadow-[4px_4px_0px_#1D1B18] p-5 space-y-4">
+          <h3 className="text-xs font-black text-[#1D1B18] uppercase tracking-wider font-mono border-b-2 border-[#1D1B18] pb-2">BEISPIEL UNTERSUCHEN</h3>
           <div className="space-y-3">
-            <label className="text-[10px] font-mono text-[#615C54] uppercase block font-bold">Kennwort oder Token eingeben</label>
+            <label htmlFor="password-input-field" className="text-[10px] font-mono text-[#615C54] uppercase block font-bold">Erfundenes Kennwort-Beispiel</label>
             <div className="relative">
               <input
                 type={showPass ? "text" : "password"}
                 value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  evaluatePassword(e.target.value);
-                }}
-                placeholder="z.B. Mein-Sicheres-Lieblings-Wetter-2026!"
-                className="w-full bg-white border-2 border-[#1D1B18] pl-4 pr-12 py-3.5 text-sm text-[#1D1B18] placeholder-[#615C54]/40 outline-none focus:bg-[#FAF8F5] shadow-inner font-mono rounded-none"
+                onChange={event => changeExample(event.target.value)}
+                placeholder="Nur ein erfundenes Beispiel"
+                autoComplete="off"
+                autoCapitalize="none"
+                spellCheck={false}
+                maxLength={256}
+                aria-describedby="password-lab-privacy password-example-note"
+                className="w-full bg-white border-2 border-[#1D1B18] pl-4 pr-12 py-3.5 text-sm text-[#1D1B18] placeholder-[#615C54]/60 outline-none focus:bg-[#FAF8F5] shadow-inner font-mono rounded-none"
                 id="password-input-field"
               />
-              <button
-                type="button"
-                onClick={() => setShowPass(!showPass)}
-                className="absolute right-3 top-4 text-[#1D1B18] hover:text-[#FF5500]"
-              >
+              <button type="button" onClick={() => setShowPass(!showPass)} aria-label={showPass ? "Trainingsbeispiel verbergen" : "Trainingsbeispiel anzeigen"} aria-pressed={showPass} className="absolute right-3 top-4 text-[#1D1B18] hover:text-[#FF5500]">
                 {showPass ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
           </div>
-
-          {/* Quick Generator Shortcut Buttons */}
           <div className="flex flex-wrap gap-2 pt-1">
-            <button
-              onClick={generatePassphrase}
-              className="bg-white hover:bg-[#FAF8F5] border-2 border-[#1D1B18] text-[#1D1B18] font-mono font-bold py-2.5 px-4 rounded-none text-xs transition flex items-center gap-1.5 shadow-[2px_2px_0px_#1D1B18] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[0px_0px_0px_#1D1B18]"
-            >
+            <button onClick={chooseTrainingExample} className="bg-white hover:bg-[#FAF8F5] border-2 border-[#1D1B18] text-[#1D1B18] font-mono font-bold py-2.5 px-4 text-xs transition flex items-center gap-1.5 shadow-[2px_2px_0px_#1D1B18] active:translate-x-0.5 active:translate-y-0.5 active:shadow-none">
               <Sparkles className="w-3.5 h-3.5 text-[#FF5500]" />
-              SATZPASS-WORT WÜRFELN (XKCD)
+              Trainingsbeispiel wechseln
             </button>
-
-            <button
-              onClick={() => {
-                setPassword("");
-                setEntropyResult(null);
-                setSimulatedGuessProgress(0);
-                setTickerText("Bereit");
-              }}
-              className="bg-[#ECE8DF] border-2 border-[#1D1B18] py-2.5 px-4 rounded-none text-xs font-mono font-bold text-[#1D1B18] hover:bg-[#DCD8CF] transition"
-            >
-              ABSÄUBERN
-            </button>
+            <button onClick={() => changeExample("")} className="bg-[#ECE8DF] border-2 border-[#1D1B18] py-2.5 px-4 text-xs font-mono font-bold text-[#1D1B18] hover:bg-[#DCD8CF] transition">Eingabe leeren</button>
           </div>
+          <p id="password-example-note" className="text-[11px] text-[#615C54] leading-relaxed">Die Schaltfläche wechselt zwischen drei öffentlichen Lernbeispielen. Sie erzeugt keine Kennwörter für echte Konten.</p>
 
-          {entropyResult && (
-            <div className="pt-4 space-y-4 border-t-2 border-[#1D1B18]">
-              
-              {/* Security Shield badge */}
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono text-[#615C54] uppercase font-bold">Sicherheits-Standard:</span>
-                <span className={`text-[10px] uppercase font-mono px-3 py-1 rounded-none border-2 font-black ${
-                  entropyResult.level === "Sehr Stark" 
-                    ? "bg-[#00A3A6]/10 border-[#00A3A6] text-[#00A3A6]"
-                    : entropyResult.level === "Mittel"
-                    ? "bg-[#1D1B18]/10 border-[#1D1B18] text-[#1D1B18]"
-                    : "bg-[#FF5500]/10 border-[#FF5500] text-[#FF5500]"
-                }`}>
-                  {entropyResult.level}
-                </span>
+          {evaluation && (
+            <div className="pt-4 space-y-4 border-t-2 border-[#1D1B18]" aria-live="polite" aria-atomic="true">
+              <div className="flex flex-wrap gap-2 items-center justify-between">
+                <span className="text-[10px] font-mono text-[#615C54] uppercase font-bold">Beobachtung:</span>
+                <span className={`text-[10px] uppercase font-mono px-3 py-1 border-2 font-black ${evaluation.hasObviousPattern ? "bg-[#FF5500]/10 border-[#FF5500] text-[#A23800]" : "bg-white border-[#1D1B18] text-[#1D1B18]"}`}>{evaluation.level}</span>
               </div>
-
-              {/* Time estimation visual display */}
               <div className="p-4 bg-white border-2 border-[#1D1B18] shadow-[3px_3px_0px_#1D1B18] space-y-1">
-                <span className="text-[9px] font-mono text-[#615C54] block uppercase font-bold">Rechnerische Brute-Force-Knackzeit:</span>
-                <span className={`text-lg font-black block uppercase font-mono ${
-                  entropyResult.level === "Sehr Stark" ? "text-[#00A3A6]" : "text-[#FF5500]"
-                }`} id="crack-time-display">
-                  {entropyResult.crackTime}
-                </span>
-                <p className="text-[10px] text-[#615C54] font-mono leading-relaxed mt-1 uppercase">
-                  BASIEREND AUF DER ANNAHME, DASS EIN GENERISCHES BOTNET BILLIARDEN SCHLÜSSELPRÜFUNGEN PRO SEKUNDE AUSFÜHRT.
-                </p>
+                <span className="text-[9px] font-mono text-[#615C54] block uppercase font-bold">Zeichenlänge</span>
+                <span className="text-lg font-black block font-mono text-[#1D1B18]" id="password-length-display">{evaluation.length} Zeichen</span>
+                <p className="text-[11px] text-[#615C54] leading-relaxed">Die Länge ist eine Beobachtung. Auswahlverfahren, Wiederverwendung und Bekanntheit werden hier nicht geprüft.</p>
               </div>
-
-              {/* Feedback guidelines */}
-              {entropyResult.feedback.length > 0 && (
-                <div className="space-y-1.5 pt-2">
-                  <span className="text-[10px] font-mono font-black text-[#1D1B18] uppercase block">SYS_EXPERTEN ANALYSE:</span>
-                  {entropyResult.feedback.map((fb, idx) => (
-                    <div key={idx} className="flex gap-2 items-start text-xs text-[#1D1B18] bg-white border border-[#1D1B18] p-3 rounded-none shadow-[1.5px_1.5px_0px_#1D1B18]">
-                      <AlertCircle className="w-4 h-4 text-[#FF5500] shrink-0 mt-0.5" />
-                      <p className="font-sans leading-relaxed">{fb}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-
+              <div className="space-y-1.5 pt-2">
+                <span className="text-[10px] font-mono font-black text-[#1D1B18] uppercase block">EINORDNUNG DER LERNHEURISTIK:</span>
+                {evaluation.feedback.map(feedback => (
+                  <div key={feedback} className="flex gap-2 items-start text-xs text-[#1D1B18] bg-white border border-[#1D1B18] p-3 shadow-[1.5px_1.5px_0px_#1D1B18]">
+                    <AlertCircle className="w-4 h-4 text-[#FF5500] shrink-0 mt-0.5" />
+                    <p className="font-sans leading-relaxed">{feedback}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
-
         </div>
 
-        {/* Right column: Crack/Hacker simulator (5 cols) */}
         <div className="lg:col-span-5 space-y-5">
-          
-          {/* Visual Crack Animation card */}
           <div className="bg-[#F4F1EA] border-2 border-[#1D1B18] shadow-[4px_4px_0px_#1D1B18] p-5 space-y-4">
-            <h3 className="text-xs font-black text-[#1D1B18] uppercase tracking-wider font-mono border-b border-[#1D1B18] pb-2">
-              👾 BOTNET-ANGREIFER SIMULATION
-            </h3>
-            <p className="text-xs text-[#615C54] leading-normal font-mono uppercase text-[11px]">
-              PRÜFEN SIE LIVE, OB COMPUTER-CLUSTER DAGEGEN EINE EXTREME CHANCE HÄTTEN. STARTEN SIE DEN ANGRIFFS-ZYKLUS.
-            </p>
-
-            <div className="bg-[#E5E1D8] p-4 border-2 border-[#1D1B18] font-mono text-xs space-y-3 rounded-none shadow-inner">
+            <h3 className="text-xs font-black text-[#1D1B18] uppercase tracking-wider font-mono border-b border-[#1D1B18] pb-2">ILLUSTRATION: PASSWÖRTER ERRATEN</h3>
+            <p className="text-xs text-[#615C54] leading-relaxed">Eine feste Lernanimation erklärt Einflussfaktoren. Der Ablauf ist für jedes Beispiel gleich; es werden keine Kombinationen geprüft.</p>
+            <div className="bg-[#E5E1D8] p-4 border-2 border-[#1D1B18] font-mono text-xs space-y-3 shadow-inner">
               <div className="flex justify-between text-[#615C54] font-black border-b border-[#1D1B18]/20 pb-1.5">
-                <span>TASK: BRUTE_FORCE</span>
-                <span className="animate-pulse text-[#FF5500]">ACTIVE_STAGES</span>
+                <span>LERNILLUSTRATION</span>
+                <span className="text-[#A23800]">{isSimulating ? "LÄUFT" : "BEREIT"}</span>
               </div>
-              
-              <div className="text-[#1D1B18] min-h-[38px] bg-white/60 p-2 border border-[#1D1B18] text-wrap select-all font-mono text-[10px] uppercase font-bold">
-                {tickerText}
-              </div>
-
-              {/* Bar progress */}
+              <div className="text-[#1D1B18] min-h-[64px] bg-white/60 p-2 border border-[#1D1B18] text-[11px] leading-relaxed">{tickerText}</div>
               <div className="space-y-1">
                 <div className="flex justify-between text-[9px] text-[#615C54] font-black uppercase">
-                  <span>Such-Fortschritt</span>
-                  <span>{simulatedGuessProgress}%</span>
+                  <span id="password-illustration-progress-label">Animationsfortschritt</span>
+                  <span>{illustrationProgress}%</span>
                 </div>
-                <div className="bg-white border border-[#1D1B18] h-3">
-                  <div 
-                    className="bg-[#1D1B18] h-full"
-                    style={{ width: `${simulatedGuessProgress}%` }}
-                  />
+                <div className="bg-white border border-[#1D1B18] h-3" role="progressbar" aria-labelledby="password-illustration-progress-label" aria-valuemin={0} aria-valuemax={100} aria-valuenow={illustrationProgress}>
+                  <div className="bg-[#1D1B18] h-full" style={{ width: `${illustrationProgress}%` }} />
                 </div>
               </div>
             </div>
-
-            <button
-              onClick={handleRunSimulation}
-              disabled={!password || isSimulating}
-              className="w-full bg-[#1D1B18] hover:bg-[#FF5500] text-white disabled:opacity-40 py-2.5 px-4 rounded-none text-xs font-mono font-bold uppercase transition flex items-center justify-center gap-2 shadow-[2px_2px_0px_#1D1B18]"
-            >
-              <RefreshCw className={`w-4 h-4 text-white ${isSimulating ? "animate-spin" : ""}`} />
-              Angriff starten
+            <p className="sr-only" role="status">{isSimulating ? "Die Lernillustration läuft." : illustrationProgress === 100 ? COMPLETE_MESSAGE : "Die Lernillustration ist bereit."}</p>
+            <button onClick={handleRunSimulation} disabled={!password || isSimulating} className="w-full bg-[#1D1B18] hover:bg-[#FF5500] text-white disabled:opacity-40 py-2.5 px-4 text-xs font-mono font-bold uppercase transition flex items-center justify-center gap-2 shadow-[2px_2px_0px_#1D1B18]">
+              <RefreshCw className={`w-4 h-4 text-white ${isSimulating ? "animate-spin motion-reduce:animate-none" : ""}`} />
+              Illustration starten
             </button>
           </div>
-
-          {/* Secure Rules Tips */}
           <div className="bg-[#F4F1EA] border-2 border-[#1D1B18] shadow-[4px_4px_0px_#1D1B18] p-5 space-y-3.5">
-            <h3 className="text-xs font-black text-[#1D1B18] uppercase tracking-wider font-mono border-b border-[#1D1B18] pb-1">
-              💡 DIE GOLDENE PROTOKOLL-REGEL
-            </h3>
-            
-            <div className="text-xs text-[#1D1B18] space-y-3 font-sans leading-relaxed">
-              <p>
-                1. <strong>Länge schlägt Wirrwarr</strong>: Ein glattes langes Wort-Gebilde wie <span className="font-mono text-xs font-bold text-[#FF5500] bg-white border border-[#1D1B18] px-1 py-0.5 whitespace-nowrap">schmetterling-kuchen-tür-wind</span> ist milliardenfach stärker gegen Hacker-Cluster als unmerkbare, extreme Zeichen-Puzzles wie <span className="font-mono text-xs text-[#1D1B18] bg-white border border-[#1D1B18] px-1 py-0.5 whitespace-nowrap">H@9&amp;!</span>.
-              </p>
-              <p>
-                2. <strong>Keine Wiederverwendung</strong>: Wenn dasselbe Passwort an mehreren Orten eingetragen wird, reicht ein einziges gehacktes Miniforum, um all Ihre Hauptkonten sofort zu kompromittieren.
-              </p>
+            <h3 className="text-xs font-black text-[#1D1B18] uppercase tracking-wider font-mono border-b border-[#1D1B18] pb-1">FÜR ECHTE KONTEN</h3>
+            <div className="text-xs text-[#1D1B18] space-y-3 leading-relaxed">
+              <p><strong>Einzigartige Kennwörter:</strong> Ein Passwortmanager kann lange, zufällige Kennwörter erzeugen und aufbewahren. Veröffentlichte Lernbeispiele eignen sich dafür nicht.</p>
+              <p><strong>Keine Wiederverwendung:</strong> Wird ein Kennwort bekannt, können Angreifer es bei anderen Diensten ausprobieren.</p>
+              <p><strong>Zusätzlicher Schutz:</strong> Nutze unterstützte Passkeys – Anmeldeschlüssel statt eines Passworts – oder zusätzliche Anmeldefaktoren. Auch ein langes Kennwort schützt nicht davor, es auf einer gefälschten Anmeldeseite preiszugeben.</p>
             </div>
+            <a className="text-[11px] text-[#615C54] underline underline-offset-2" href="https://pages.nist.gov/800-63-4/sp800-63b/passwords/" target="_blank" rel="noopener noreferrer">Fachliche Grundlage: NIST SP 800-63B-4</a>
           </div>
-
         </div>
-
       </div>
-
     </div>
   );
 }

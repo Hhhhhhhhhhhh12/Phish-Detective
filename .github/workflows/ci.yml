@@ -6,26 +6,32 @@ on:
   pull_request:
     branches: [ main, master, dev ]
 
+permissions:
+  contents: read
+
 jobs:
   verify:
     name: Build & Verification Suite
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: 📂 Checkout Codebase
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: 🟢 Setup Node.js Environment
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
-          cache: 'npm'
+          package-manager-cache: false
 
       - name: 📦 Install Project Dependencies
-        run: npm ci
+        run: npm ci --ignore-scripts
 
-      - name: 🔍 TypeScript Typecheck & Linting
-        run: npm run lint
+      - name: 🔍 TypeScript type check
+        run: npm run typecheck
 
       - name: 🧪 Run Automated Unit Tests (Vitest)
         run: npm run test
@@ -37,3 +43,19 @@ jobs:
 
       - name: Check static artifact boundaries
         run: npm run check:pages
+
+      - name: Install browser test engines
+        run: npx --no-install playwright install --with-deps chromium webkit
+
+      - name: Verify critical browser journeys
+        run: npm run test:e2e
+
+      - name: Retain browser test diagnostics
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: browser-test-diagnostics
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

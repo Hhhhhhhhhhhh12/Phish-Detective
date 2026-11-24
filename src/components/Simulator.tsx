@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { defaultCases } from "../cases";
-import { SimulationCase, DetectiveProfile } from "../types";
+import React, { useState, useEffect, useRef } from "react";
+import { SimulationCase } from "../types";
+import { loadProfile, selectProfileCase, resetProfile, recordStoredCaseDecision, SimulatorProfile } from "../utils/progress";
+import { subscribeStorageChanges } from "../utils/storage";
 import { 
   ShieldAlert, ShieldCheck, Award, Zap, Check, ChevronRight, Compass,
   AlertTriangle, Play, Target, Brain
@@ -29,36 +30,18 @@ const getLocalizedRanks = (lang: string) => {
 export default function Simulator({ language = "de" }: { language?: Language }) {
   const currentCases = getLocalizedCases(language);
 
-  const [profile, setProfile] = useState<DetectiveProfile>(() => {
-    const rawRanks = getLocalizedRanks(language);
-    return {
-      xp: 0,
-      score: 0,
-      completedCasesCount: 0,
-      streak: 0,
-      rank: rawRanks[0].title,
-      solvedCaseIds: []
-    };
-  });
-
-  const [activeCaseIdx, setActiveCaseIdx] = useState(0);
-  const [currentCase, setCurrentCase] = useState<SimulationCase>(currentCases[0]);
+  const [profile, setProfile] = useState<SimulatorProfile>(loadProfile);
+  const [activeCaseIdx, setActiveCaseIdx] = useState(() => Math.max(0, currentCases.findIndex(c => c.id === profile.activeCaseId)));
+  const [currentCase, setCurrentCase] = useState<SimulationCase>(currentCases[activeCaseIdx]);
   const [hoveredLinkUrl, setHoveredLinkUrl] = useState<string | null>(null);
-  const [userGuess, setUserGuess] = useState<boolean | null>(null);
-  const [isRoundSolved, setIsRoundSolved] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
+  const restoredGuess = profile.activeCaseId === currentCases[activeCaseIdx].id ? profile.lastGuess : undefined;
+  const [userGuess, setUserGuess] = useState<boolean | null>(restoredGuess ?? null);
+  const [isRoundSolved, setIsRoundSolved] = useState(restoredGuess !== undefined);
+  const [isCorrect, setIsCorrect] = useState(restoredGuess === currentCases[activeCaseIdx].isPhishing);
+  const roundAnswered = useRef(restoredGuess !== undefined);
   const calculatedRanks = getLocalizedRanks(language);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("phish_detective_profile_v2");
-    if (saved) {
-      try {
-        setProfile(JSON.parse(saved));
-      } catch (e) {
-        console.error(e);
-      }
-    }
-  }, []);
+  const profileRef = useRef(profile);
+  const [syncNotice, setSyncNotice] = useState("");
 
   useEffect(() => {
     if (activeCaseIdx < currentCases.length) {
@@ -76,84 +59,88 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
     return currentRank;
   };
 
-  const saveProfile = (newProfile: DetectiveProfile) => {
-    setProfile(newProfile);
-    localStorage.setItem("phish_detective_profile_v2", JSON.stringify(newProfile));
+  const acceptProfile = (latest: SimulatorProfile) => {
+    profileRef.current = latest;
+    setProfile(latest);
   };
+
+  const restoreSavedRound = (latest: SimulatorProfile) => {
+    const idx = Math.max(0, currentCases.findIndex(c => c.id === latest.activeCaseId));
+    const restoredCase = currentCases[idx];
+    const guess = latest.activeCaseId === restoredCase.id ? latest.lastGuess : undefined;
+    setActiveCaseIdx(idx);
+    setCurrentCase(restoredCase);
+    setUserGuess(guess ?? null);
+    setIsCorrect(guess === restoredCase.isPhishing);
+    setIsRoundSolved(guess !== undefined);
+    roundAnswered.current = guess !== undefined;
+    setHoveredLinkUrl(null);
+  };
+
+  const resetNotice = language === "en"
+    ? "Simulator progress was reset in another tab. The saved round is shown; the old round was discarded."
+    : "Der Simulator-Fortschritt wurde in einem anderen Tab zurückgesetzt. Die gespeicherte Runde wird angezeigt; die alte Runde wurde verworfen.";
+
+  useEffect(() => {
+    const refresh = () => {
+      const latest = loadProfile();
+      const resetChanged = latest.resetRevision !== profileRef.current.resetRevision;
+      acceptProfile(latest);
+      // Other tabs may choose their own practice case. Only a shared reset
+      // discards the currently displayed round and its obsolete feedback.
+      if (resetChanged) {
+        restoreSavedRound(latest);
+        setSyncNotice(resetNotice);
+      }
+    };
+    refresh();
+    return subscribeStorageChanges(refresh);
+  }, [language]);
 
   const handleDecision = (claimedIsPhish: boolean) => {
-    if (isRoundSolved) return;
-
-    setUserGuess(claimedIsPhish);
-    const correct = currentCase.isPhishing === claimedIsPhish;
-    setIsCorrect(correct);
-    setIsRoundSolved(true);
-
-    const xpGained = correct ? 50 : 10;
-    const pointsGained = correct ? (10 + profile.streak * 5) : 0;
-    const nextStreak = correct ? profile.streak + 1 : 0;
-    
-    const updatedSolvedIds = [...profile.solvedCaseIds];
-    const updatedFailedIds = [...(profile.failedCaseIds || [])];
-
-    if (correct) {
-      if (!updatedSolvedIds.includes(currentCase.id)) {
-        updatedSolvedIds.push(currentCase.id);
-      }
-      const failedIdx = updatedFailedIds.indexOf(currentCase.id);
-      if (failedIdx > -1) {
-        updatedFailedIds.splice(failedIdx, 1);
-      }
-    } else {
-      if (!updatedFailedIds.includes(currentCase.id)) {
-        updatedFailedIds.push(currentCase.id);
-      }
+    if (isRoundSolved || roundAnswered.current) return;
+    roundAnswered.current = true;
+    const expectedResetRevision = profileRef.current.resetRevision;
+    const nextProfile = recordStoredCaseDecision(currentCase.id, claimedIsPhish, currentCase.isPhishing, expectedResetRevision);
+    acceptProfile(nextProfile);
+    if (nextProfile.resetRevision !== expectedResetRevision) {
+      restoreSavedRound(nextProfile);
+      setSyncNotice(resetNotice);
+      return;
     }
 
-    const nextXp = profile.xp + xpGained;
-    const nextProfile: DetectiveProfile = {
-      xp: nextXp,
-      score: profile.score + pointsGained,
-      completedCasesCount: profile.completedCasesCount + 1,
-      streak: nextStreak,
-      rank: calculateRank(nextXp),
-      solvedCaseIds: updatedSolvedIds,
-      failedCaseIds: updatedFailedIds
-    };
-
-    saveProfile(nextProfile);
+    // If another tab answered this saved round first, show that recorded
+    // answer instead of claiming a second reward for the current click.
+    const recordedGuess = nextProfile.lastGuess ?? claimedIsPhish;
+    setUserGuess(recordedGuess);
+    setIsCorrect(currentCase.isPhishing === recordedGuess);
+    setIsRoundSolved(true);
+    setSyncNotice("");
   };
 
-  const handleNextCase = () => {
+  const openCase = (idx: number) => {
+    const latest = selectProfileCase(currentCases[idx].id);
+    acceptProfile(latest);
+    roundAnswered.current = false;
     setIsRoundSolved(false);
     setUserGuess(null);
     setHoveredLinkUrl(null);
-    
-    const nextIdx = (activeCaseIdx + 1) % currentCases.length;
-    setActiveCaseIdx(nextIdx);
-    setCurrentCase(currentCases[nextIdx]);
+    setSyncNotice("");
+    setActiveCaseIdx(idx);
+    setCurrentCase(currentCases[idx]);
   };
 
+  const handleNextCase = () => openCase((activeCaseIdx + 1) % currentCases.length);
+
   const handleRestartProgress = () => {
-    const confirmMsg = language === "en" 
-      ? "Do you really want to clear your entire progress and detective rank?" 
-      : "Möchten Sie Ihren gesamten Fortschritt und Ihr Detektiv-Level zurücksetzen?";
-    if (confirm(confirmMsg)) {
-      const rawRanks = getLocalizedRanks(language);
-      const freshProf: DetectiveProfile = {
-        xp: 0,
-        score: 0,
-        completedCasesCount: 0,
-        streak: 0,
-        rank: rawRanks[0].title,
-        solvedCaseIds: [],
-        failedCaseIds: []
-      };
-      saveProfile(freshProf);
-      setActiveCaseIdx(0);
-      setCurrentCase(currentCases[0]);
-      setIsRoundSolved(false);
-      setUserGuess(null);
+    const confirmMsg = language === "en"
+      ? "Reset simulator practice points, answers and rank in this browser (including other tabs)? Byte, pet XP, unlocks and the flashcard box will stay unchanged."
+      : "Simulator-Übungspunkte, Antworten und Rang in diesem Browser (auch in anderen Tabs) zurücksetzen? Byte, Fisch-XP, Modulfreischaltungen und der Vokabelkasten bleiben erhalten.";
+    if (window.confirm(confirmMsg)) {
+      const latest = resetProfile(currentCases[0].id);
+      acceptProfile(latest);
+      restoreSavedRound(latest);
+      setSyncNotice("");
     }
   };
 
@@ -161,24 +148,24 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
     const skills = [
       {
         id: "sender",
-        name: language === "en" ? "SENDER VALIDITY" : "ABSENDER-RECHTLICHKEIT",
-        description: language === "en" ? "AUDITING OF SENDER ADDRESSES AND DOMAINS." : "PRÜFUNG VON CO-SENDER ADRESSEN UND DOMAINS.",
+        name: language === "en" ? "SENDER CHECKS" : "ABSENDERPRÜFUNG",
+        description: language === "en" ? "CHECKING SENDER ADDRESSES AND DOMAINS." : "ABSENDERADRESSEN UND DOMAINS PRÜFEN.",
         associatedCases: ["case-paypal", "case-dhl", "case-hr-spear"],
         tipIfWeak: language === "en" ? "TIP: INSPECT THE DOMAIN PORTION AFTER THE '@'." : "TIPP: REINSCHAUEN BEIM DOMAIN-HOSTELEMENT NACH DEM '@'."
       },
       {
         id: "links",
-        name: language === "en" ? "LINK DIAGNOSTICS" : "LINK-RECHNER-DIAGNOSTIK",
-        description: language === "en" ? "EXPOSING HIGH-RISK TLDS (E.G. .CN AND .RU)." : "ENTLARVUNG VON HOCHRISIKO-TLDS (Z.B. .CN UND .RU).",
+        name: language === "en" ? "LINK INSPECTION" : "LINKPRÜFUNG",
+        description: language === "en" ? "COMPARING LINK HOSTNAMES WITH THE EXPECTED SERVICE." : "LINK-HOSTNAMEN MIT DEM ERWARTETEN DIENST ABGLEICHEN.",
         associatedCases: ["case-paypal", "case-dhl", "case-hr-spear"],
         tipIfWeak: language === "en" ? "TIP: USE THE 'INSPECTOR' TOOL TO DECONSTRUCT MULTI-LEVEL DOMAINS." : "TIPP: NUTZEN SIE DAS 'SEZIERMESSER' IN DER LINK-INSPEKTION."
       },
       {
         id: "urgency",
-        name: language === "en" ? "PRESSURE RESISTANCE" : "VETRESISTENZ GEGEN DRUCK",
+        name: language === "en" ? "PRESSURE RESISTANCE" : "UMGANG MIT ZEITDRUCK",
         description: language === "en" ? "RESISTING ARTIFICIAL TIMEOUT THREATS." : "WIDERSTAND GEGEN KÜNSTLICHE ZEITBEDROHUNGEN.",
         associatedCases: ["case-paypal", "case-hr-spear", "case-microsoft"],
-        tipIfWeak: language === "en" ? "TIP: LEGITIMATE FIRMS RARELY THREATEN YOU WITH 24-HOUR BANS." : "TIPP: REALE FIRMEN DROHEN SELTEN MIT SPONTANEN 24H-SPERREN."
+        tipIfWeak: language === "en" ? "TIP: VERIFY URGENT REQUESTS THROUGH A KNOWN, INDEPENDENT CHANNEL." : "TIPP: DRINGENDE ANFRAGEN ÜBER EINEN BEKANNTEN, UNABHÄNGIGEN KANAL PRÜFEN."
       },
       {
         id: "social",
@@ -202,15 +189,7 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
       });
 
       const total = solvedCount + failedCount;
-      let percentage = 75;
-
-      if (total > 0) {
-        percentage = Math.round((solvedCount / total) * 100);
-      } else {
-        if (profile.xp > 0) {
-          percentage = Math.min(100, 75 + Math.min(25, Math.floor(profile.xp / 25) * 5));
-        }
-      }
+      const percentage = total > 0 ? Math.round((solvedCount / total) * 100) : null;
 
       return {
         ...skill,
@@ -224,6 +203,7 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start animate-fade-in" id="simulator-container-elem">
+      {syncNotice && <p role="status" className="lg:col-span-12 border-2 border-amber-600 bg-amber-50 p-3 text-sm text-amber-950">{syncNotice}</p>}
       
       {/* LEFT: Dashboard profile status & actions (4 columns) */}
       <div className="lg:col-span-4 space-y-6">
@@ -239,16 +219,16 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
               <span className="text-[9px] font-mono uppercase text-[#615C54] font-black block">
                 {language === "en" ? "INVESTIGATOR_HQ" : "ERMITTLER_STEUERUNG"}
               </span>
-              <h3 className="text-sm font-black text-[#1D1B18] uppercase tracking-tight font-mono">{profile.rank}</h3>
+              <h3 className="text-sm font-black text-[#1D1B18] uppercase tracking-tight font-mono">{calculateRank(profile.xp)}</h3>
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4 text-center">
             <div className="bg-white p-3 border-2 border-[#1D1B18] shadow-[2px_2px_0px_#1D1B18]">
               <span className="text-[9px] font-mono text-[#615C54] uppercase tracking-wider block font-bold">
-                {language === "en" ? "EXPERIENCE (XP)" : "ERFAHRUNG (XP)"}
+                {language === "en" ? "PRACTICE POINTS" : "ÜBUNGSPUNKTE"}
               </span>
-              <div className="text-base font-black font-mono text-[#FF5500] mt-0.5">{profile.xp} XP</div>
+              <div className="text-base font-black font-mono text-[#FF5500] mt-0.5">{profile.xp}</div>
             </div>
             <div className="bg-white p-3 border-2 border-[#1D1B18] shadow-[2px_2px_0px_#1D1B18]">
               <span className="text-[9px] font-mono text-[#615C54] uppercase tracking-wider block font-bold">
@@ -258,9 +238,14 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
             </div>
           </div>
 
+          <p className="mt-3 text-xs text-[#615C54]">
+            {language === "en"
+              ? "Simulator points and ranks belong to this practice mode, including repeats. Pet XP unlock modules separately."
+              : "Simulator-Punkte und Ränge gelten für diesen Übungsmodus, einschliesslich Wiederholungen. Fisch-XP schalten separat Module frei."}
+          </p>
           <div className="mt-4 space-y-2 uppercase font-mono text-xs text-[#1D1B18]">
             <div className="flex justify-between">
-              <span>{language === "en" ? "CASES EXAMINED" : "FÄLLE EXAMINIERT"}</span>
+              <span>{language === "en" ? "PRACTICE ROUNDS" : "ÜBUNGSRUNDEN"}</span>
               <span className="font-bold text-[#1D1B18]">{profile.completedCasesCount}</span>
             </div>
             
@@ -298,12 +283,12 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
             <div className="flex items-center gap-2">
               <Brain className="w-4 h-4 text-[#00A3A6]" />
               <h4 className="text-xs font-black uppercase text-[#1D1B18] font-mono">
-                {language === "en" ? "📊 SKILLS RADAR & MATRIX" : "📊 STÄRKEN & SCHWÄCHEN_INDEX"}
+                {language === "en" ? "📊 ANSWERS BY TOPIC" : "📊 ANTWORTEN NACH THEMA"}
               </h4>
             </div>
             <span className="text-[8px] font-mono font-black border-2 border-[#1D1B18] bg-[#1D1B18] text-white px-2 py-0.5 uppercase">
               {profile.completedCasesCount > 0 
-                ? (language === "en" ? "LIVE ANALYSING" : "LIVE_ANALYSE") 
+                ? (language === "en" ? "LOCAL ANSWERS" : "LOKALE ANTWORTEN")
                 : (language === "en" ? "PENDING" : "AUSSTEHEND")}
             </span>
           </div>
@@ -312,8 +297,8 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
             <div className="p-3 bg-white border border-[#1D1B18] text-center space-y-2.5 font-mono text-[10px] uppercase">
               <p className="text-[#615C54] leading-relaxed">
                 {language === "en" 
-                  ? "Solve cases in the simulator to unlock your personal strengths & weaknesses radar. Your forensic decisions are monitored live."
-                  : "Absolvieren Sie Fälle im Simulator, um Ihr persönliches Stärken- & Schwächenprofil freizuschalten. Unser System wertet Ihre Ermittlungen live aus."}
+                  ? "Solve prepared cases to see a summary of your answers. This is practice feedback, not a validated skills assessment."
+                  : "Bearbeite vorbereitete Fälle, um deine Antworten zusammengefasst zu sehen. Das ist Übungsfeedback, keine validierte Kompetenzmessung."}
               </p>
               <div className="flex items-center justify-center gap-1.5 text-[#FF5500] font-black uppercase tracking-wider animate-pulse pt-1">
                 <Target className="w-4 h-4" />
@@ -324,14 +309,14 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
             <div className="space-y-4">
               <p className="text-xs text-[#1D1B18] font-mono uppercase tracking-tight">
                 {language === "en" 
-                  ? `BASED ON ${profile.completedCasesCount} COMPLETED EXAMS:` 
-                  : `BASIEREND AUF ${profile.completedCasesCount} DURCHGEFÜHRTEN EXAMEN:`}
+                  ? "Latest answer per relevant case; unanswered topics show no percentage:"
+                  : "Letzte Antwort je zugeordnetem Fall; ohne Antworten gibt es keinen Prozentwert:"}
               </p>
 
               <div className="space-y-3.5">
                 {computeSkills().map((skill) => {
-                  const isStrength = skill.percentage >= 80;
-                  const isWeakness = skill.percentage < 60;
+                  const isStrength = skill.percentage !== null && skill.percentage >= 80;
+                  const isWeakness = skill.percentage !== null && skill.percentage < 60;
                   
                   return (
                     <div key={skill.id} className="space-y-1.5">
@@ -340,7 +325,7 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
                         <span className={`font-black ${
                           isStrength ? "text-[#00A3A6]" : isWeakness ? "text-[#FF5500]" : "text-amber-500"
                         }`}>
-                          {skill.percentage}%
+                          {skill.percentage === null ? (language === "en" ? "No answers yet" : "Noch keine Antworten") : `${skill.percentage}% (${skill.solvedCount}/${skill.total})`}
                         </span>
                       </div>
                       
@@ -349,7 +334,7 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
                           className={`h-full ${
                             isStrength ? "bg-[#00A3A6]" : isWeakness ? "bg-[#FF5500]" : "bg-amber-400"
                           }`}
-                          style={{ width: `${skill.percentage}%` }}
+                          style={{ width: `${skill.percentage ?? 0}%` }}
                         />
                       </div>
                     </div>
@@ -361,16 +346,16 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
               <div className="border-t-2 border-[#1D1B18] pt-3.5 space-y-3 font-mono">
                 
                 {/* Strengths section */}
-                {computeSkills().some(s => s.percentage >= 80) && (
+                {computeSkills().some(s => s.percentage !== null && s.percentage >= 80) && (
                   <div className="space-y-1.5">
                     <span className="text-[9px] font-black uppercase tracking-wider text-[#00A3A6] flex items-center gap-1">
                       <Check className="w-3.5 h-3.5 shrink-0" />
-                      {language === "en" ? "Forensic Strengths:" : "Ermittlungs-Stärken:"}
+                      {language === "en" ? "Correct practice answers:" : "Richtige Übungsantworten:"}
                     </span>
                     <div className="space-y-1">
-                      {computeSkills().filter(s => s.percentage >= 80).map(s => (
+                      {computeSkills().filter(s => s.percentage !== null && s.percentage >= 80).map(s => (
                         <div key={s.id} className="text-[10px] text-[#1D1B18] bg-[#00A3A6]/10 px-2.5 py-1.5 border border-[#00A3A6] uppercase">
-                          🎯 <strong>{s.name}</strong> {language === "en" ? "IS WELL SECURED" : "IST SEHR GUT GEFESTIGT"} ({s.percentage}%)
+                          🎯 <strong>{s.name}</strong> {language === "en" ? "CORRECT IN THESE CASES" : "IN DIESEN FÄLLEN RICHTIG"} ({s.percentage}%)
                         </div>
                       ))}
                     </div>
@@ -378,14 +363,14 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
                 )}
 
                 {/* Weaknesses/Tips Section */}
-                {computeSkills().some(s => s.percentage < 80) && (
+                {computeSkills().some(s => s.percentage !== null && s.percentage < 80) && (
                   <div className="space-y-1.5">
                     <span className="text-[9px] font-black uppercase tracking-wider text-[#FF5500] flex items-center gap-1">
                       <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                       {language === "en" ? "Training Input & Tips:" : "Schulungsbedarf / Tipps:"}
                     </span>
                     <div className="space-y-1.5 flex flex-col gap-1">
-                      {computeSkills().filter(s => s.percentage < 80).map(s => (
+                      {computeSkills().filter(s => s.percentage !== null && s.percentage < 80).map(s => (
                         <div key={s.id} className="text-[9px] text-[#1D1B18] bg-white p-2.5 border border-[#1D1B18] uppercase">
                           ⚠️ <span className="font-extrabold text-[#FF5500]">{s.name} ({s.percentage}%):</span>
                           <span className="text-[#615C54] block mt-1 font-sans normal-case">
@@ -418,19 +403,13 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
         {/* Local Preset Switcher */}
         <div className="bg-[#F4F1EA] border-2 border-[#1D1B18] shadow-[4px_4px_0px_#1D1B18] p-5 space-y-3">
           <h4 className="text-xs font-black text-[#1D1B18] uppercase tracking-wider font-mono border-b border-[#1D1B18] pb-1.5">
-            {language === "en" ? "📚 LOCAL CASE RECORD CHASSIS" : "📚 LOKALES CHASSIS-BUCH"}
+            {language === "en" ? "📚 CHOOSE A PRACTICE CASE" : "📚 ÜBUNGSFALL WÄHLEN"}
           </h4>
           <div className="space-y-1.5">
             {currentCases.map((cs, idx) => (
               <button
                 key={cs.id}
-                onClick={() => {
-                  setActiveCaseIdx(idx);
-                  setCurrentCase(cs);
-                  setIsRoundSolved(false);
-                  setUserGuess(null);
-                  setHoveredLinkUrl(null);
-                }}
+                onClick={() => openCase(idx)}
                 className={`w-full text-left p-2.5 rounded-none flex items-center justify-between text-[11px] font-mono border-2 transition ${
                   currentCase.id === cs.id 
                     ? "bg-[#1D1B18] border-[#1D1B18] text-white"
@@ -459,7 +438,7 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
               onClick={handleRestartProgress}
               className="w-full text-center py-2 px-3 border-2 border-[#1D1B18] bg-[#ECE8DF] hover:bg-[#FF5500] hover:text-white text-[#1D1B18] text-[9.5px] font-mono font-black uppercase transition shadow-[1px_1px_0px_#1D1B18] active:translate-y-0.5"
             >
-              {language === "en" ? "🔄 PURGE PROFILE & METRICS" : "🔄 SPIELFORTSCHRITT ABSÄUBERN"}
+              {language === "en" ? "🔄 RESET SIMULATOR PROGRESS" : "🔄 SIMULATOR-FORTSCHRITT ZURÜCKSETZEN"}
             </button>
           </div>
         </div>
@@ -536,13 +515,9 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
                 <button
                   key={link.id}
                   onMouseEnter={() => setHoveredLinkUrl(link.actualUrl)}
-                  onMouseLeave={() => setHoveredLinkUrl(null)}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    alert(language === "en" 
-                      ? "Caution! You directly clicked a link button. In our simulator, you never click. Hover your selector cursor over the button to evaluate the true URL destination inside the bottom status line first, then arbitrarily make your choice." 
-                      : "Vorsicht! Im Simulator müssen Sie den Link nicht anklicken. Hovern Sie stattdessen darüber, um das echte Ziel unten in der Statusleiste zu prüfen, und fällen Sie dann Ihr Ermittlerurteil.");
-                  }}
+                  onFocus={() => setHoveredLinkUrl(link.actualUrl)}
+                  onClick={() => setHoveredLinkUrl(link.actualUrl)}
+                  aria-label={`${link.text} – ${language === "en" ? "show destination, does not open the site" : "Ziel anzeigen, öffnet keine Website"}`}
                   className="bg-white hover:bg-[#FAF8F5] border-2 border-[#1D1B18] text-[#1D1B18] font-mono font-black py-2.5 px-5 rounded-none ml-0 transition flex items-center justify-center gap-1.5 shadow-[3px_3px_0px_#1D1B18] hover:shadow-[1px_1px_0px_#1D1B18] active:translate-y-0.5 uppercase text-xs"
                 >
                   {link.text}
@@ -553,7 +528,7 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
             {/* Simulated Desktop Client Hover Bar (Statusleiste) */}
             <div className="absolute bottom-2 left-2 max-w-[90%] md:max-w-md pointer-events-none">
               {hoveredLinkUrl && (
-                <div className="bg-[#1D1B18] border-2 border-[#1D1B18] text-white font-mono px-3 py-1.5 rounded-none shadow-lg flex items-center gap-1.5 tracking-tight">
+                <div role="status" className="bg-[#1D1B18] border-2 border-[#1D1B18] text-white font-mono px-3 py-1.5 rounded-none shadow-lg flex items-center gap-1.5 tracking-tight">
                   <span className="w-1.5 h-1.5 bg-[#FF5500] animate-pulse"></span>
                   <span className="text-slate-400 mr-0.5 text-[9px] uppercase font-black">
                     {language === "en" ? "Target Link:" : "Link-Ziel:"}
@@ -569,7 +544,7 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
             {!isRoundSolved ? (
               <div className="flex flex-col sm:flex-row items-center justify-between gap-3 font-mono">
                 <span className="text-[10px] text-[#615C54] flex items-center gap-1.5 font-bold uppercase">
-                  {language === "en" ? "HOVER TO INSPECT SENSITIVE LINKS AND ARBITRATE." : "HOVERN SIE ZUM PRÜFEN UND ENTSCHEIDEN SIE."}
+                  {language === "en" ? "HOVER, FOCUS OR TAP A LINK TO INSPECT ITS DESTINATION." : "LINK-ZIELE PER MAUS, TASTATURFOKUS ODER ANTIPPEN PRÜFEN."}
                 </span>
                 <div className="flex gap-2 w-full sm:w-auto">
                   <button
@@ -582,7 +557,7 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
                     onClick={() => handleDecision(true)}
                     className="flex-1 sm:flex-none border-2 border-[#1D1B18] bg-[#FF5500] hover:bg-[#CC4400] text-white font-bold py-2.5 px-5 rounded-none text-xs uppercase shadow-[2px_2px_0px_#1D1B18] active:translate-y-0.5 transition"
                   >
-                    {language === "en" ? "🚨 INVASIVE PHISH!" : "🚨 INVASIVER PHISH!"}
+                    {language === "en" ? "🚨 PHISHING" : "🚨 PHISHING"}
                   </button>
                 </div>
               </div>
@@ -598,12 +573,12 @@ export default function Simulator({ language = "de" }: { language?: Language }) 
                     <h4 className="text-xs font-black text-[#1D1B18] uppercase">
                       {isCorrect 
                         ? (language === "en" ? "SUCCESSFULLY IDENTIFIED!" : "ERFOLGREICH IDENTIFIZIERT!") 
-                        : (language === "en" ? "DIAGNOSTIC LEAKED!" : "DIAGNOSE VERABSÄUMT!")}
+                        : (language === "en" ? "TRY THE EXPLANATION" : "SCHAU DIR DIE ERKLÄRUNG AN")}
                     </h4>
                     <p className="text-[10px] text-[#615C54] uppercase font-bold leading-normal">
                       {isCorrect 
-                        ? (language === "en" ? "Spot securely. Added +50 XP to your profile tracker." : "Ihr Verdacht war absolut gerechtfertigt. +50 XP hinzugefügt.") 
-                        : (language === "en" ? "Phishing hook active. Incident logged (+10 XP)." : "Der Köder wurde geschluckt. Risikoanalyse verbucht (+10 XP).")
+                        ? (language === "en" ? "Correct for this prepared case. +50 practice points." : "Richtig für diesen vorbereiteten Fall. +50 Übungspunkte.")
+                        : (language === "en" ? "Review the case explanation. +10 practice points for the attempt." : "Lies die Fallerklärung. +10 Übungspunkte für den Versuch.")
                       }
                     </p>
                   </div>

@@ -25,23 +25,14 @@ export const translations = {
     comics: "Noir-Comics",
     urlScan: "URL Scan",
     handbook: "Handbuch",
-    cheatsOn: "🔓 CHEATS: AN (ALLES OFFEN)",
-    cheatsOff: "🔒 LEVELVERLAUF SPERREN",
+    cheatsOn: "🔓 DEMO-MODUS: AN",
+    cheatsOff: "🔒 DEMO-MODUS: AUS",
     mobileMode: "[ → MOBIL-SIMULATOR ]",
     desktopMode: "[ → VOLLE BREITE ]",
     lockMessage: "Gesperrt",
-    cheatCta: "[ Sofort freischalten ]",
+    cheatCta: "[ Demo-Modus aktivieren ]",
 
     // Dashboard
-    integrateTitle: "Repository-Prüfstand & CI/CD Pipelines",
-    ciStatus: "CI Build & Verification",
-    runPipelineBtn: "Test-Pipeline anstoßen",
-    pipelineRunning: "Prüfung läuft...",
-    resetPipeline: "Zurücksetzen",
-    terminalReady: "Prüfstand Geladen // Bitte Diagnostik-Taste drücken",
-    terminalSuccess: "Zertifikat Ausgestellt!",
-    terminalDesc: "Verifikationslinie zu 100% einwandfrei. Bereit für GitHub-Checks.",
-    localBuild: "Dieses Software-Repository sichert jede Code-Änderung über eine echte, vollautomatische Pipeline ab. Drücke auf den Prüfknopf, um die Pipeline-Diagnostik lokal im Simulator auszuführen.",
     dashboardMilestoneTitle: "DEINE CYBER-FORENSIK ROTATION",
     dashboardMilestoneDesc: "Folge der Ausbildungslinie und trainiere die Fähigkeiten deines Fisches, um neue Detektiv-Schnittstellen im System freizuschalten:",
     lockedXp: "Sperre: {xp} XP",
@@ -69,44 +60,10 @@ export const translations = {
     gameBtnSafe: "Durchlassen [D]",
     gameTimeOut: "Zeit abgelaufen! Zu langsam!",
     gameCorrect: "Korrekt! Code-Muster erkannt.",
-    gameWrong: "Falsch! System infiziert!",
+    gameWrong: "Falsche Antwort im Übungsfall.",
     gameOver: "Training beendet!",
     gameRewardText: "Du hast {score} Punkte erzielt und {xp} XP generiert!",
     gameBackBtn: "[ Laborsteuerung aktivieren ]",
-
-    // Password Lab
-    pwdTitle: "KRYPTO_ENTROPIE_ASSESSOR",
-    pwdSubtitle: "Berechnung realer Passwortstabilität / Angriffsresistenz",
-    pwdLabel: "Muster-Passwort eingeben:",
-    strengthLabel: "Sicherheit des Passworts:",
-    entropy: "Informations-Entropie",
-    bruteForceTime: "Zeit zum Brute-Force Knacken (10 Mrd. Versuche/Sek):",
-    instant: "Sofort (Millisekunden)",
-    minutes: "Minuten",
-    seconds: "Sekunden",
-    hours: "Stunden",
-    days: "Tage",
-    years: "Jahre",
-    centuries: "Jahrhunderte",
-    lengthPower: "Warum Länge mächtiger ist als Sonderzeichen:",
-    lengthDesc: "Ein langes Passwort bildet durch Kombinatorik unknackbare Entropie-Barrieren, selbst wenn es nur aus einfachen Wörtern besteht.",
-    pwdTips: "Tipps für perfekte Passwörter:",
-    pwdTip1: "Nutze Passsätze mit 4 oder mehr zufälligen Wörtern (z.B. 'fisch-tastatur-kaffee-sicherheit').",
-    pwdTip2: "Benutze niemals dasselbe Passwort für mehr als einen Dienst (Verwende einen Passwort-Manager).",
-    pwdTip3: "Aktiviere Zwei-Faktor-Authentifizierung (2FA) wo immer möglich.",
-
-    // URL Inspector
-    inspectTitle: "URL SEZIERMESSER // ANATOMIE DER DOMAIN",
-    inspectSubtitle: "Prüfe unbekannte Weblinks risikofrei in Einzelteilen",
-    inspectLabel: "Verdächtigen Link eingeben:",
-    inspectBtn: "Link dekonstruieren",
-    inspectPlaceholder: "z.B. https://secure-login.paypal.de.verify-portal.cn/index.html",
-    inspectResult: "DEKONSTRUIERTE DOMAIN-ARCHITEKTUR",
-    inspectProt: "Übertragungprotokoll",
-    inspectSub: "Subdomains (Zusatz)",
-    inspectMain: "Registrierte Hauptdomain",
-    inspectTld: "Top-Level-Domain (TLD)",
-    inspectAnalysis: "SICHERHEITSANALYSE DES DOMAIN-NAME-SYSTEMS (DNS)",
 
     // Noir Comics
     comicTitle: "INTERAKTIVE FISCH-NOIR SAGA",
@@ -142,22 +99,14 @@ export const translations = {
     comics: "Noir Comics",
     urlScan: "URL Scan",
     handbook: "Handbook",
-    cheatsOn: "🔓 CHEATS: ON (ALL UNLOCKED)",
-    cheatsOff: "🔒 LOCK PROGRESSION",
+    cheatsOn: "🔓 DEMO MODE: ON",
+    cheatsOff: "🔒 DEMO MODE: OFF",
     mobileMode: "[ → MOBILE MODE ]",
     desktopMode: "[ → DESKTOP MODE ]",
     lockMessage: "Locked",
-    cheatCta: "[ Instant Unlock ]",
+    cheatCta: "[ Enable demo mode ]",
 
     // Dashboard
-    integrateTitle: "Repository Health & CI/CD Pipelines",
-    runPipelineBtn: "Run Verification Pipeline",
-    pipelineRunning: "Running pipeline...",
-    resetPipeline: "Reset",
-    terminalReady: "Verification Rig Loaded // Press the diagnostic key",
-    terminalSuccess: "Verification Successful!",
-    terminalDesc: "Integration status 100% clean. Ready for GitHub checks.",
-    localBuild: "This codebase secures every changes through a fully-automated verification pipeline. Push the trigger to local-run the diagnostics in our emulator.",
     dashboardMilestoneTitle: "YOUR CYBER-FORENSICS ROTATION",
     dashboardMilestoneDesc: "Complete the training regimen and build up your pet's cyber-defenses to unlock advanced system interfaces:",
     lockedXp: "Locked: {xp} XP",
@@ -189,40 +138,6 @@ export const translations = {
     gameOver: "Regimen Completed!",
     gameRewardText: "You scored {score} points and generated +{xp} XP!",
     gameBackBtn: "[ Back to Lab Controls ]",
-
-    // Password Lab
-    pwdTitle: "CRYPTO_ENTROPY_ASSESSOR",
-    pwdSubtitle: "Real-time auditing of passphrase complexity & crack resilience",
-    pwdLabel: "Enter Sample Password:",
-    strengthLabel: "Assessed Resilience:",
-    entropy: "Information Entropy",
-    bruteForceTime: "Estimated time to crack (at 10bn attempts/sec):",
-    instant: "Instant (milliseconds)",
-    minutes: "Minutes",
-    seconds: "Seconds",
-    hours: "Hours",
-    days: "Days",
-    years: "Years",
-    centuries: "Centuries",
-    lengthPower: "Why length reigns supreme over character styling:",
-    lengthDesc: "Using a passphrase with multiple common words constructs combinatorial blockades that brute-forcers cannot realistically touch.",
-    pwdTips: "Key security recommendations:",
-    pwdTip1: "Select phrases combining 4+ dictionary words (e.g., 'fish-keyboard-coffee-safety').",
-    pwdTip2: "Do not recycle secrets across different services (Utilize a modern password vault).",
-    pwdTip3: "Enable Multi-Factor Authentication (MFA) on all valuable accounts.",
-
-    // URL Inspector
-    inspectTitle: "URL ANALYSER // LINK ANATOMY DECONSTRUCTOR",
-    inspectSubtitle: "Dissect suspicious web domains without risking infections",
-    inspectLabel: "Paste Suspicious Link:",
-    inspectBtn: "Deconstruct Core Link",
-    inspectPlaceholder: "e.g., https://secure-login.paypal.de.verify-portal.cn/index.html",
-    inspectResult: "DISSECTED SECURE PORTAL ARCHITECTURE",
-    inspectProt: "Payload Protocol",
-    inspectSub: "Subdomains (Ancillary)",
-    inspectMain: "Registered Root Origin",
-    inspectTld: "Top-Level Domain (TLD)",
-    inspectAnalysis: "DOMAIN NAME SERVER (DNS) INTEGRITY ASSESSOR",
 
     // Noir Comics
     comicTitle: "INTERACTIVE FISH NOIR CHRONICLES",
@@ -258,22 +173,14 @@ export const translations = {
     comics: "Noir-Comics",
     urlScan: "URL Scan",
     handbook: "Handbuch",
-    cheatsOn: "🔓 CHEATS: AN (ALLES OFFEN)",
-    cheatsOff: "🔒 LEVELVERLAUF SPERREN",
+    cheatsOn: "🔓 DEMO-MODUS: AN",
+    cheatsOff: "🔒 DEMO-MODUS: AUS",
     mobileMode: "[ → MOBIL-SIMULATOR ]",
     desktopMode: "[ → VOLLE BREITE ]",
     lockMessage: "Gesperrt",
-    cheatCta: "[ Sofort freischalten ]",
+    cheatCta: "[ Demo-Modus aktivieren ]",
 
     // Dashboard
-    integrateTitle: "Repository-Prüfstand & CI/CD Pipelines",
-    runPipelineBtn: "Test-Pipeline anstossen",
-    pipelineRunning: "Prüfung läuft...",
-    resetPipeline: "Zurücksetzen",
-    terminalReady: "Prüfstand Geladen // Bitte Diagnostik-Taste drücken",
-    terminalSuccess: "Zertifikat Ausgestellt!",
-    terminalDesc: "Verifikationslinie zu 100% einwandfrei. Bereit für GitHub-Checks.",
-    localBuild: "Dieses Software-Repository sichert jede Code-Änderung über eine echte, vollautomatische Pipeline ab. Drücke auf den Prüfknopf, um die Pipeline-Diagnostik lokal im Simulator auszuführen.",
     dashboardMilestoneTitle: "DEINE CYBER-FORENSIK ROTATION",
     dashboardMilestoneDesc: "Folge der Ausbildungslinie und trainiere die Fähigkeiten deines Fisches, um neue Detektiv-Schnittstellen im System freizuschalten:",
     lockedXp: "Sperre: {xp} XP",
@@ -301,44 +208,10 @@ export const translations = {
     gameBtnSafe: "Durchlassen [D]",
     gameTimeOut: "Zeit abgelaufen! Zu langsam!",
     gameCorrect: "Korrekt! Code-Muster erkannt.",
-    gameWrong: "Falsch! System infiziert!",
+    gameWrong: "Falsche Antwort im Übungsfall.",
     gameOver: "Training beendet!",
     gameRewardText: "Du hast {score} Punkte erzielt und {xp} XP generiert!",
     gameBackBtn: "[ Laborsteuerung aktivieren ]",
-
-    // Password Lab
-    pwdTitle: "KRYPTO_ENTROPIE_ASSESSOR",
-    pwdSubtitle: "Berechnung realer Passwortstabilität / Angriffsresistenz",
-    pwdLabel: "Muster-Passwort eingeben:",
-    strengthLabel: "Sicherheit des Passworts:",
-    entropy: "Informations-Entropie",
-    bruteForceTime: "Zeit zum Brute-Force Knacken (10 Mrd. Versuche/Sek):",
-    instant: "Sofort (Millisekunden)",
-    minutes: "Minuten",
-    seconds: "Sekunden",
-    hours: "Stunden",
-    days: "Tage",
-    years: "Jahre",
-    centuries: "Jahrhunderte",
-    lengthPower: "Warum Länge mächtiger ist als Sonderzeichen:",
-    lengthDesc: "Ein langes Passwort bildet durch Kombinatorik unknackbare Entropie-Barrieren, selbst wenn es nur aus einfachen Wörtern besteht.",
-    pwdTips: "Tipps für perfekte Passwörter:",
-    pwdTip1: "Nutze Passsätze mit 4 oder mehr zufälligen Wörtern (z.B. 'fisch-tastatur-kaffee-sicherheit').",
-    pwdTip2: "Benutze niemals dasselbe Passwort für mehr als einen Dienst (Verwende einen Passwort-Manager).",
-    pwdTip3: "Aktiviere Zwei-Faktor-Authentifizierung (2FA) wo immer möglich.",
-
-    // URL Inspector
-    inspectTitle: "URL SEZIERMESSER // ANATOMIE DER DOMAIN",
-    inspectSubtitle: "Prüfe unbekannte Weblinks risikofrei in Einzelteilen",
-    inspectLabel: "Verdächtigen Link eingeben:",
-    inspectBtn: "Link dekonstruieren",
-    inspectPlaceholder: "z.B. https://secure-login.postfinance.ch.verify-portal.cn/index.html",
-    inspectResult: "DEKONSTRUIERTE DOMAIN-ARCHITEKTUR",
-    inspectProt: "Übertragungprotokoll",
-    inspectSub: "Subdomains (Zusatz)",
-    inspectMain: "Registrierte Hauptdomain",
-    inspectTld: "Top-Level-Domain (TLD)",
-    inspectAnalysis: "SICHERHEITSANALYSE DES DOMAIN-NAME-SYSTEMS (DNS)",
 
     // Noir Comics
     comicTitle: "INTERAKTIVE FISCH-NOIR SAGA",
@@ -380,7 +253,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         explainingClues: [
           {
             target: "Sender Email Address",
-            text: "The email is from 'security@pay-secure-verify.com'. A real PayPal system message would originate from the official domain '@paypal.com' or '@paypal.de'. 'pay-secure-verify.com' is a look-alike fake domain.",
+            text: "In this prepared case, the sender address differs from the independently known provider address. The case uses the name as a look-alike; no domain registration or ownership lookup was performed.",
             status: "suspicious"
           },
           {
@@ -395,7 +268,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
           },
           {
             target: "Generic Salutation",
-            text: "'Dear customer' is generic. PayPal knows your full name from onboarding and would address you by it personally.",
+            text: "A generic greeting can be a clue, but a personalised greeting does not prove authenticity. Consider the other signs in this prepared example.",
             status: "suspicious"
           }
         ],
@@ -433,12 +306,12 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
             status: "suspicious"
           },
           {
-            target: "Top Level Domain (.cn)",
-            text: "The real link guides to a site using '.cn' (China) instead of official routing. Secure couriers never process postage fees on untrusted foreign servers.",
+            target: "Different link destination",
+            text: "The target in this example differs from the independently known provider address. Its country suffix alone proves neither the server location nor fraud.",
             status: "suspicious"
           }
         ],
-        detailedExplanation: "Classic Parcel Phishing. Victims readily register credit cards to release a physical package, leading to credit card harvesting. Official couriers do not ask for online fees via sketchy domains."
+        detailedExplanation: "Classic Parcel Phishing. Victims readily register credit cards to release a physical package, leading to credit card harvesting. Verify unexpected charges through the provider’s app or tracking page opened independently."
       },
       {
         id: "case-microsoft",
@@ -463,7 +336,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         explainingClues: [
           {
             target: "Sender Domain Integrity",
-            text: "The domain '@accountprotection.microsoft.com' is Microsoft's certified and official web domain for authorization codes and key indicators.",
+            text: "In this prepared case, the displayed sender uses the provider’s domain. A visible From address alone is not an authentication check.",
             status: "safe"
           },
           {
@@ -477,7 +350,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
             status: "safe"
           }
         ],
-        detailedExplanation: "This is a completely LEGITIMATE security message. This is part of standard multi-factor (2FA) verification. The domain is correct, no emergency is threatened, and links guide securely."
+        detailedExplanation: "This prepared case represents a legitimate security notice. A visible sender and lack of urgency do not verify a real message. Never share an unexpected code; check account activity through the official app opened independently."
       },
       {
         id: "case-amazon",
@@ -658,7 +531,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         explainingClues: [
           {
             target: "Risky TLD Ending",
-            text: "The link maps to '.info' registration. Genuine tax ministries and governmental entities utilize official domains (.gov or .gov.uk).",
+            text: "The target in this example differs from the independently known tax service address. A suffix alone does not establish ownership or trust.",
             status: "suspicious"
           },
           {
@@ -718,7 +591,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
           },
           {
             target: "Anredeformel",
-            text: "PostFinance spricht Sie im Online-Banking persönlich mit Namen an. Eine unpersönliche Anrede deutet immer auf Phishing hin.",
+            text: "Eine unpersönliche Anrede kann auffallen. Eine persönliche Anrede beweist umgekehrt keine Echtheit; entscheidend ist der Gesamtzusammenhang.",
             status: "suspicious"
           }
         ],
@@ -752,12 +625,12 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
           },
           {
             target: "Absenderbereich",
-            text: "Die Adresse lautet '@post-ch-zollabwicklung.info'. Die Post nutzt ausschliesslich Adressen auf '.post.ch' oder '.ch' und niemals fremde '.info'-Domänen für Zahlungen.",
+            text: "Die im Beispiel genannte Adresse weicht von der bekannten Anbieteradresse ab. Prüfe den Auftrag unabhängig in der offiziellen App; eine .info-Endung allein entscheidet nichts.",
             status: "suspicious"
           },
           {
             target: "Fehlendes E-Finance Login",
-            text: "Die Post fordert Sie für solche Abwicklungen im echten Post-Portal 'My Post' auf, sich gesichert anzumelden, anstatt Direktlinks für Kreditkarten-Inserts zu schicken.",
+            text: "Prüfe die Sendung und eine mögliche Gebühr in der selbst geöffneten offiziellen App oder über einen bekannten Kontakt. Der unerwartete Zahlungslink im Beispiel wird nicht verifiziert.",
             status: "suspicious"
           }
         ],
@@ -800,7 +673,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
             status: "safe"
           }
         ],
-        detailedExplanation: "Diese Nachricht ist absolut legitim und Teil der Zwei-Faktor-Sicherung von Microsoft. Keine gefälschte Domain, kein Druck."
+        detailedExplanation: "Dieser vorbereitete Fall stellt eine legitime Sicherheitsbenachrichtigung dar. Sichtbare Adresse und fehlender Zeitdruck allein verifizieren keine echte Nachricht. Teile unerwartete Codes nicht und prüfe Aktivitäten unabhängig."
       },
       {
         id: "case-amazon",
@@ -835,7 +708,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
           },
           {
             target: "Echte Amazon Domain",
-            text: "Der Ziel-Link führt sicher auf die offizielle Schweizer/Deutsche Prime-Infrastruktur unter amazon.de.",
+            text: "Das Linkziel des vorbereiteten Falls lautet amazon.de. Das bestätigt keine Echtheit einer realen Nachricht; öffne das Kundenkonto bei Zweifeln unabhängig.",
             status: "safe"
           }
         ],
@@ -1025,7 +898,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
       explainingClues: [
         {
           target: "Absender-E-Mail",
-          text: "Die E-Mail kommt von 'sicherheit@pay-secure-verify.com'. Eine echte Nachricht von PayPal würde immer von der offiziellen Domain 'paypal.com' oder 'paypal.de' gesendet werden. 'pay-secure-verify.com' ist eine registrierte Fake-Domain.",
+          text: "Im Übungsfall weicht die Absenderadresse von der unabhängig bekannten Anbieteradresse ab. Der Name wurde für diesen Fall als Täuschung gewählt; es wurde keine Registrierung oder Eigentümerschaft untersucht.",
           status: "suspicious"
         },
         {
@@ -1040,7 +913,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         },
         {
           target: "Unpersönliche Anrede",
-          text: "'Sehr geehrte Kundin, sehr geehrter Kunde' ist unpersönlich. PayPal kennt Ihren vollen Namen und würde Sie stets persönlich ansprechen.",
+          text: "Eine allgemeine Anrede kann auffallen. Auch Nachrichten mit dem richtigen Namen können gefälscht sein; die Anrede ist kein Echtheitsnachweis.",
           status: "suspicious"
         }
       ],
@@ -1079,11 +952,11 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         },
         {
           target: "Top-Level-Domain (.cn)",
-          text: "Der echte Ziel-Link führt zu einer Website mit der Endung '.cn' (China), nicht '.de' oder '.com'. DHL leitet Gebührenzahlungen niemals auf chinesische Server um.",
+          text: "Das Linkziel weicht im Übungsfall von der bekannten Anbieteradresse ab. Die Domain-Endung allein beweist weder einen Standort noch einen Betrug.",
           status: "suspicious"
         }
       ],
-      detailedExplanation: "Dies ist das berüchtigte 'Zoll-Phishing' (Parcel Phishing). Opfer geben bereitwillig ihre Kreditkartendaten ein, um ein vermeintliches Paket freizuschalten. DHL fordert solche Gebühren niemals unerwartet via Mail von dubiosen Domains an."
+      detailedExplanation: "Dies ist das berüchtigte 'Zoll-Phishing' (Parcel Phishing). Opfer geben bereitwillig ihre Kreditkartendaten ein, um ein vermeintliches Paket freizuschalten. Prüfe unerwartete Gebühren über die selbst geöffnete Anbieter-App oder Sendungsverfolgung."
     },
     {
       id: "case-microsoft",
@@ -1118,11 +991,11 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         },
         {
           target: "Sicherer Link",
-          text: "Der Link und die angezeigte Hover-URL stimmen exakt überein und verweisen auf die völlig sichere, offizielle Microsoft-Subdomain 'account.microsoft.com'.",
+          text: "Im Übungsfall verweisen Linktext und Ziel auf account.microsoft.com. Das ist kein allgemeines Sicherheitszertifikat für Nachrichten mit diesem sichtbaren Text.",
           status: "safe"
         }
       ],
-      detailedExplanation: "Diese E-Mail ist völlig LEGITIM. Es handelt sich um ein normales Sicherheits-Feature der Zwei-Faktor-Authentifizierung (2FA). Da Microsoft nicht zur sofortigen Datenfreigabe droht, der Absender echt ist und der Link auf die echte Microsoft-Domain führt, besteht hier keine Gefahr."
+      detailedExplanation: "Dieser vorbereitete Fall stellt eine legitime Sicherheitsbenachrichtigung dar. Bei echten Nachrichten reichen eine sichtbare Absenderadresse und fehlender Zeitdruck nicht als Nachweis. Teile einen unerwarteten Code nicht und prüfe Aktivitäten über die selbst geöffnete offizielle App."
     },
     {
       id: "case-amazon",
@@ -1196,7 +1069,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
         },
         {
           target: "Login-Abfrage (Credential Harvesting)",
-          text: "Der Ziel-Link führt scheinbar zu einem 'Office365 Signature-Portal' unter einer fremden Domain. Wenn Sie sich dort mit Ihren Microsoft-Anmeldedaten anmelden, haben die Angreifer Zugriff auf Ihr gesamtes Firmennetzwerk!",
+          text: "Der Ziel-Link führt scheinbar zu einem 'Office365 Signature-Portal' unter einer fremden Domain. Die Eingabe könnte Zugangsdaten preisgeben; welche Systeme dadurch gefährdet wären, hängt von den Kontorechten und zusätzlichen Schutzmassnahmen ab.",
           status: "suspicious"
         },
         {
@@ -1244,7 +1117,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
           status: "suspicious"
         }
       ],
-      detailedExplanation: "Dies ist eine hochaktuelle Bedrohung: 'MFA Fatigue' kombiniert mit Spear-Phishing. Hacker, die bereits das Passwort erbeutet haben, bombardieren Sie mit Push-Nachrichten und senden eine gefälschte IT-Mail. Sobald Sie aufgeben oder dem Link folgen und abgleichen, ist Ihr Account kompromittiert."
+      detailedExplanation: "Dieser Fall verbindet MFA-Fatigue mit Spear-Phishing: wiederholte Anmeldeanfragen und eine gefälschte IT-Anweisung sollen zur Freigabe verleiten. Bestätige keine unerwartete Anmeldung und melde den Vorfall über den vorgesehenen IT-Weg."
     },
     {
       id: "case-ai-ceo-emergency",
@@ -1308,7 +1181,7 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
       explainingClues: [
         {
           target: "Länderendung .info",
-          text: "Die Zieladresse führt zu '.info', nicht '.de' oder '.bund.de'. Offizielle Behörden nutzen niemals so günstige TLDs für kritischen Datenverkehr.",
+          text: "Die Zieladresse des Übungsfalls ist nicht die unabhängig bekannte Behördenadresse. Die Endung allein ist kein Nachweis für Echtheit oder Betrug.",
           status: "suspicious"
         },
         {
@@ -1328,128 +1201,83 @@ export const getLocalizedCases = (lang: Language): SimulationCase[] => {
 };
 
 export const getLocalizedLearningModules = (lang: Language): LearningModule[] => {
-  if (lang === "en") {
-    return [
-      {
-        id: "module-sender",
-        title: "1. Exposing the Sender",
-        shortDescription: "How cybercriminals use fake names and display profiles to hijack your confidence.",
-        icon: "Mail",
-        clues: [
-          "The Display Name (e.g. 'PayPal') can be configured freely and does not validate the underlying email.",
-          "Inspect whatever succeeds the '@-symbol'. If you see '@paypal-verification-desk.com' instead of '@paypal.com', it is a scam.",
-          "Watch out for typo-squatting variants: like netf1ix.com, paypaI.com (Capital 'I' instead of 'l') or microsoft-security-auth.net."
-        ],
-        content: "Validating the sender constitutes your primary shield. Scammers utilize spoofing vectors or register close look-alike domains. Carefully check full headers. When display titles sound authentic, but the digital address is randomized or points onto consumer accounts (like web.de, gmail.com), discard the payload straight into trash."
-      },
-      {
-        id: "module-links",
-        title: "2. Hover Protocol & Domain Anatomy",
-        shortDescription: "Differentiate hazardous destination links from reliable company roots.",
-        icon: "Link",
-        clues: [
-          "Always hover your mouse cursor over any hyperlinks without issuing a click. The actual landing URL will display in your browser status bar.",
-          "Distinguish the registered parent (Second-Level-Domain): In 'login.paypal-verify.com.scam.ru', the parent is actually 'scam.ru'! The root sits right before the trailing country code (.ru), separated by a single period.",
-          "HTTPS signals secure socket layers, but is no voucher of identity: Scammers acquire free SSL certificates routinely, so the lock logo does not prove legitimacy!"
-        ],
-        content: "A link text can claim to guide to 'https://your-bank.com', but direct onto foreign servers. Hovering with the mouse strips these layers instantly. Watch for complex nested structures designed to hide the final registered domain."
-      },
-      {
-        id: "module-engineering",
-        title: "3. Social Engineering Vectors",
-        shortDescription: "How hackers exploit base human drivers: fear, greed, curiosity, and authority.",
-        icon: "AlertTriangle",
-        clues: [
-          "Artificial urgency ('Action required within 2 hours', 'Tax refund expiring tonight') paralyzes rational checks.",
-          "Direct threats of legal operations, fines, or frozen assets are standard phishing ammunition.",
-          "Sudden rewards ('You won', 'Grant approved') aim directly at avarice and quick clicks."
-        ],
-        content: "Social Engineering represents the manipulation of cognitive behaviors. Attackers trigger emotional rushes (panic, joy) to trick you into bypassing daily defenses. No genuine portal or banking hub ever demands data overrides within hours under threat of permanent deletion."
-      }
-    ];
+  return lang === "en"
+    ? [
+  {
+    "id": "module-sender",
+    "title": "1. Check the sender",
+    "shortDescription": "Names and addresses are clues, not proof of identity.",
+    "icon": "Mail",
+    "clues": [
+      "A display name can be chosen freely. Read the complete sender address.",
+      "Compare the domain after @ with an address obtained independently from the organisation. A familiar brand name somewhere in the address is not sufficient.",
+      "A correct-looking address, a personal greeting or flawless language does not prove that a message is genuine."
+    ],
+    "content": "Spoofing means imitating a sender. Look-alike domains use similar spelling. Check the request through a known app, bookmark or contact when unsure. Sender authentication in message headers can provide more evidence, but it does not guarantee that the content is trustworthy."
+  },
+  {
+    "id": "module-links",
+    "title": "2. Read a URL",
+    "shortDescription": "Separate the host, domain and path without opening the target.",
+    "icon": "Link",
+    "clues": [
+      "In this app, focus or tap the link preview to see the target without opening it. In a real mail app, use its link inspection feature; behaviour varies by app and device.",
+      "In login.bank.example.other-site.example, the known-looking name is only a subdomain. Domain boundaries depend on public suffixes: co.uk contains two labels, and services such as github.io also separate sites.",
+      "HTTPS protects the connection to the named host. It does not prove that the site or the message is trustworthy."
+    ],
+    "content": "Link text can differ from the target. The URL Inspector parses the address locally using a public suffix list, including private hosting suffixes. It does not check ownership, redirects or page contents. A country suffix is neither a location check nor evidence of fraud. When unsure, open the service through a known app or an independently verified address."
+  },
+  {
+    "id": "module-engineering",
+    "title": "3. Recognise pressure",
+    "shortDescription": "Pause when a message uses fear, rewards or authority.",
+    "icon": "AlertTriangle",
+    "clues": [
+      "A short deadline or threatened account closure is a reason to verify the request independently.",
+      "Requests to disclose a password, approve an unexpected sign-in or share a security code deserve particular care.",
+      "An unexpected reward or delivery is a clue to investigate, not proof of fraud by itself."
+    ],
+    "content": "Social engineering uses human reactions to influence decisions. Read the complete context, avoid hurried actions and verify unusual requests with a known contact. Do not use the contact details in a suspicious message as your only source. These training examples illustrate patterns; they do not classify real messages automatically."
   }
-
-  if (lang === "ch") {
-    // Swiss German (no Eszett ß)
-    return [
-      {
-        id: "module-sender",
-        title: "1. Den Absender entlarven",
-        shortDescription: "Wie Angreifer gefälschte E-Mail-Adressen und Display-Namen nutzen, um Vertrauen zu erschleichen.",
-        icon: "Mail",
-        clues: [
-          "Der Anzeigename (z.B. 'Die Post') ist frei wählbar und sagt nichts über die tatsächliche Absenderadresse aus.",
-          "Prüfe immer das, was nach dem @-Zeichen steht. Steht dort '@postfinance-service-sichern.com' statt '@postfinance.ch', ist es Betrug.",
-          "Achte auf Buchstabendreher (Typosquatting): z.B. netf1ix.com, paypaI.com (mit grossem i statt l) oder post-sicherheit.ch."
-        ],
-        content: "Der Absender-Check ist Ihre erste Verteidigungslinie. Betrüger nutzen so genanntes 'Spoofing' oder registrieren 'Look-alike-Domains'. Schauen Sie sich die E-Mail-Header genau an. Wenn der Anzeigename unverdächtig klingt, die Adresse dahinter jedoch kryptisch ist oder von einem Gratis-Anbieter wie Gmail stammt (obwohl es eine Nachricht von PostFinance sein soll), verschieben Sie die Mail sofort in den Spam-Ordner."
-      },
-      {
-        id: "module-links",
-        title: "2. Hover-Pflicht & Link-Anatomie",
-        shortDescription: "Gefährliche Ziel-Links von echten verlässlichen Webadressen unterscheiden.",
-        icon: "Link",
-        clues: [
-          "Führe den Mauszeiger über einen Link, ohne zu klicken (Hovern). Im E-Mail-Client wird am unteren Rand das echte Ziel angezeigt.",
-          "Prüfe die Hauptdomain (Second-Level-Domain): Bei 'login.post.ch.secure-webpage.cn' ist die echte Domain 'secure-webpage.cn'! Der echte Name steht direkt vor dem Länderkürzel (TLD), abgetrennt durch einen Punkt.",
-          "Sichere Verbindungen (HTTPS) sind Pflicht, aber Vorsicht: Auch Kriminelle nutzen heutzutage kostenlose SSL-Zertifikate, sodass das grüne Schloss im Browser kein Garant für Seriosität mehr ist!"
-        ],
-        content: "Ein Link kann als 'www.postfinance.ch' beschriftet sein, aber im Hintergrund auf eine chinesische (.cn) Server-Struktur verlinken. Durch das Hovern (Darübergleiten mit der Maus) enttarnen Sie diese Abweichungen sofort. Halten Sie stets Ausschau nach Subdomain-Tricks, bei denen die bekannte Marke nur als Teil-Subdomain missbraucht wird."
-      },
-      {
-        id: "module-engineering",
-        title: "3. Social Engineering Tricks",
-        shortDescription: "Wie Hacker Gefühle wie Angst, Neugier, Pflichtbewusstsein oder Gier manipulieren.",
-        icon: "AlertTriangle",
-        clues: [
-          "Extremer Zeitdruck ('Handeln Sie in 2 Stunden', 'Auszahlung sonst verfallen') blockiert rationales Denken.",
-          "Drohungen von Geldstrafen, Kontosperrungen oder rechtlichen Schritten sind typische Phishing-Waffen.",
-          "Unerwartete Gewinne ('Sie haben gewonnen', 'Steuerrückerstattung beantragen') zielen auf Gier ab."
-        ],
-        content: "Social Engineering beschreibt die psychologische Manipulation von Menschen. Kriminelle versuchen Sie in einen emotionalen Zustand (Angst, Panik, Freude) zu versetzen, damit Sie Ihre Sicherheitsroutinen vergessen. Keine Schweizer Bank, kein Streamingdienst und kein Konzern verlangt von Ihnen die Eingabe geheimer Daten innerhalb weniger Stunden unter Androhung einer Kontolöschung."
-      }
-    ];
+]
+    : [
+  {
+    "id": "module-sender",
+    "title": "1. Den Absender prüfen",
+    "shortDescription": "Name und Adresse sind Hinweise, kein Identitätsnachweis.",
+    "icon": "Mail",
+    "clues": [
+      "Der Anzeigename ist frei wählbar. Lies die vollständige Absenderadresse.",
+      "Vergleiche die Domain nach @ mit einer unabhängig bekannten Adresse der Organisation. Ein Markenname irgendwo in der Adresse reicht nicht.",
+      "Eine vertraute Adresse, persönliche Anrede oder fehlerfreie Sprache beweist nicht, dass eine Nachricht echt ist."
+    ],
+    "content": "Spoofing bedeutet, einen Absender nachzuahmen. Look-alike-Domains verwenden ähnlich aussehende Namen. Prüfe unklare Anfragen über eine bekannte App, ein Lesezeichen oder einen vertrauten Kontakt. Prüfungen in den Nachrichtenkopfzeilen können weitere Hinweise liefern, garantieren aber keine vertrauenswürdigen Inhalte."
+  },
+  {
+    "id": "module-links",
+    "title": "2. Eine URL lesen",
+    "shortDescription": "Host, Domain und Pfad unterscheiden, ohne das Ziel zu öffnen.",
+    "icon": "Link",
+    "clues": [
+      "In dieser App zeigt Fokus oder Antippen der Linkvorschau das Ziel, ohne es zu öffnen. Nutze in echten Mailprogrammen deren Linkvorschau; die Bedienung unterscheidet sich je nach Gerät und App.",
+      "In login.bank.example.anderes-ziel.example ist der vertraute Name nur eine Subdomain. Domain-Grenzen hängen von öffentlichen Suffixen ab: co.uk hat zwei Bestandteile, und auch Hostingdienste wie github.io trennen einzelne Websites.",
+      "HTTPS schützt die Verbindung zum genannten Host. Es bestätigt nicht, dass die Website oder die Nachricht vertrauenswürdig ist."
+    ],
+    "content": "Linktext und tatsächliches Ziel können voneinander abweichen. Der URL-Inspector zerlegt die Adresse lokal mit einer Liste öffentlicher und privater Domain-Suffixe. Er prüft keine Eigentümer, Weiterleitungen oder Seiteninhalte. Eine Länderendung beweist weder den Serverstandort noch einen Betrug. Öffne den Dienst bei Zweifeln über eine bekannte App oder eine unabhängig geprüfte Adresse."
+  },
+  {
+    "id": "module-engineering",
+    "title": "3. Handlungsdruck erkennen",
+    "shortDescription": "Bei Angst, Gewinnversprechen oder Autoritätsdruck innehalten.",
+    "icon": "AlertTriangle",
+    "clues": [
+      "Kurze Fristen oder eine angedrohte Kontosperrung sind ein Anlass, die Anfrage unabhängig zu prüfen.",
+      "Aufforderungen, Kennwörter oder Sicherheitscodes preiszugeben oder unerwartete Anmeldungen zu bestätigen, verlangen besondere Aufmerksamkeit.",
+      "Unerwartete Gewinne oder Lieferungen sind ein Grund zum Nachfragen, für sich allein aber kein Betrugsbeweis."
+    ],
+    "content": "Social Engineering nutzt menschliche Reaktionen, um Entscheidungen zu beeinflussen. Lies den Zusammenhang, vermeide übereilte Schritte und prüfe ungewöhnliche Anfragen bei einem bekannten Kontakt. Nutze dafür nicht ausschliesslich Kontaktdaten aus der verdächtigen Nachricht. Die vorbereiteten Fälle illustrieren Muster und klassifizieren keine echten Nachrichten automatisch."
   }
-
-  // default de
-  return [
-    {
-      id: "module-sender",
-      title: "1. Den Absender entlarven",
-      shortDescription: "Wie Angreifer gefälschte E-Mail-Adressen und Display-Namen nutzen, um Vertrauen zu erschleichen.",
-      icon: "Mail",
-      clues: [
-        "Der Anzeigename (z.B. 'PayPal') ist frei wählbar und sagt nichts über die tatsächliche Absenderadresse aus.",
-        "Prüfe immer das, was nach dem @-Zeichen steht. Steht dort '@paypal-service-sichern.com' statt '@paypal.de', ist es Betrug.",
-        "Achte auf Buchstabendreher (Typosquatting): z.B. netf1ix.com, paypaI.com (mit großem i statt l) oder dhl-sicherheit.de."
-      ],
-      content: "Der Absender-Check ist Ihre erste Verteidigungslinie. Betrüger nutzen so genanntes 'Spoofing' oder registrieren 'Look-alike-Domains'. Schauen Sie sich die E-Mail-Header genau an. Wenn der Anzeigename unverdächtig klingt, die Adresse dahinter jedoch kryptisch ist oder von einem Gratis-Anbieter wie Gmail, Web.de oder Gmx.net stammt (obwohl es eine Nachricht von der Postbank sein soll), verschieben Sie die Mail sofort in den Spam-Ordner."
-    },
-    {
-      id: "module-links",
-      title: "2. Hover-Pflicht & Link-Anatomie",
-      shortDescription: "Gefährliche Ziel-Links von echten verlässlichen Webadressen unterscheiden.",
-      icon: "Link",
-      clues: [
-        "Führe den Mauszeiger über einen Link, ohne zu klicken (Hovern). Im E-Mail-Client wird am unteren Rand das echte Ziel angezeigt.",
-        "Prüfe die Hauptdomain (Second-Level-Domain): Bei 'login.paypal.de.secure-webpage.cn' ist die echte Domain 'secure-webpage.cn'! Der echte Name steht direkt vor dem Länderkürzel (TLD), abgetrennt durch einen Punkt.",
-        "Sichere Verbindungen (HTTPS) sind Pflicht, aber Vorsicht: Auch Kriminelle nutzen heutzutage kostenlose SSL-Zertifikate, sodass das grüne Schloss im Browser kein Garant für Seriosität mehr ist!"
-      ],
-      content: "Ein Link kann als 'www.ihre-bank.de' beschriftet sein, aber im Hintergrund auf eine russische (.ru) oder chinesische (.cn) Server-Struktur verlinken. Durch das Hovern (Darübergleiten mit der Maus) enttarnen Sie diese Abweichungen sofort. Halten Sie stets Ausschau nach Subdomain-Tricks, bei denen die bekannte Marke nur als Teil-Subdomain missbraucht wird."
-    },
-    {
-      id: "module-engineering",
-      title: "3. Social Engineering Tricks",
-      shortDescription: "Wie Hacker Gefühle wie Angst, Neugier, Pflichtbewusstsein oder Gier manipulieren.",
-      icon: "AlertTriangle",
-      clues: [
-        "Extremer Zeitdruck ('Handeln Sie in 2 Stunden', 'Auszahlung sonst verfallen') blockiert rationales Denken.",
-        "Drohungen von Geldstrafen, Kontosperrungen oder rechtlichen Schritten sind typische Phishing-Waffen.",
-        "Unerwartete Gewinne ('Sie haben gewonnen', 'Steuerrückerstattung beantragen') zielen auf Gier ab."
-      ],
-      content: "Social Engineering beschreibt die psychologische Manipulation von Menschen. Kriminelle versuchen Sie in einen emotionalen Zustand (Angst, Panik, Freude) zu versetzen, damit Sie Ihre Sicherheitsroutinen vergessen. Keine seriöse Versicherung, kein Streamingdienst und keine Bank verlangt von Ihnen die Eingabe geheimer Daten innerhalb weniger Stunden unter Androhung einer Kontolöschung."
-    }
-  ];
+];
 };
 
 export const getLocalizedGamePacketsPool = (lang: Language) => {

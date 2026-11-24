@@ -2,6 +2,7 @@ export interface PetState {
   name: string;
   level: number;
   xp: number;
+  totalXp: number; // Cumulative XP; module unlocks never decrease on evolution.
   energy: number; // 0 - 100
   happiness: number; // 0 - 100
   passwordDefense: number; // 0 - 100

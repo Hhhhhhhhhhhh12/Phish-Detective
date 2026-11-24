@@ -32,7 +32,7 @@ const INTERACTIVE_SAGAS: InteractiveSaga[] = [
   {
     id: "saga-1",
     title: "Phishs chaotischer Posteingang",
-    synopsis: "Begleite Phish, unseren tollpatschigen Fisch, der versucht, sich durch seinen Arbeits-Posteingang zu navigieren. Jede falsche Taste droht das Firmennetzwerk zu sprengen!",
+    synopsis: "Begleite Phish, unseren tollpatschigen Fisch, der versucht, sich durch seinen Arbeits-Posteingang zu navigieren. Die Folgen werden in der Geschichte bewusst überzeichnet.",
     difficulty: "EINSTEIGER",
     startPanelId: 1,
     panels: {
@@ -48,7 +48,7 @@ const INTERACTIVE_SAGAS: InteractiveSaga[] = [
             xpReward: 0,
             chaosEffect: 60,
             isCorrect: false,
-            feedback: "Aua! Phishing-Falle zugeschnappt. Schadsoftware blockiert sofort alle Datenbanksysteme. Die Bildschirme blinken blutrot."
+            feedback: "In der Geschichte führt der Klick zu einem Sicherheitsvorfall. Ein echter Klick bedeutet nicht automatisch eine Infektion. Gib keine Daten ein, öffne keine Downloads und melde den Vorfall über den vorgesehenen Weg."
           },
           {
             text: "Innehalten, den Mauszeiger über den Link bewegen (hovern) und Absender prüfen.",
@@ -56,7 +56,7 @@ const INTERACTIVE_SAGAS: InteractiveSaga[] = [
             xpReward: 50,
             chaosEffect: 0,
             isCorrect: true,
-            feedback: "Clever! Du siehst, dass der Link zu '@spearphishing-bonus-claims.ru' führt. Keine Spur von der echten HR-Abteilung!"
+            feedback: "Clever! Das angezeigte Ziel 'bonus-pruefung.example' weicht vom bekannten Personalportal ab. Bestätige die Anfrage über einen unabhängig bekannten Kontakt; die Endung allein beweist keinen Betrug."
           }
         ]
       },
@@ -80,7 +80,7 @@ const INTERACTIVE_SAGAS: InteractiveSaga[] = [
             xpReward: 60,
             chaosEffect: -20,
             isCorrect: true,
-            feedback: "Richtig reagiert! Durch das Kappen der physikalischen Verbindung verhinderst du, dass sich die Ransomware auf andere Server ausbreitet."
+            feedback: "Bei Verdacht auf einen Befall: den vorgesehenen IT-Notfallweg nutzen und das Gerät nach internen Vorgaben vom Netz trennen. Das kann weitere Ausbreitung begrenzen, garantiert aber keine Eindämmung."
           }
         ]
       },
@@ -96,7 +96,7 @@ const INTERACTIVE_SAGAS: InteractiveSaga[] = [
             xpReward: 100,
             chaosEffect: 0,
             isCorrect: true,
-            feedback: "Ausgezeichnet! Du hast bewiesen, dass ein kühler Fischkopf jeden Angreifer ins Leere laufen lässt!"
+            feedback: "Ausgezeichnet! Du hast die auffällige Anfrage geprüft und über einen vertrauten Weg gemeldet."
           }
         ]
       },
@@ -119,7 +119,7 @@ const INTERACTIVE_SAGAS: InteractiveSaga[] = [
       5: {
         id: 5,
         visualType: "safe_harbor",
-        narrator: "Dank Phishs schnellem Kabelziehen konnte das Backup eingespielt werden. Die Hacker gehen leer aus. Phish erhält eine Auszeichnung als 'Brandschutz-Matrose'!",
+        narrator: "Das IT-Team untersucht den Vorfall und prüft eine Wiederherstellung aus sauberen Backups. In dieser Geschichte gelingt die Wiederherstellung. Phish erhält eine Auszeichnung als 'Brandschutz-Matrose'!",
         dialogue: "Phish: „Manchmal ist kein Stecker der beste Stecker!“",
         choices: [
           {
@@ -160,7 +160,7 @@ const INTERACTIVE_SAGAS: InteractiveSaga[] = [
             xpReward: 0,
             chaosEffect: 50,
             isCorrect: false,
-            feedback: "Fehler! Innerhalb von 4 Minuten greifen automatische Scob-Scanner das Log-In an und erraten das simple Muster."
+            feedback: "Das bekannte Muster ist leicht vorhersehbar. Wie schnell es erraten werden könnte, hängt unter anderem von Versuchslimits und der Speicherung beim Dienst ab."
           },
           {
             text: "Ein langes Passwort (Passphrase) aus 4 zufälligen Wörtern zusammensetzen.",
@@ -168,7 +168,7 @@ const INTERACTIVE_SAGAS: InteractiveSaga[] = [
             xpReward: 60,
             chaosEffect: 0,
             isCorrect: true,
-            feedback: "Hervorragend! Du wählst 'ozean-koralle-taucherkette-balkon' (35 Zeichen). Die Brute-Force-Rechner der Cyber-Söldner kapitulieren sofort."
+            feedback: "Eine lange, zufällig ausgewählte und nur einmal verwendete Passphrase kann das Erraten erschweren. Die Wörter in dieser Geschichte sind öffentliche Beispiele und dürfen nicht als echtes Kennwort dienen."
           }
         ]
       },
@@ -187,19 +187,19 @@ const INTERACTIVE_SAGAS: InteractiveSaga[] = [
             feedback: "Keine Wirkung! Die Angreifer sperren dich per Admin-Konto komplett aus deinem eigenen Aquarium-System aus."
           },
           {
-            text: "Router sofort auf Werkseinstellungen zurücksetzen und Zwei-Faktor-Authentifizierung (2FA) einschalten.",
+            text: "Gerät isolieren, IT kontaktieren und den betroffenen Zugang von einem vertrauenswürdigen Gerät aus absichern.",
             nextPanelId: 5,
             xpReward: 70,
             chaosEffect: -30,
             isCorrect: true,
-            feedback: "Rettung! Der Hard-Reset vertreibt die Besatzer. Das neue 2FA-Protokoll fordert ab jetzt immer eine Bestätigung auf Phishs Muschel-Telefon."
+            feedback: "Das IT-Team prüft Geräte und aktive Sitzungen. Ein neues einzigartiges Kennwort und zusätzliche Anmeldungssicherheit helfen; ein Router-Reset oder 2FA allein entfernt keinen bereits bestehenden Befall."
           }
         ]
       },
       3: {
         id: 3,
         visualType: "safe_harbor",
-        narrator: "Phishs Geheimaquarium bleibt absolut uneinnehmbar. Seine Kryptoschlüssel halten jedem Brute-Force-Sturm stand.",
+        narrator: "Phish hat eine wichtige Hürde gegen das Erraten seines Kennworts geschaffen. Gegen Phishing und Schadsoftware braucht er zusätzlich weitere Schutzmassnahmen.",
         dialogue: "Phish: „Sicherheit fühlt sich trocken und entspannt an.“",
         choices: [
           {
@@ -235,20 +235,20 @@ const INTERACTIVE_SAGAS: InteractiveSaga[] = [
         dialogue: "Phish: „Keine unbefugte Erwärmung auf meiner Uhr!“",
         choices: [
           {
-            text: "Zertifikat für 2FA aktivieren!",
+            text: "Geschichte abschliessen und Schutzmassnahmen wiederholen!",
             nextPanelId: 100,
             xpReward: 100,
             chaosEffect: 0,
             isCorrect: true,
-            feedback: "Kompakt und bombensicher gelöst!"
+            feedback: "Das richtige Vorgehen in diesem Übungsfall erkannt. 2FA ergänzt den Schutz, garantiert ihn aber nicht."
           }
         ]
       },
       100: {
         id: 100,
         visualType: "safe_harbor",
-        narrator: "ENDE DER CHRONIK. Länge gewinnt jedes Algorithmenrennen.",
-        dialogue: "System: „Sicherheits-Zertifikat freigeschaltet.“",
+        narrator: "ENDE DER CHRONIK. Lange, einzigartige Kennwörter und zusätzliche Schutzmassnahmen ergänzen sich.",
+        dialogue: "System: „Übungsdurchlauf abgeschlossen.“",
         choices: []
       }
     }
@@ -261,26 +261,36 @@ export default function NoirComics() {
   const [chaosLevel, setChaosLevel] = useState(0); // Clumsy meter!
   const [xpPoints, setXpPoints] = useState(0);
   const [answeredText, setAnsweredText] = useState<string | null>(null);
+  const [nextPanelId, setNextPanelId] = useState<number | null>(null);
 
   const activeSaga = INTERACTIVE_SAGAS[activeSagaIdx];
   const activePanel = activeSaga.panels[currentPanelId] || activeSaga.panels[1];
 
   const handleChoice = (choice: StoryChoice) => {
+    if (answeredText !== null) return;
     setAnsweredText(choice.feedback);
+    setNextPanelId(choice.nextPanelId);
     setXpPoints(prev => prev + choice.xpReward);
     setChaosLevel(prev => Math.max(0, Math.min(100, prev + choice.chaosEffect)));
-    
-    // Move to next step delay
-    setTimeout(() => {
-      setAnsweredText(null);
-      setCurrentPanelId(choice.nextPanelId);
-    }, 3800);
   };
 
   const resetSaga = () => {
-    setCurrentPanelId(1);
+    setCurrentPanelId(activeSaga.startPanelId);
     setChaosLevel(0);
+    setXpPoints(0);
     setAnsweredText(null);
+    setNextPanelId(null);
+  };
+
+  const continueSaga = () => {
+    if (nextPanelId === null) return;
+    if (nextPanelId === activeSaga.startPanelId) {
+      resetSaga();
+      return;
+    }
+    setCurrentPanelId(nextPanelId);
+    setAnsweredText(null);
+    setNextPanelId(null);
   };
 
   // Render beautiful, stylized, interactive vector comic panels
@@ -302,11 +312,11 @@ export default function NoirComics() {
             {/* Vintage computer screen print */}
             <div className="my-auto space-y-1.5 z-10 text-[10px] leading-tight">
               <p className="text-[#33FF33] font-bold">&gt; INCOMING SPEARPHISHING EM...</p>
-              <p className="text-[#33FF33]/70 font-bold">&gt; SOURCE: bonus-hr@untrusted-domain.ru</p>
+              <p className="text-[#33FF33]/70 font-bold">&gt; SOURCE: bonus-hr@bonus-pruefung.example</p>
               <p className="text-amber-400 font-extrabold">&gt; WARN: DOMAIN LOOKALIKES DETECTED</p>
               <div className="flex items-center gap-1.5 bg-red-950/40 border border-[#33FF33]/30 px-1.5 py-1 text-red-400 mt-1">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
-                <span>PHISHING RISK INDEX: 94%</span>
+                <span>FIKTIVER PHISHING-FALL</span>
               </div>
             </div>
 
@@ -424,7 +434,7 @@ export default function NoirComics() {
             </div>
 
             <div className="bg-red-50 border border-red-200 p-1.5 text-center">
-              <p className="text-[9px] text-red-600 font-extrabold uppercase">PASSWORTSTÄRKE: 12% ALARM</p>
+              <p className="text-[9px] text-red-600 font-extrabold uppercase">BEKANNTES KENNWORTMUSTER</p>
               <p className="text-[8px] text-zinc-500 font-medium">Wert: 'Phish123!' (Leicht zu raten)</p>
             </div>
           </div>
@@ -540,7 +550,7 @@ export default function NoirComics() {
           PHISHS CHAOTISCHE COMIC-CHRONIKEN
         </h2>
         <p className="text-xs text-[#615C54] font-mono mt-1">
-          ÜBERNEHME DIE STEUERUNG FÜR 'PHISH' – DEINEN UNGESCHICKTEN INTERAKTIVEN BEGleiter. JEDE ENTSCHEIDUNG VERÄNDERT DAS NETZWERKSCHICKSAL!
+          Zwei erfundene Lerngeschichten mit überzeichneten Folgen. Comicpunkte gelten nur für den aktuellen Durchlauf, werden nicht gespeichert und schalten keine Module frei.
         </p>
       </div>
 
@@ -555,11 +565,14 @@ export default function NoirComics() {
             {INTERACTIVE_SAGAS.map((saga, idx) => (
               <button
                 key={saga.id}
+                aria-pressed={activeSagaIdx === idx}
                 onClick={() => {
                   setActiveSagaIdx(idx);
-                  setCurrentPanelId(1);
+                  setCurrentPanelId(saga.startPanelId);
                   setAnsweredText(null);
+                  setNextPanelId(null);
                   setChaosLevel(0);
+                  setXpPoints(0);
                 }}
                 className={`w-full text-left p-4 rounded-none border-2 transition ${
                   activeSagaIdx === idx
@@ -602,7 +615,7 @@ export default function NoirComics() {
               />
             </div>
             <p className="text-[9px] text-[#615C54] font-mono uppercase leading-snug">
-              Triffst du unvorsichtige Phishing-Entscheidungen, steigt Phishs Chaos-Pegel. Erreicht er 100%, brennt das System ab!
+              Der Chaos-Pegel illustriert Folgen in der Geschichte. Er ist keine technische Risikomessung.
             </p>
           </div>
         </div>
@@ -639,9 +652,12 @@ export default function NoirComics() {
                     <span className="text-[10px] font-mono font-black text-[#FF5500] uppercase block tracking-wider animate-pulse flex items-center gap-1">
                       <Zap className="w-3 h-3 text-[#FF5500]" /> SYSTEM-AUSWIRKUNG &gt;
                     </span>
-                    <p className="text-xs md:text-sm text-[#1D1B18] leading-relaxed font-mono uppercase font-black">
+                    <p role="status" className="text-xs md:text-sm text-[#1D1B18] leading-relaxed font-mono font-black">
                       {answeredText}
                     </p>
+                    <button type="button" onClick={continueSaga} className="border-2 border-[#1D1B18] bg-[#1D1B18] text-white px-4 py-3 font-bold text-sm">
+                      Weiter zur nächsten Szene
+                    </button>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -688,7 +704,7 @@ export default function NoirComics() {
                   <div className="space-y-3 pt-4">
                     <div className="p-3 bg-emerald-50 border-2 border-emerald-500 font-mono text-[11px] text-emerald-800 uppercase flex items-center gap-2">
                       <CheckCircle2 className="w-4.5 h-4.5 text-emerald-600 shrink-0" />
-                      <span>Saga erfolgreich gelöst! Erworbenes XP-Volumen: +{xpPoints} XP.</span>
+                      <span>Saga abgeschlossen! Comicpunkte in diesem Durchlauf: {xpPoints}.</span>
                     </div>
                     <button
                       onClick={resetSaga}

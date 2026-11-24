@@ -7,7 +7,6 @@ export interface AnalysisMarker {
 }
 
 export interface EmailScanResult {
-  phishScore: number; // 0 to 100
   verdict: "safe" | "suspicious" | "dangerous" | "unknown";
   summary: string;
   markers: AnalysisMarker[];

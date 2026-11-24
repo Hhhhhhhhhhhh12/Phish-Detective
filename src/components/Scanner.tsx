@@ -15,7 +15,7 @@ export default function Scanner({ language = "de" }: { language?: Language }) {
         </h2>
         <p className="text-sm text-[#615C54]">
           {english
-            ? "Live AI analysis is unavailable in this training version. These are fixed examples, not an analysis of your own messages. No message is sent to an AI service."
+            ? "Live AI analysis is unavailable in this training version. These are fixed examples, not an analysis of your own messages. No message is sent to an AI service. The report text is currently in German."
             : "Diese Trainingsversion bietet keine Live-KI-Analyse. Die Berichte sind feste Beispiele und keine Prüfung eigener Nachrichten. Es wird keine Nachricht an einen KI-Dienst gesendet."}
         </p>
         <div className="flex flex-wrap gap-3">

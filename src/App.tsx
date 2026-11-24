@@ -29,6 +29,8 @@ import NoirComics from "./components/NoirComics";
 import CyberPet from "./components/CyberPet";
 import PasswordLab from "./components/PasswordLab";
 import { translations, Language } from "./utils/i18n";
+import { loadPet, MODULE_UNLOCK_XP } from "./utils/progress";
+import { getStorageIssues, readStoredString, writeStoredString, subscribeStorageChanges, subscribeStorageIssues } from "./utils/storage";
 
 /**
  * @license
@@ -37,50 +39,30 @@ import { translations, Language } from "./utils/i18n";
 
 type ActiveTab = "landing" | "dashboard" | "simulator" | "scanner" | "inspector" | "comics" | "pet" | "password" | "handbook";
 
-// Sequential unlock thresholds for Duolingo-style progression
-const UNLOCK_XP_REQUIREMENTS: Record<Exclude<ActiveTab, "landing">, number> = {
-  dashboard: 0,
-  pet: 0,
-  password: 0,
-  simulator: 80,
-  comics: 180,
-  scanner: 280,
-  inspector: 380,
-  handbook: 0,
-};
-
-// Simple German display titles for the milestones
-const TAB_LABEL_MAPPING: Record<Exclude<ActiveTab, "landing">, string> = {
-  dashboard: "HQ Pfad",
-  pet: "Phish-O-Mat",
-  password: "Passwort-Lab",
-  simulator: "Simulator",
-  comics: "Noir-Comics",
-  scanner: "AI Scan",
-  inspector: "URL Scan",
-  handbook: "Handbuch",
-};
+const UNLOCK_XP_REQUIREMENTS = MODULE_UNLOCK_XP;
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>("landing");
   const [language, setLanguage] = useState<Language>(() => {
-    const saved = localStorage.getItem("phish_detective_language");
+    const saved = readStoredString("phish_detective_language");
     if (saved === "de" || saved === "en" || saved === "ch") return saved;
     return "de";
   });
   const [currentTime, setCurrentTime] = useState("");
   const [isMobileSimulator, setIsMobileSimulator] = useState(false);
   const [bypassLocks, setBypassLocks] = useState<boolean>(() => {
-    return localStorage.getItem("phish_bypass_locks") === "true";
+    return readStoredString("phish_bypass_locks") === "true";
   });
 
-  // Load and subscribe to pet state to track real-time level/XP
-  const [currentXp, setCurrentXp] = useState(15);
-  const [petName, setPetName] = useState("Byte");
-  const [petLevel, setPetLevel] = useState(1);
+  const [petProgress, setPetProgress] = useState(loadPet);
+  const currentXp = petProgress.totalXp;
+  const petName = petProgress.name;
+  const petLevel = petProgress.level;
+  const [storageIssues, setStorageIssues] = useState(getStorageIssues);
   const [showLockAlert, setShowLockAlert] = useState<{ active: boolean; needed: number; module: string } | null>(null);
 
   const focusDashboardOnEntry = useRef(false);
+  const lockAlertTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const labels = translations[language];
 
   const enterDashboard = () => {
@@ -110,29 +92,37 @@ export default function App() {
 
   const changeLanguage = (lang: Language) => {
     setLanguage(lang);
-    localStorage.setItem("phish_detective_language", lang);
-  };
-
-  // Sync pet XP from localStorage
-  const refreshPetXp = () => {
-    try {
-      const saved = localStorage.getItem("phish_detective_pet");
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        setCurrentXp(parsed.xp || 15);
-        setPetLevel(parsed.level || 1);
-        setPetName(parsed.name || "Byte");
-      }
-    } catch (e) {
-      // ignore
-    }
+    writeStoredString("phish_detective_language", lang);
   };
 
   useEffect(() => {
-    refreshPetXp();
-    // Poll to keep in perfect synchronization
-    const timer = setInterval(refreshPetXp, 1000);
-    return () => clearInterval(timer);
+    const refreshProgress = () => {
+      const latestPet = loadPet();
+      const latestBypass = readStoredString("phish_bypass_locks") === "true";
+      setPetProgress(latestPet);
+      setBypassLocks(latestBypass);
+      setActiveTab(current => {
+        if (!latestBypass && current !== "landing" && latestPet.totalXp < UNLOCK_XP_REQUIREMENTS[current]) {
+          focusDashboardOnEntry.current = true;
+          return "dashboard";
+        }
+        return current;
+      });
+    };
+    refreshProgress();
+    return subscribeStorageChanges(refreshProgress);
+  }, []);
+
+  useEffect(() => {
+    const updateIssues = () => setStorageIssues(getStorageIssues());
+    updateIssues();
+    return subscribeStorageIssues(updateIssues);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (lockAlertTimer.current) clearTimeout(lockAlertTimer.current);
+    };
   }, []);
 
   // Live Clock UTC
@@ -148,9 +138,10 @@ export default function App() {
   }, [language]);
 
   const handleBypassToggle = () => {
-    const newVal = !bypassLocks;
+    const newVal = readStoredString("phish_bypass_locks") !== "true";
     setBypassLocks(newVal);
-    localStorage.setItem("phish_bypass_locks", newVal ? "true" : "false");
+    setShowLockAlert(null);
+    writeStoredString("phish_bypass_locks", newVal ? "true" : "false");
   };
 
   const isModuleLocked = (tab: ActiveTab): boolean => {
@@ -161,6 +152,7 @@ export default function App() {
   };
 
   const handleTabClick = (tab: ActiveTab) => {
+    if (lockAlertTimer.current) clearTimeout(lockAlertTimer.current);
     if (isModuleLocked(tab)) {
       const req = UNLOCK_XP_REQUIREMENTS[tab as Exclude<ActiveTab, "landing">];
       setShowLockAlert({
@@ -168,7 +160,7 @@ export default function App() {
         needed: req,
         module: getTabLabel(tab as Exclude<ActiveTab, "landing">)
       });
-      setTimeout(() => setShowLockAlert(null), 5000);
+      lockAlertTimer.current = setTimeout(() => setShowLockAlert(null), 5000);
       return;
     }
     setActiveTab(tab);
@@ -200,9 +192,21 @@ export default function App() {
 
       <p role="note" className="relative bg-[#F4F1EA] border-b-2 border-[#1D1B18] px-4 py-2 text-center text-sm text-[#1D1B18]">
         {language === "en"
-          ? "Training version without live AI. Cases and example reports are prepared in advance."
+          ? "Training version without live AI. Cases and example reports are prepared in advance. Some modules remain in German."
           : "Trainingsversion ohne Live-KI. Fälle und Beispielberichte sind vorgegeben."}
       </p>
+
+      {storageIssues.length > 0 && (
+        <p role="status" className="relative border-b-2 border-amber-700 bg-amber-50 px-4 py-3 text-center text-sm text-amber-950">
+          {storageIssues.includes("unavailable")
+            ? (language === "en"
+              ? "Browser storage is unavailable. Changes remain in this tab only and can be lost when you reload or close it."
+              : "Der Browserspeicher ist nicht verfügbar. Änderungen bleiben nur in diesem Tab und können beim Neuladen oder Schliessen verloren gehen.")
+            : (language === "en"
+              ? "Some saved data could not be read. The affected module uses default values; new actions replace that module’s invalid save."
+              : "Ein gespeicherter Stand war ungültig. Das betroffene Modul nutzt Startwerte; neue Aktionen ersetzen dessen ungültigen Speicherstand.")}
+        </p>
+      )}
 
       {activeTab === "landing" ? (
         <div className="detective-landing relative isolate min-h-screen flex flex-col items-center justify-center p-4 bg-gradient-to-tr from-[#04080a] via-[#091518] to-slate-950 text-[#FAF8F5] overflow-x-hidden overflow-y-auto w-full">
@@ -286,7 +290,7 @@ export default function App() {
               {language === "en" && (
                 <div className="hidden sm:flex bg-blue-500/10 border border-blue-500/20 text-blue-400 p-2.5 rounded-lg text-[10px] font-mono text-center items-center justify-center gap-1.5 animate-fade-in uppercase font-bold">
                   <span>🇬🇧</span>
-                  <span>INTERNATIONAL MODE: All simulators and guides localized with USD &amp; English</span>
+                  <span>English navigation and selected exercises. Some training modules remain in German.</span>
                 </div>
               )}
               {language === "de" && (
@@ -331,13 +335,13 @@ export default function App() {
               {/* Micro-Progress meter with actual XP tracker */}
               <div className="space-y-1">
                 <div className="flex justify-between text-[8px] font-mono text-zinc-500 uppercase font-bold">
-                  <span>{labels.xpText}</span>
-                  <span className="text-[#00A3A6]">{currentXp} / {petLevel * 100} XP</span>
+                  <span>{language === "en" ? "Total XP for module unlocks" : "Gesamt-XP für Freischaltungen"}</span>
+                  <span className="text-[#00A3A6]">{currentXp} XP</span>
                 </div>
                 <div className="h-1 bg-zinc-900 w-full rounded overflow-hidden">
                   <div 
                     className="h-full bg-gradient-to-r from-[#00A3A6] to-[#00E5FF] transition-all duration-500" 
-                    style={{ width: `${Math.min(100, (currentXp / (petLevel * 100)) * 100)}%` }}
+                    style={{ width: `${Math.min(100, (currentXp / UNLOCK_XP_REQUIREMENTS.inspector) * 100)}%` }}
                   />
                 </div>
               </div>
@@ -380,6 +384,7 @@ export default function App() {
             <div className="flex items-center gap-1 bg-[#ECE8DF] border border-[#1D1B18] px-2 py-1">
               <span className="font-bold select-none text-[8px] tracking-wider font-mono text-[#FF5500] uppercase">LANG:</span>
               <select
+                aria-label={language === "en" ? "Language (some modules remain in German)" : "Sprache (einige Module bleiben deutsch)"}
                 value={language}
                 onChange={(e) => changeLanguage(e.target.value as Language)}
                 className="bg-transparent font-black tracking-wider uppercase outline-none cursor-pointer text-[#1D1B18] text-[9px]"
@@ -393,7 +398,7 @@ export default function App() {
             {/* Real-time XP & Progress */}
             <div className="bg-[#1D1B18] text-[#FAF8F5] px-2 py-1 flex items-center gap-1">
               <Flame className="w-3 h-3 text-amber-400 fill-amber-400" />
-              <span className="font-extrabold uppercase font-mono">{petName}: {currentXp} XP (Lvl {petLevel})</span>
+              <span className="font-extrabold uppercase font-mono">{petName}: {currentXp} {language === "en" ? "total XP" : "Gesamt-XP"} (Lvl {petLevel})</span>
             </div>
 
             {/* Simulated hardware state */}
@@ -428,13 +433,15 @@ export default function App() {
             {/* Cheat Mode Toggle for immediate feature testing */}
             <button
               onClick={handleBypassToggle}
+              aria-pressed={bypassLocks}
+              title={language === "en" ? "Unlock all modules for a demo without changing earned XP" : "Alle Module zur Vorführung freischalten, ohne verdiente XP zu verändern"}
               className={`px-2.5 py-1 transition-all uppercase border font-bold font-mono text-[9px] ${
                 bypassLocks 
                   ? "bg-emerald-600 text-white border-emerald-700" 
                   : "bg-white hover:bg-slate-50 border-slate-300 text-slate-500"
               }`}
             >
-              {bypassLocks ? labels.cheatsOn : labels.cheatsOff}
+              {language === "en" ? `Demo mode: ${bypassLocks ? "on" : "off"}` : `Demo-Modus: ${bypassLocks ? "an" : "aus"}`}
             </button>
 
           </div>
@@ -442,18 +449,20 @@ export default function App() {
 
         {/* Lock alert helper warning toast */}
         {showLockAlert && (
-          <div className="bg-amber-50 border-2 border-amber-500 p-3 text-left font-mono text-[11px] text-amber-800 uppercase flex items-center justify-between gap-3 animate-fade-in">
+          <div role="status" className="bg-amber-50 border-2 border-amber-500 p-3 text-left font-mono text-[11px] text-amber-800 uppercase flex items-center justify-between gap-3 animate-fade-in">
             <div className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-amber-600 animate-bounce" />
               <span>
-                <strong>{labels.lockMessage} &quot;{showLockAlert.module}&quot;:</strong> {language === "en" ? `You require at least ${showLockAlert.needed} XP (Current: ${currentXp} XP). Train your pet fish in Phish-O-Matic to accrue XP!` : `Du benötigst mindestens ${showLockAlert.needed} XP (Aktuell: ${currentXp} XP). Trainiere deinen Fisch im Phish-O-Mat, um XP zu erhalten!`}
+                <strong>{labels.lockMessage} &quot;{showLockAlert.module}&quot;:</strong> {language === "en" ? `This module needs ${showLockAlert.needed} total pet XP (current: ${currentXp}). Train Byte or enable demo mode. Simulator practice points are separate.` : `Dieses Modul benötigt ${showLockAlert.needed} Gesamt-XP deines Fisches (aktuell: ${currentXp}). Trainiere Byte oder aktiviere den Demo-Modus. Simulator-Übungspunkte werden separat gezählt.`}
               </span>
             </div>
             <button 
               onClick={handleBypassToggle}
+              aria-pressed={bypassLocks}
+              title={language === "en" ? "Unlock all modules for a demo without changing earned XP" : "Alle Module zur Vorführung freischalten, ohne verdiente XP zu verändern"}
               className="bg-amber-600 hover:bg-amber-700 text-white px-2 py-0.5 text-[9px] font-bold"
             >
-              [ {labels.cheatCta} ]
+              {language === "en" ? "Enable demo mode" : "Demo-Modus aktivieren"}
             </button>
           </div>
         )}
@@ -531,7 +540,7 @@ export default function App() {
                 {activeTab === "simulator" && <Simulator language={language} />}
                 {activeTab === "scanner" && <Scanner language={language} />}
                 {activeTab === "inspector" && <Inspector />}
-                {activeTab === "pet" && <CyberPet />}
+                {activeTab === "pet" && <CyberPet language={language} />}
                 {activeTab === "password" && <PasswordLab />}
                 {activeTab === "comics" && <NoirComics />}
                 {activeTab === "handbook" && <Handbook />}
@@ -552,7 +561,7 @@ export default function App() {
             {activeTab === "simulator" && <Simulator language={language} />}
             {activeTab === "scanner" && <Scanner language={language} />}
             {activeTab === "inspector" && <Inspector />}
-            {activeTab === "pet" && <CyberPet />}
+            {activeTab === "pet" && <CyberPet language={language} />}
             {activeTab === "password" && <PasswordLab />}
             {activeTab === "comics" && <NoirComics />}
             {activeTab === "handbook" && <Handbook />}

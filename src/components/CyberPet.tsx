@@ -1,31 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Zap, Heart, Award, Shield, Sparkles, RefreshCw, Cookie, Flame, Play, Terminal, BookOpen } from "lucide-react";
-import { PetState, LEVEL_NAMES, EVOLUTION_AVATARS, GAME_PACKETS_POOL } from "./cyberpet/types";
+import { PetState, LEVEL_NAMES, EVOLUTION_AVATARS } from "./cyberpet/types";
 import PetStatsMonitor from "./cyberpet/PetStatsMonitor";
 import LeitnerConsole from "./cyberpet/LeitnerConsole";
 import RetroStage from "./cyberpet/RetroStage";
-import { translations, Language } from "../utils/i18n";
+import { translations, Language, getLocalizedGamePacketsPool } from "../utils/i18n";
+import { addPetXp, loadPet, updatePet, loadLeitnerMap, saveLeitnerMap } from "../utils/progress";
+import { subscribeStorageChanges } from "../utils/storage";
 
 export default function CyberPet({ language = "de" }: { language?: Language }) {
-  const [pet, setPet] = useState<PetState>(() => {
-    const saved = localStorage.getItem("phish_detective_pet");
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (e) {
-        /* fallback */
-      }
-    }
-    return {
-      name: "Byte",
-      level: 1,
-      xp: 15,
-      energy: 80,
-      happiness: 75,
-      passwordDefense: 30,
-      lastAction: language === "en" ? "Freshly adopted from cyberspace." : "Gerade aus dem Cyberspace adoptiert."
-    };
-  });
+  const [pet, setPet] = useState<PetState>(loadPet);
+  const answerTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const answerPending = useRef(false);
+  const packets = useMemo(() => getLocalizedGamePacketsPool(language), [language]);
 
   const [message, setMessage] = useState("");
   const [customNameInput, setCustomNameInput] = useState("");
@@ -41,18 +28,32 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
   const [isGameOver, setIsGameOver] = useState(false);
   const [petVisualOverride, setPetVisualOverride] = useState<string | null>(null);
 
-  const getLeitnerMap = (): Record<string, number> => {
-    try {
-      const saved = localStorage.getItem("phish_leitner_box");
-      return saved ? JSON.parse(saved) : {};
-    } catch (e) {
-      return {};
-    }
+  const getLeitnerMap = loadLeitnerMap;
+
+  useEffect(() => {
+    const refresh = () => setPet(loadPet());
+    refresh();
+    return subscribeStorageChanges(refresh);
+  }, []);
+
+  const changePet = (update: (current: PetState) => PetState) => {
+    setPet(updatePet(update));
   };
 
-  const saveLeitnerMap = (map: Record<string, number>) => {
-    localStorage.setItem("phish_leitner_box", JSON.stringify(map));
-  };
+  useEffect(() => {
+    return () => {
+      if (answerTimeout.current) clearTimeout(answerTimeout.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (answerTimeout.current) clearTimeout(answerTimeout.current);
+    answerPending.current = false;
+    setIsGaming(false);
+    setIsGameOver(false);
+    setGameFeedback(null);
+    setPetVisualOverride(null);
+  }, [language]);
 
   // Game timer countdown loop
   useEffect(() => {
@@ -74,6 +75,8 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
     if (!isGaming || isGameOver || gameFeedback) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (e.repeat || target?.isContentEditable || target?.matches("input, textarea, select")) return;
       if (e.key === "s" || e.key === "S") {
         handleGameAnswer(true);
       } else if (e.key === "d" || e.key === "D") {
@@ -86,10 +89,14 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
   }, [isGaming, isGameOver, gameFeedback, gamePacket]);
 
   const startMinigame = () => {
-    if (pet.energy < 15) {
+    if (answerTimeout.current) clearTimeout(answerTimeout.current);
+    answerPending.current = false;
+    const currentPet = loadPet();
+    setPet(currentPet);
+    if (currentPet.energy < 15) {
       setMessage(language === "en" 
-        ? `${pet.name} is too tired for games! Feed them web cookies first (+25 Energy).`
-        : `${pet.name} ist zu müde für Spiele! Gib ihm erst Web-Cookies (+25 Energy).`);
+        ? `${currentPet.name} is too tired for games! Feed them web cookies first (+25 Energy).`
+        : `${currentPet.name} ist zu müde für Spiele! Gib ihm erst Web-Cookies (+25 Energy).`);
       return;
     }
 
@@ -101,15 +108,11 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
     setPetVisualOverride(null);
 
     const leitner = getLeitnerMap();
-    let playable = GAME_PACKETS_POOL.filter((p) => (leitner[p.text] || 0) < 2);
+    let playable = packets.filter((p) => (leitner[p.text] || 0) < 2);
 
-    // Auto reset if all are mastered so the game doesn't stall
+    // Keep recorded answers when starting another practice round.
     if (playable.length === 0) {
-      GAME_PACKETS_POOL.forEach((p) => {
-        leitner[p.text] = 0;
-      });
-      saveLeitnerMap(leitner);
-      playable = [...GAME_PACKETS_POOL];
+      playable = [...packets];
     }
 
     const firstPacket = playable[Math.floor(Math.random() * playable.length)];
@@ -119,7 +122,8 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
   };
 
   const handleGameAnswer = (answeredPhish: boolean | null) => {
-    if (gameFeedback) return;
+    if (!isGaming || isGameOver || !gamePacket || gameFeedback || answerPending.current) return;
+    answerPending.current = true;
 
     const correct = answeredPhish === null ? false : answeredPhish === gamePacket?.isPhish;
 
@@ -148,7 +152,9 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
       setPetVisualOverride("⚡💀⚡");
     }
 
-    setTimeout(() => {
+    answerTimeout.current = setTimeout(() => {
+      answerTimeout.current = null;
+      answerPending.current = false;
       setPetVisualOverride(null);
       setGameFeedback(null);
 
@@ -158,28 +164,18 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
         const earnedXp = Math.floor(finalScore / 10) + 15;
         const earnedHappiness = Math.min(30, 8 + Math.floor(finalScore / 30));
 
-        setPet((prev) => {
-          let nextXp = prev.xp + earnedXp;
-          let nextLevel = prev.level;
-          const xpNeeded = nextLevel * 100;
-          let levelUpMsg = "";
-
-          if (nextXp >= xpNeeded) {
-            nextLevel = Math.min(5, nextLevel + 1);
-            nextXp = nextXp - xpNeeded;
-            levelUpMsg = language === "en" 
-              ? ` ✨ EVOLUTION TO LEVEL ${nextLevel}!` 
-              : ` ✨ EVOLUTION AUF LEVEL ${nextLevel}!`;
-          }
+        changePet((prev) => {
+          const progressed = addPetXp(prev, earnedXp);
+          const levelUpMsg = progressed.level > prev.level
+            ? (language === "en" ? ` ✨ EVOLUTION TO LEVEL ${progressed.level}!` : ` ✨ EVOLUTION AUF LEVEL ${progressed.level}!`)
+            : "";
 
           setMessage(language === "en"
             ? `Mini-training complete! +${earnedXp} XP, +${earnedHappiness}% happiness.${levelUpMsg}`
             : `Minitraining beendet! +${earnedXp} XP, +${earnedHappiness}% Zufriedenheit.${levelUpMsg}`);
 
           return {
-            ...prev,
-            level: nextLevel,
-            xp: nextXp,
+            ...progressed,
             energy: Math.max(0, prev.energy - 15),
             happiness: Math.min(100, prev.happiness + earnedHappiness),
             lastAction: language === "en" 
@@ -191,9 +187,9 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
         setGameRound((prev) => prev + 1);
 
         const leitner = getLeitnerMap();
-        let playable = GAME_PACKETS_POOL.filter((p) => (leitner[p.text] || 0) < 2);
+        let playable = packets.filter((p) => (leitner[p.text] || 0) < 2);
         if (playable.length === 0) {
-          playable = [...GAME_PACKETS_POOL];
+          playable = [...packets];
         }
 
         let nextPacket = playable[Math.floor(Math.random() * playable.length)];
@@ -209,13 +205,9 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
     }, 1300);
   };
 
-  useEffect(() => {
-    localStorage.setItem("phish_detective_pet", JSON.stringify(pet));
-  }, [pet]);
-
   // Actions
   const handleAction = (type: "feed" | "train_sender" | "harden_password" | "clean_logs") => {
-    setPet((prev) => {
+    changePet((prev) => {
       let nextXp = prev.xp;
       let nextEnergy = prev.energy;
       let nextHappiness = prev.happiness;
@@ -265,8 +257,8 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
           nextPass = Math.min(100, prev.passwordDefense + 18);
           actionLog = language === "en" ? "Hardened password defense." : "Passwort-Verteidigung trainiert.";
           setMessage(language === "en"
-            ? `Shield hardened! ${prev.name} now understands complex passphrases (+18% password strength).`
-            : `Schild gehärtet! ${prev.name} beherrscht nun komplexe Phrasen (+18% Passwortstärke).`);
+            ? `Shield hardened! ${prev.name} gains +18 game points on the shield gauge.`
+            : `Schild gehärtet! ${prev.name} erhält +18 Spielpunkte auf der Schildanzeige.`);
           break;
         case "clean_logs":
           nextHappiness = Math.min(100, prev.happiness + 20);
@@ -278,21 +270,15 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
           break;
       }
 
-      // Check level up (every 100 XP)
-      let nextLevel = prev.level;
-      const xpNeeded = nextLevel * 100;
-      if (nextXp >= xpNeeded) {
-        nextLevel = Math.min(5, nextLevel + 1);
-        nextXp = nextXp - xpNeeded; // carry over
+      const progressed = addPetXp(prev, nextXp - prev.xp);
+      if (progressed.level > prev.level) {
         setMessage(language === "en"
-          ? `✨ EVOLUTION! Your Phish reached level ${nextLevel} and gets even sleek and robust!`
-          : `✨ EVOLUTION! Ihr Phish hat Level ${nextLevel} erreicht und wird immer heißer und robuster!`);
+          ? `✨ EVOLUTION! Your Phish reached level ${progressed.level}. Unlocked modules stay available.`
+          : `✨ EVOLUTION! Dein Phish hat Level ${progressed.level} erreicht. Freigeschaltete Module bleiben verfügbar.`);
       }
 
       return {
-        ...prev,
-        level: nextLevel,
-        xp: nextXp,
+        ...progressed,
         energy: nextEnergy,
         happiness: nextHappiness,
         passwordDefense: nextPass,
@@ -303,7 +289,7 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
 
   const handleRename = () => {
     if (customNameInput.trim()) {
-      setPet((prev) => ({ ...prev, name: customNameInput.trim() }));
+      changePet((prev) => ({ ...prev, name: customNameInput.trim().slice(0, 40) }));
       setIsRenaming(false);
       setCustomNameInput("");
       setMessage(language === "en" ? "Pet renamed!" : "Haustier umbenannt!");
@@ -341,8 +327,8 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
           </h2>
           <p className="text-xs text-[#615C54] font-mono mt-1">
             {language === "en" 
-              ? "TRAIN YOUR AQUATIC SPECIES TO DEFEND DOMAIN SCAMS VIA CRYPTO-PROTOCOLS."
-              : "TRAINIEREN SIE IHREN SPEICHER-FISCH PER SPEZIELLEM SICHERHEITS-PROTOKOLL."}
+              ? "Play with Byte and recognise warning signs in prepared examples."
+              : "Spiele mit Byte und erkenne Warnzeichen in vorbereiteten Beispielen."}
           </p>
         </div>
         <div className="font-mono text-[10px] bg-[#ECE8DF] border border-[#1D1B18] px-3 py-1 flex items-center gap-1.5 self-start">
@@ -351,6 +337,11 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
         </div>
       </div>
 
+      <p className="text-sm text-[#615C54] border-l-4 border-[#00A3A6] pl-3" role="note">
+        {language === "en"
+          ? "XP, shield and happiness are game values, not measurements of your security skills. The answers describe prepared fictional examples: a familiar address or a domain ending alone never verifies a real message."
+          : "XP, Schild und Zufriedenheit sind Spielwerte, keine Messung deiner Sicherheitskompetenz. Die Antworten gelten für vorbereitete fiktive Beispiele: Eine bekannte Adresse oder eine Domain-Endung allein bestätigt keine echte Nachricht."}
+      </p>
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         {/* Left column: Tamagotchi screen monitor (7 cols) */}
         <div className="lg:col-span-7 bg-[#F4F1EA] border-2 border-[#1D1B18] shadow-[4px_4px_0px_#1D1B18] p-6 relative flex flex-col items-center">
@@ -386,6 +377,8 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
             <div className="bg-white p-3 border-2 border-[#1D1B18] shadow-[2px_2px_0px_#1D1B18] mb-4 w-full flex gap-2">
               <input
                 type="text"
+                aria-label={language === "en" ? "Pet name" : "Name des Fisches"}
+                maxLength={40}
                 value={customNameInput}
                 onChange={(e) => setCustomNameInput(e.target.value)}
                 placeholder={language === "en" ? "New Name..." : "Neuer Name..."}
@@ -416,6 +409,10 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
             handleGameAnswer={handleGameAnswer}
             language={language}
             onResetGame={() => {
+              if (answerTimeout.current) clearTimeout(answerTimeout.current);
+              answerPending.current = false;
+              setGameFeedback(null);
+              setPetVisualOverride(null);
               setIsGaming(false);
               setIsGameOver(false);
             }}
@@ -449,15 +446,18 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
                   {language === "en" ? "MEMORY EVOLUTION PROGRESS (XP):" : "SPEICHER-FORT_SCHRITT (XP):"}
                 </span>
                 <span className="text-[#FF5500] font-black">
-                  {pet.xp} / {pet.level * 100} XP
+                  {pet.level === 5 ? (language === "en" ? "Max level" : "Höchstes Level") : `${pet.xp} / ${pet.level * 100} XP`}
                 </span>
               </div>
               <div className="w-full bg-[#ECE8DF] h-3 border-2 border-[#1D1B18]">
                 <div
                   className="bg-[#FF5500] h-full transition-all duration-300"
-                  style={{ width: `${Math.min(100, (pet.xp / (pet.level * 100)) * 100)}%` }}
+                  style={{ width: `${Math.min(100, pet.level === 5 ? 100 : (pet.xp / (pet.level * 100)) * 100)}%` }}
                 />
               </div>
+              <p className="text-xs text-[#615C54]">
+                {language === "en" ? `${pet.totalXp} total XP for module unlocks` : `${pet.totalXp} Gesamt-XP für Modulfreischaltungen`}
+              </p>
             </div>
           )}
         </div>
@@ -553,8 +553,8 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
                   </h5>
                   <p className="text-[9px] text-[#615C54] font-mono uppercase mt-0.5">
                     {language === "en"
-                      ? "Adds +18% password strength."
-                      : "Gibt +18% Passwortstärke."}
+                      ? "Adds +18 game points to the shield gauge."
+                      : "Gibt +18 Spielpunkte auf der Schildanzeige."}
                   </p>
                 </div>
               </button>
@@ -588,7 +588,7 @@ export default function CyberPet({ language = "de" }: { language?: Language }) {
         language={language}
         onReset={() => {
           if (window.confirm(language === "en" ? "Do you want to reset all mastered domains inside the card box?" : "Möchtest du die gelernten Domänen im Vokabelkasten zurücksetzen?")) {
-            localStorage.removeItem("phish_leitner_box");
+            saveLeitnerMap({});
             setMessage(language === "en" ? "Flashcard box has been flushed and reset successfully." : "Vokabelkasten wurde geleert und zurückgesetzt.");
           }
         }}
