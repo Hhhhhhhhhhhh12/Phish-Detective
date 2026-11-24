@@ -13,7 +13,7 @@ export default function ScannerResults({ scanResult, exampleLabel }: ScannerResu
       case "safe":
         return {
           bg: "bg-[#00A3A6]/10 border-[#00A3A6] text-[#00A3A6]",
-          text: "LEGITIM / SICHER",
+          text: "UNAUFFÄLLIG IM BEISPIEL",
           color: "text-[#00A3A6]",
           icon: <CheckCircle className="w-5 h-5 text-[#00A3A6]" id="icon-verdict-safe" />
         };
@@ -27,7 +27,7 @@ export default function ScannerResults({ scanResult, exampleLabel }: ScannerResu
       case "dangerous":
         return {
           bg: "bg-[#FF5500]/10 border-[#FF5500] text-[#FF5500]",
-          text: "GEFÄHRLICH (PHISHING)",
+          text: "VORGEGEBENER PHISHING-FALL",
           color: "text-[#FF5500]",
           icon: <Shield className="w-5 h-5 text-[#FF5500]" id="icon-verdict-dangerous" />
         };
@@ -43,7 +43,7 @@ export default function ScannerResults({ scanResult, exampleLabel }: ScannerResu
 
   const badge = getVerdictBadge(scanResult.verdict);
   return (
-    <div className="space-y-6 animate-fade-in" id="scanner-scan-results">
+    <div className="space-y-6 animate-fade-in" id="scanner-scan-results" lang="de">
       {/* Verdict Card */}
       <div className="bg-[#F4F1EA] border-2 border-[#1D1B18] p-5 shadow-[4px_4px_0px_#1D1B18]">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -62,16 +62,9 @@ export default function ScannerResults({ scanResult, exampleLabel }: ScannerResu
             </div>
           </div>
 
-          {/* Threat Score Circle Gauge */}
-          <div className="flex items-center gap-3 bg-white py-2 px-4 border-2 border-[#1D1B18] shadow-[2px_2px_0px_#1D1B18]">
-            <div className="relative w-12 h-12 flex items-center justify-center font-mono">
-              <div className="text-xs font-black text-[#1D1B18]">{scanResult.phishScore}%</div>
-            </div>
-            <div>
-              <div className="text-[10px] font-black font-mono text-[#1D1B18] uppercase">GEFAHR-STUFE</div>
-              <div className="text-[8px] font-mono text-[#615C54] uppercase block font-bold">PROBABILITY INDEX</div>
-            </div>
-          </div>
+          <p className="max-w-xs text-xs text-[#615C54] border border-[#1D1B18] bg-white p-3">
+            Die Einordnung wurde für dieses Beispiel vorgegeben. Es wird keine Betrugswahrscheinlichkeit berechnet.
+          </p>
         </div>
 
         <p className="text-xs text-[#1D1B18] mt-4 bg-white p-3 border border-[#1D1B18] leading-relaxed font-mono uppercase">
@@ -83,7 +76,7 @@ export default function ScannerResults({ scanResult, exampleLabel }: ScannerResu
       <div className="bg-[#F4F1EA] border-2 border-[#1D1B18] p-5 shadow-[4px_4px_0px_#1D1B18] space-y-4">
         <h3 className="text-xs font-black text-[#1D1B18] uppercase tracking-wider font-mono border-b border-[#1D1B18] pb-2 flex items-center gap-2">
           <FileText className="w-4 h-4 text-[#FF5500]" id="icon-indicators-indicators" />
-          CHASSIS MESSFUNKTION / DETEKTIERTE SPOREN
+          HINWEISE IM VORBEREITETEN BEISPIEL
         </h3>
 
         <div className="space-y-3 max-h-56 overflow-y-auto pr-1">
@@ -121,7 +114,7 @@ export default function ScannerResults({ scanResult, exampleLabel }: ScannerResu
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Detailed forensic */}
         <div className="bg-[#F4F1EA] border-2 border-[#1D1B18] shadow-[2px_2px_0px_#1D1B18] p-4 space-y-2">
-          <h4 className="text-[10px] font-mono font-black text-[#1D1B18] uppercase tracking-wider">🕵️‍♂️ INTERNER LAB-PROZESS</h4>
+          <h4 className="text-[10px] font-mono font-black text-[#1D1B18] uppercase tracking-wider">🕵️‍♂️ ERLÄUTERUNG DES BEISPIELS</h4>
           <p className="text-[11px] text-[#615C54] leading-relaxed font-mono uppercase">
             {scanResult.technicalDetails}
           </p>
@@ -129,7 +122,7 @@ export default function ScannerResults({ scanResult, exampleLabel }: ScannerResu
 
         {/* Recommendations */}
         <div className="bg-[#F4F1EA] border-2 border-[#1D1B18] shadow-[2px_2px_0px_#1D1B18] p-4 space-y-2">
-          <h4 className="text-[10px] font-mono font-black text-[#1D1B18] uppercase tracking-wider">📋 CO-REAGIERENDE MASSNAHMEN</h4>
+          <h4 className="text-[10px] font-mono font-black text-[#1D1B18] uppercase tracking-wider">📋 MÖGLICHE NÄCHSTE SCHRITTE</h4>
           <ul className="space-y-1.5 pt-1 uppercase font-mono text-[10px]">
             {scanResult.detectiveTips?.map((tip, idx) => (
               <li key={idx} className="text-[#1D1B18] flex items-start gap-1.5 leading-relaxed">

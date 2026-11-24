@@ -80,11 +80,11 @@ export default function RetroStage({
           {/* Temperature badge style */}
           <div className="z-10 bg-white border border-[#1D1B18] px-3 py-1 flex items-center gap-1.5 shadow-[1.5px_1.5px_0px_#1D1B18] text-[9px] font-mono">
             <span className={`w-1.5 h-1.5 rounded-full ${isHot ? "bg-[#FF5500] animate-ping" : "bg-[#00A3A6]"}`}></span>
-            <span className="text-[#615C54]">{language === "en" ? "MEMORY LEVEL:" : "SPEICHER-DRUCK:"}</span>
+            <span className="text-[#615C54]">{language === "en" ? "EVOLUTION:" : "ENTWICKLUNG:"}</span>
             <span className={`font-bold uppercase ${isHot ? "text-[#FF5500]" : "text-[#1D1B18]"}`}>
               {isHot 
-                ? (language === "en" ? "EXTREMELY HOT & SECURE" : "EXTREM HEISS & SICHER")
-                : (language === "en" ? "MODERATE / STABLE" : "MODERAT / STABIL")}
+                ? (language === "en" ? "ADVANCED GAME STAGE" : "FORTGESCHRITTENE SPIELSTUFE")
+                : (language === "en" ? "EARLY GAME STAGE" : "FRÜHE SPIELSTUFE")}
             </span>
           </div>
 
@@ -104,14 +104,14 @@ export default function RetroStage({
           </p>
           <p className="text-[9px] text-[#615C54] leading-relaxed max-w-xs mx-auto uppercase">
             {gameScore >= 400 
-              ? (language === "en" ? "Absolute Cyber Expert! Your fish is proud of you and swims happily." : "Absoluter Cyber-Experte! Dein Fisch ist stolz auf dich und schwimmt glücklich.")
-              : (language === "en" ? "Good training, but keep practicing your speed!" : "Gutes Training, aber übe weiter deine Speicher-Präzision!")}
+              ? (language === "en" ? "At least 4 of 5 practice cards answered correctly. Well done!" : "Mindestens 4 von 5 Übungskarten richtig beantwortet. Gut gemacht!")
+              : (language === "en" ? "Try again and review the examples. In real situations, take time to check." : "Übe die Beispiele erneut. Nimm dir in echten Situationen Zeit zum Prüfen.")}
           </p>
           <button
             onClick={onResetGame}
             className="mt-2 bg-[#1D1B18] text-white text-[9px] font-bold uppercase tracking-wider px-3 py-1.5 hover:bg-[#FF5500] transition active:translate-y-0.5"
           >
-            {language === "en" ? "[ Diagnostic State ]" : "[ Diagnose-Zustand ]"}
+            {language === "en" ? "[ Back to Byte ]" : "[ Zurück zu Byte ]"}
           </button>
         </div>
       ) : (
@@ -120,7 +120,7 @@ export default function RetroStage({
             <div className="space-y-2 py-4">
               <div className="text-5xl animate-bounce">😎</div>
               <div className="bg-[#1D1B18] text-[#00E5A3] font-bold text-xs uppercase py-1 px-3 inline-block">
-                {language === "en" ? "+100 PTS // BLOCKED!" : "+100 PKT // GEBLOCKT!"}
+                {language === "en" ? "+100 PTS // CORRECT!" : "+100 PKT // RICHTIG!"}
               </div>
             </div>
           )}
@@ -128,7 +128,7 @@ export default function RetroStage({
             <div className="space-y-2 py-4">
               <div className="text-5xl animate-pulse">⚡💀⚡</div>
               <div className="bg-[#FF5500] text-[#FFFFFF] font-bold text-xs uppercase py-1 px-3 inline-block">
-                {language === "en" ? "LEAK! DATA TAMPERED!" : "LEAK! DATENSCHADEN!"}
+                {language === "en" ? "INCORRECT ANSWER" : "FALSCHE ANTWORT"}
               </div>
             </div>
           )}
@@ -136,7 +136,7 @@ export default function RetroStage({
             <div className="space-y-2 py-4">
               <div className="text-5xl">😵</div>
               <div className="bg-amber-500 text-white font-bold text-xs uppercase py-1 px-3 inline-block">
-                {language === "en" ? "TIMEOUT / LEAK!" : "ZEITABLAUF / LEAK!"}
+                {language === "en" ? "TIME IS UP" : "ZEIT ABGELAUFEN"}
               </div>
             </div>
           )}

@@ -1,76 +1,55 @@
 export interface PasswordEvaluation {
-  score: number; // 0 to 4
-  crackTime: string;
-  level: "Schwach" | "Mittel" | "Sehr Stark";
+  /** Unicode code points after NFC normalization, not UTF-16 code units. */
+  length: number;
+  level: "Leer" | "Auffälliges Muster" | "Kurzes Beispiel" | "Längeres Beispiel";
+  hasObviousPattern: boolean;
   feedback: string[];
 }
 
-export function evaluatePassword(val: string): PasswordEvaluation {
-  const feedbacks: string[] = [];
-  let score = 0;
+/**
+ * A small, local teaching heuristic. It does not estimate entropy, guessing time,
+ * breach exposure, or suitability for a real account. Its pattern list is
+ * deliberately limited. The absence of a match is not a security verdict.
+ */
+export function evaluatePassword(value: string): PasswordEvaluation {
+  const normalized = value.normalize("NFC");
+  const characters = Array.from(normalized);
+  const length = characters.length;
 
-  if (!val) {
+  if (length === 0) {
+    return { length: 0, level: "Leer", hasObviousPattern: false, feedback: [] };
+  }
+
+  const commonSequence = /1234|4321|qwert|asdf|zxcv|passw(?:ord|ort)|letmein|admin/iu.test(normalized);
+  const repeatedCharacter = characters.length > 1 && characters.every(character => character === characters[0]);
+  const repeatedBlock = /^(.{1,4})\1{2,}$/u.test(normalized);
+  const hasObviousPattern = commonSequence || repeatedCharacter || repeatedBlock;
+
+  // Inspect patterns before generating feedback so a warning cannot coexist
+  // with an earlier claim that the same example is exceptionally strong.
+  if (hasObviousPattern) {
     return {
-      score: 0,
-      crackTime: "Unter einer Millisekunde (Sofort)",
-      level: "Schwach",
-      feedback: []
+      length,
+      level: "Auffälliges Muster",
+      hasObviousPattern: true,
+      feedback: [
+        "Dieses Beispiel enthält eine bekannte Zeichenfolge oder Wiederholung. Mehr Zeichen allein machen ein vorhersehbares Muster nicht schwer zu erraten.",
+        "Die lokale Musterliste ist klein und ersetzt weder eine Prüfung auf bekannte kompromittierte Kennwörter noch eine Sicherheitsbewertung.",
+      ],
     };
   }
 
-  // Length analysis
-  if (val.length >= 8) score++;
-  if (val.length >= 12) score++;
-  if (val.length >= 16) score++;
-
-  // Character variety
-  const hasLower = /[a-z]/.test(val);
-  const hasUpper = /[A-Z]/.test(val);
-  const hasDigit = /[0-9]/.test(val);
-  const hasSpecial = /[^A-Za-z0-9]/.test(val);
-
-  const varietyCount = [hasLower, hasUpper, hasDigit, hasSpecial].filter(Boolean).length;
-  if (varietyCount >= 3) score++;
-
-  // Estimate Crack Time (simulated formula based on entropy)
-  let crackTime = "Sofort (< 1 Sekunde)";
-  let level: "Schwach" | "Mittel" | "Sehr Stark" = "Schwach";
-
-  if (val.length < 6) {
-    crackTime = "Unter einer Millisekunde (Sofort)";
-    level = "Schwach";
-    feedbacks.push("🚨 Zu kurz! Passwörter unter 8 Zeichen werden unmittelbar durch Wörterbuch-Angriffe geknackt.");
-  } else if (score <= 1) {
-    crackTime = "Wenige Sekunden";
-    level = "Schwach";
-    feedbacks.push("⚠️ Sehr geringe Zeichenvielfalt. Fügen Sie Großbuchstaben, Zahlen oder Sonderzeichen ein.");
-  } else if (score === 2) {
-    crackTime = "ca. 5 Minuten bis 1 Tag (Heuristische Suche)";
-    level = "Schwach";
-    feedbacks.push("⚠️ Mäßige Länge. Für Angreifer-Cluster spielerisch berechenbar.");
-  } else if (score === 3) {
-    crackTime = "ca. 10 Monate bis 50 Jahre";
-    level = "Mittel";
-    feedbacks.push("👍 Gute Länge! Um es im Alltag unhackbar zu machen, aktivieren Sie zusätzlich Zwei-Faktor-Authentifizierung (2FA).");
-  } else if (score >= 4) {
-    crackTime = "Mehrere Jahrtausende (unbezwingbar)";
-    level = "Sehr Stark";
-    feedbacks.push("✨ Erstklassige Festung! Durch die hohe Länge widersteht dieses Kennwort jedem Brute-Force-Cluster.");
-  }
-
-  // Common dangerous patterns
-  if (/1234/.test(val) || /qwert/i.test(val) || /pass/i.test(val) || /hallo/i.test(val)) {
-    score = Math.max(0, score - 2);
-    crackTime = "Sofort (Beliebtes Opfermuster)";
-    level = "Schwach";
-    feedbacks.push("❌ Enthält triviale Tastaturmuster (wie '1234' oder 'password'). Hacker-Wörterbücher prüfen diese zuerst!");
-  }
-
   return {
-    score,
-    crackTime,
-    level,
-    feedback: feedbacks
+    length,
+    level: length < 15 ? "Kurzes Beispiel" : "Längeres Beispiel",
+    hasObviousPattern: false,
+    feedback: [
+      length < 15
+        ? "Für ein Kennwort als einzigen Anmeldefaktor empfiehlt NIST mindestens 15 Zeichen. Andere Anwendungsfälle haben andere Anforderungen; Sonderzeichen allein gleichen geringe Länge nicht aus."
+        : "Mehr Länge kann das Erraten erschweren, wenn die Auswahl nicht vorhersehbar ist. Eine bekannte Wortfolge oder ein veröffentlichtes Beispiel bleibt ungeeignet für ein echtes Konto.",
+      "Kein Muster in dieser kleinen Auswahl erkannt. Das sagt nichts über Wiederverwendung, veröffentlichte Kennwörter oder andere vorhersehbare Wörter aus.",
+    ],
   };
 }
+
 export default evaluatePassword;

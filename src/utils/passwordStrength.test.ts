@@ -1,30 +1,72 @@
 import { describe, it, expect } from "vitest";
 import { evaluatePassword } from "./passwordStrength";
 
-describe("Password Evaluation Utility", () => {
-  it("should handle empty password gracefully", () => {
-    const result = evaluatePassword("");
-    expect(result.score).toBe(0);
-    expect(result.level).toBe("Schwach");
-    expect(result.feedback).toEqual([]);
+describe("password teaching observations", () => {
+  it("has no security verdict for an empty example", () => {
+    expect(evaluatePassword("")).toEqual({
+      length: 0,
+      level: "Leer",
+      hasObviousPattern: false,
+      feedback: [],
+    });
   });
 
-  it("should mark very short passwords as Schwach", () => {
-    const result = evaluatePassword("abc1");
-    expect(result.level).toBe("Schwach");
-    expect(result.feedback[0]).toContain("Zu kurz");
+  it("does not describe a single Unicode code point as a repetition", () => {
+    const result = evaluatePassword("😀");
+    expect(result.length).toBe(1);
+    expect(result.level).toBe("Kurzes Beispiel");
+    expect(result.hasObviousPattern).toBe(false);
   });
 
-  it("should penalize keyboards or simple dictionary sequences like 1234", () => {
-    const result = evaluatePassword("SichererText1234!");
-    expect(result.level).toBe("Schwach");
-    expect(result.feedback.join(" ")).toContain("Tastaturmuster");
+  it("does not award strength for character-class complexity in a short example", () => {
+    const result = evaluatePassword("H0f_f@r!");
+    expect(result.level).toBe("Kurzes Beispiel");
+    expect(result.length).toBe(8);
+    expect(result.feedback.join(" ")).toContain("Sonderzeichen allein");
   });
 
-  it("should rate a long multiword passphrase as Sehr Stark", () => {
-    const result = evaluatePassword("Regenschirm-Kaffeetasse-Nordsee-Sicherheitsnetz-2026!");
-    expect(result.level).toBe("Sehr Stark");
-    expect(result.feedback[0]).toContain("Erstklassige Festung");
-    expect(result.score).toBeGreaterThanOrEqual(4);
+  it.each([
+    "SichererText1234!",
+    "THIS-IS-A-LONG-PASSWORD-EXAMPLE",
+    "qwerty-als-langes-beispiel",
+    "aaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "abcabcabcabcabcabc",
+    "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+    "                    ",
+  ])("flags a visible pattern without praising the length: %s", example => {
+    const result = evaluatePassword(example);
+    expect(result.level).toBe("Auffälliges Muster");
+    expect(result.hasObviousPattern).toBe(true);
+    expect(result.feedback.join(" ")).toContain("Wiederholung");
+    expect(result.feedback.join(" ")).not.toContain("Mehr Länge kann");
+  });
+
+  it("describes a long phrase without certifying it or estimating crack time", () => {
+    const result = evaluatePassword("regenschirm-kiesel-zebra-nebel");
+    expect(result.level).toBe("Längeres Beispiel");
+    expect(result.hasObviousPattern).toBe(false);
+    expect(result.feedback.join(" ")).toContain("veröffentlichtes Beispiel");
+    expect(result.feedback.join(" ")).toContain("Wiederverwendung");
+    expect(result).not.toHaveProperty("crackTime");
+    expect(result).not.toHaveProperty("score");
+  });
+
+  it("keeps the length boundary descriptive rather than treating it as certification", () => {
+    expect(evaluatePassword("zebra-kiesel-x").level).toBe("Kurzes Beispiel");
+    const longer = evaluatePassword("zebra-kiesel-xy");
+    expect(longer.length).toBe(15);
+    expect(longer.level).toBe("Längeres Beispiel");
+    expect(longer.feedback.join(" ")).toContain("vorhersehbar");
+  });
+
+  it("counts supplementary Unicode characters once, not as UTF-16 surrogate pairs", () => {
+    const result = evaluatePassword("😀🚲🌧️");
+    // The variation selector is a code point too; this is not a grapheme count.
+    expect(result.length).toBe(4);
+    expect(result.level).toBe("Kurzes Beispiel");
+  });
+
+  it("treats canonically equivalent Unicode examples consistently", () => {
+    expect(evaluatePassword("café-nebel")).toEqual(evaluatePassword("cafe\u0301-nebel"));
   });
 });

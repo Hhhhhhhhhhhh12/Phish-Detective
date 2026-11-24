@@ -12,7 +12,7 @@ export default function PetStatsMonitor({ pet, language = "de" }: PetStatsMonito
     <div className="bg-[#F4F1EA] border-2 border-[#1D1B18] shadow-[4px_4px_0px_#1D1B18] p-5 space-y-4" id="pet-stats-monitor">
       <h4 className="text-[10px] font-mono font-black uppercase tracking-wider text-[#1D1B18] border-b-2 border-[#1D1B18] pb-2 flex items-center gap-1.5">
         <Terminal className="w-4 h-4 text-[#00A3A6]" />
-        {language === "en" ? "SPECIFICATION // SYSTEM DIAGNOSTICS" : "SPEZIFIKATION // DIAGNOSE_WERTE"}
+        {language === "en" ? "BYTE’S GAME VALUES" : "BYTES SPIELWERTE"}
       </h4>
 
       <div className="grid grid-cols-1 gap-4">
@@ -33,7 +33,7 @@ export default function PetStatsMonitor({ pet, language = "de" }: PetStatsMonito
         <div className="space-y-1" id="stat-happiness">
           <div className="flex justify-between items-center text-xs">
             <span className="text-[#1D1B18] flex items-center gap-1 font-mono font-bold uppercase text-[10px]">
-              <Heart className="w-3.5 h-3.5 text-[#FF5500] shrink-0" id="icon-happiness" /> {language === "en" ? "ZUFRIEDENHEIT (CORE)" : "ZUFRIEDENHEIT (CORE)"}
+              <Heart className="w-3.5 h-3.5 text-[#FF5500] shrink-0" id="icon-happiness" /> {language === "en" ? "HAPPINESS" : "ZUFRIEDENHEIT"}
             </span>
             <span className="font-mono font-black text-[#1D1B18]">{pet.happiness}%</span>
           </div>
@@ -46,7 +46,7 @@ export default function PetStatsMonitor({ pet, language = "de" }: PetStatsMonito
         <div className="space-y-1" id="stat-defense">
           <div className="flex justify-between items-center text-xs">
             <span className="text-[#1D1B18] flex items-center gap-1 font-mono font-bold uppercase text-[10px]">
-              <Shield className="w-3.5 h-3.5 text-[#00A3A6] shrink-0" id="icon-defense" /> {language === "en" ? "DEFENSE strength (SECURE)" : "ABWEHR-STÄRKE (SECURE)"}
+              <Shield className="w-3.5 h-3.5 text-[#00A3A6] shrink-0" id="icon-defense" /> {language === "en" ? "SHIELD (GAME VALUE)" : "SCHILD (SPIELWERT)"}
             </span>
             <span className="font-mono font-black text-[#00A3A6]">{pet.passwordDefense}%</span>
           </div>

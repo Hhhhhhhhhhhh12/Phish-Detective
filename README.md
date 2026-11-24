@@ -1,109 +1,168 @@
 # Phish Detective
 
-[![CI-Status](https://github.com/Hhhhhhhhhhhh12/Phish-Detective/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Hhhhhhhhhhhh12/Phish-Detective/actions/workflows/ci.yml)
-[![Lizenz: MIT](https://img.shields.io/badge/License-MIT-gray?style=flat-square)](./LICENSE)
+[![CI für main](https://github.com/Hhhhhhhhhhhh12/Phish-Detective/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Hhhhhhhhhhhh12/Phish-Detective/actions/workflows/ci.yml)
 
-**[Öffentliche Trainingsdemo öffnen](https://hhhhhhhhhhhh12.github.io/Phish-Detective/)**
+**[Öffentliche Trainingsdemo](https://hhhhhhhhhhhh12.github.io/Phish-Detective/)** · [Automatisierte Prüfungen](https://github.com/Hhhhhhhhhhhh12/Phish-Detective/actions/workflows/ci.yml) · [Veröffentlichungsläufe](https://github.com/Hhhhhhhhhhhh12/Phish-Detective/actions/workflows/pages.yml)
 
-Phish Detective ist eine technische Arbeitsprobe für interaktives Security-Awareness-Training. Die React-/TypeScript-App zeigt anhand vorbereiteter Fälle, wie sich Absender, Linkziele und typische Phishing-Signale beurteilen lassen. Das Passwortlabor veranschaulicht Passwortstärke mit einer lokalen Heuristik. Im Dashboard lassen sich Module für eine kurze Vorführung über die XP-Freischaltung direkt öffnen.
+Phish Detective ist ein KI-gestützt entwickelter Prototyp für interaktives
+Security-Awareness-Training. Vorbereitete E-Mails, ein Fischdetektiv und kurze
+Übungen erklären typische Phishing-Muster. Die Arbeitsprobe zeigt die Umsetzung
+von Benutzerführung, lokaler Zustandsverwaltung und einem statischen Release-Prozess.
+Sie belegt keine empirisch gemessene Lernwirksamkeit und keine Kundenprojekte.
 
-Die Trainingsanwendung enthält vorbereitete Fälle und feste Beispielberichte. Der Lernfortschritt wird lokal im Browser gespeichert. Die GitHub-Actions-Pipeline prüft Typen, Tests und den Inhalt des Veröffentlichungsartefakts.
+Die App verwendet **keine Live-KI und keinen eigenen Server**. Fälle und Berichte
+sind vorbereitet; der URL-Inspector zerlegt Adressen lokal und das Passwortlabor
+bespricht erfundene Übungsbeispiele. Keines dieser Werkzeuge bestätigt die
+Sicherheit einer echten Nachricht, Website oder eines echten Kennworts.
 
-## 🎨 Designphilosophie & visuelle Identität
+## Eine kurze Vorführung
 
-Das Interface folgt einer exklusiven **Tactile Brutalist Aesthetic** mit klaren, dicken Rahmen, starkem Schlagschatten und kontrastreichen Akzentfarben:
-- **Echtes Digitales Aquarium**: Ein wunderschön animiertes, simuliertes Glastank-Aquarium mit anpassungsfähigen Vector-Fischen, aufsteigenden Luftblasen, sanften Meereswellen und CRT-Bildschirm-Zerstörungsfiltern.
-- **Interaktiver Ermittler-Look**: Kombination aus klassischem Kreide-Karton, tiefem Anthrazit und leuchtenden Signal-Warnungen für echte Detektiv-Atmosphäre.
-- **Evolutions-Feedback**: Der persönliche Cyber-Fisch wächst und verändert seine optische Erscheinung (vom einfachen Fisch über coole Sonnenbrillen-Upgrades bis zum majestätischen Königs-Hai mit Detektiv-Hut), wenn der Nutzer Meilensteine und XP-Punkte auf dem Lernpfad sammelt.
+1. **START** öffnet nach dem kurzen Intro das Dashboard. Das Intro lässt sich
+   überspringen; bei reduzierter Bewegung führt START direkt weiter.
+2. **Demo-Modus** in der Navigation aktivieren. Er öffnet alle Module, ohne
+   Fortschritt zu vergeben oder zu löschen.
+3. Im **Simulator** einen vorbereiteten Fall lesen, das Linkziel per Fokus,
+   Maus oder Antippen ansehen und eine Entscheidung treffen. Danach das
+   Feedback und die auf Antworten beruhenden Übungsstatistiken erklären.
+4. Einen **URL-Aufbau** untersuchen oder im **Passwort-Lab** ausschliesslich
+   erfundene Beispiele vergleichen. Die Grenzen stehen direkt am Ergebnis.
+5. Die tatsächlichen Prüfergebnisse über den GitHub-Link ansehen. Ein Ergebnis
+   gilt immer für den zugehörigen Commit, also einen bestimmten Code-Stand.
 
----
+Das Dashboard zeigt keinen simulierten Testlauf und keine fest eingebauten
+„Passing“- oder Sicherheitsplaketten. Ein grüner CI-Status für `main` beweist
+auch nicht, dass genau dieser Stand öffentlich ausgeliefert wird; Pages wird
+separat veröffentlicht.
 
-## 🧩 Die Ausbildungs-Module im Überblick
+## Module und Grenzen
 
-### 1. 🐠 Der Phish-O-Mat (Leitner-Cyber-Reflektor)
-- **Domänen-Reaktionsspiel**: Nutzer müssen in Sekundenbruchteilen echte von gefälschten URLs trennen (z. B. `paypal-security.com` vs. `paypal.com`).
-- **Karteikarten-Leitner-Engine**: Falsch beantwortete Sicherheitsbegriffe wandern zurück in vordere Fächer und werden systematisch wiederholt, bis sie perfekt verinnerlicht wurden.
+| Modul | Implementiertes Verhalten | Grenze |
+| --- | --- | --- |
+| Phish-O-Mat und Byte | Reaktionsspiel, Spielwerte, Level und Karten mit null/einer/zwei richtigen Antworten | Keine Prüfung echter Absender, keine Kompetenzmessung und kein zeitgesteuerter Lernplan |
+| E-Mail-Simulator | Vorbereitete Fälle, Entscheidungen, erklärtes Feedback, gespeicherter Fall und Antwortstand | Eine angezeigte Adresse oder persönliche Anrede authentifiziert keine echte Nachricht |
+| Passwort-Lab | Länge und begrenzte Musterhinweise, feste Übungsbeispiele, als Illustration gekennzeichnete Animation | Keine Entropie- oder Knackzeitschätzung; kein Generator für Kontokennwörter; keine Speicherung der Eingabe |
+| URL-Inspector | Lokale Browser-URL-Zerlegung und Public Suffix List, einschliesslich privater Hosting-Endungen, IP-Adressen und Punycode | Keine DNS-, Eigentümer-, Zertifikats-, Weiterleitungs-, Inhalts- oder Reputationsprüfung; keine Zielseite wird geöffnet |
+| Noir-Comics | Zwei fiktive Geschichten, bewusstes Weiterblättern, Punkte pro Durchlauf | Folgen sind überzeichnet; Comicpunkte werden weder dauerhaft gespeichert noch für Freischaltungen verwendet |
+| Beispielberichte | Zwei feste, als vorbereitet bezeichnete Berichte | Keine Live-Analyse und keine berechnete Betrugswahrscheinlichkeit |
+| Handbuch | Kurze Hinweise zu Absendern, Links und Handlungsdruck | Einordnung für Training; keine vollständige Sicherheitsausbildung |
 
-### 2. 🔑 Das Passwort-Lab
-- **Stärkeschätzung**: Bewertet Länge, Zeichenklassen und vorhersehbare Muster direkt im Browser.
-- **Brute-Force-Simulation**: Veranschaulicht den möglichen Aufwand eines Angriffs anhand geschätzter Werte.
+Die kräftigen Rahmen, Aquarium-Illustrationen und der Fischdetektiv bleiben
+Teil der Gestaltung. Reduzierte Bewegung wird im Intro, bei Motion-Übergängen
+und CSS-Animationen berücksichtigt. Dies ist keine vollständige
+Barrierefreiheitszertifizierung.
 
-### 3. 📧 Der E-Mail-Simulator
-- **Scharfer Posteingang**: Untersuche realistische Phishing-, Spearphishing- und CEO-Fraud-Mails im Detail.
-- **Interaktivität**: Markiere verdächtige Header, betrügerische Links oder falsche Absenderadressen direkt im Editor.
+### Sprache
 
-### 4. 🎬 Die Interactive Noir-Comics
-- **Entscheidung-Sagas**: Steuere die Schicksale von "Phish", dem tollpatschigen Anti-Held. Falsche Cyber-Entscheidungen führen zu katastrophalem Server-Chaos (sichtbar durch schmelzende Server-Racks und rot glühende Warnlichter); richtige Antworten führen zum sicheren Hafen.
+Navigation, Dashboard, Simulator, Handbuch und Teile des Fischspiels haben
+deutsche, englische und schweizerische Varianten. Passwortlabor, URL-Inspector,
+Comics und Beispielberichtstexte sind derzeit deutsch. Die Sprachauswahl erklärt
+diese Begrenzung; vollständige Lokalisierung wird nicht behauptet.
 
-### 5. Beispielberichte
-- **Trainingsdemo**: Zwei gekennzeichnete Beispielberichte erläutern typische Warnsignale und mögliche nächste Schritte.
+## Fortschritt und lokale Speicherung
 
----
+| Daten | Verhalten |
+| --- | --- |
+| Byte-Gesamt-XP | Öffnen Module bei 80 / 180 / 280 / 380 XP; bleiben bei Levelaufstieg erhalten |
+| Byte-Level-XP | Restfortschritt im aktuellen Level; getrennt von den Gesamt-XP |
+| Simulator-Übungspunkte | Eigene Spielwertung; der aktuell beantwortete Fall wird nach Neuladen mit Feedback wiederhergestellt, ohne erneut Punkte zu vergeben |
+| Themenstatistik | Letzte richtige/falsche Entscheidung je vorbereitetem Fall; unbeantwortete Themen haben keinen erfundenen Startwert |
+| Comicpunkte | Nur aktueller Durchlauf; Neustart und Geschichtenwechsel setzen sie zurück |
+| Demo-Modus | Umgeht nur Freischaltschwellen; erzeugt keine Lern- oder Spielpunkte |
 
-## 💻 Tech-Stack
+Browserdaten werden beim Lesen auf Struktur geprüft. Bei beschädigten Daten
+erscheinen sichere Startwerte mit einer Meldung; das Lesen allein überschreibt
+den alten Wert nicht. Kann der Browser nichts speichern, bleiben Änderungen
+während des geöffneten Tabs verfügbar. Die App weist darauf hin, dass sie beim
+Neuladen oder Schliessen verloren gehen können.
 
-- **Frontend**: React 19, TypeScript, **Motion** (für extrem geschmeidige Animationen und Übergänge)
-- **Styling**: **Tailwind CSS v4** (hochmoderne Utility-First Styles)
-- **Icons**: `lucide-react` (Präzise, einheitliche Vektorsymbole)
+Der Simulator-Reset setzt nur seinen eigenen Fortschritt zurück. Das Leeren
+des Kartenkastens setzt nur dessen Antworten zurück. Byte, Modulfreischaltungen
+und fremde Browserdaten bleiben dabei erhalten. Es wird kein
+`localStorage.clear()` verwendet.
 
----
+Bestehende Byte-Stände werden aus Level und Rest-XP migriert. Historische XP,
+die die alte Version nach Level 5 bereits verworfen hatte, sind nicht
+rekonstruierbar. Solche Stände behalten mindestens 1000 Gesamt-XP zuzüglich
+vorhandener Rest-XP; damit bleiben alle Module frei.
 
-## 🚀 Lokale Installation & Betrieb
+## Entwicklung und Prüfungen
 
-### Detective-Intro und START
-
-Der Startbildschirm zeigt die bestätigte Außenansicht mit dem Fischdetektiv.
-Erst **START** spielt den kurzen POV auf Brief, Haken und Schnur ab; danach
-öffnet sich das Dashboard. Überspringen, ein direkter Einstieg bei reduzierter
-Bewegung und ein Standbild bei nicht verfügbarem Intro sind vorgesehen.
-Ton ist standardmäßig aus. Die Medien liegen lokal unter
-`public/media/detective/` und verwenden den jeweiligen App-Unterpfad.
-Gestaltung, Herkunft und der aktuelle Prüfstatus stehen in [docs/INTRO.md](docs/INTRO.md).
-
-### GitHub Pages: Trainingsversion ohne Live-KI
-
-Für GitHub Pages gibt es einen eigenen statischen Build:
+Die CI verwendet **Node.js 22**. Lokal eignet sich dieselbe Hauptversion.
 
 ```bash
-npm ci
+npm ci --ignore-scripts
+npm run dev
+```
+
+Entwicklungs- und Vorschauserver dienen der lokalen Arbeit. Für die regulären
+Prüfschritte:
+
+```bash
+npm run typecheck
+npm test
+npm run build
 npm run build:pages
 npm run check:pages
 npm run preview:pages
 ```
 
-Die lokale Vorschau verwendet den Projektpfad `/Phish-Detective/`.
-`check:pages` erlaubt nur das gebaute Frontend, Manifest, Service Worker und
-die Intro-Medien. Es prüft die Pfade, sucht in Textdateien nach bekannten
-Schlüsselmustern und blockiert die beiden Live-KI-Endpunkte im Artefakt.
+Die Pages-Vorschau ist unter `/Phish-Detective/` erreichbar. Das ältere Skript
+`npm run lint` bleibt als Alias der TypeScript-Prüfung erhalten. Es gibt
+**kein ESLint**, und der TypeScript-`strict`-Modus ist derzeit nicht aktiviert.
 
-Die öffentliche Version zeigt vorbereitete Fälle und feste Beispielberichte.
-Der Lernfortschritt bleibt lokal im Browser. Google Fonts und Unsplash
-liefern weiterhin Schriften bzw. App-Icons. Die Demo setzt eine
-Internetverbindung voraus.
-
-Veröffentlichungen laufen über [Publish training version to GitHub Pages](https://github.com/Hhhhhhhhhhhh12/Phish-Detective/actions/workflows/pages.yml).
-Die Pages-Quelle ist GitHub Actions. Der Workflow startet nach Freigabe
-manuell von `main` und lädt ausschliesslich das geprüfte Verzeichnis `dist` hoch.
-
-### Lokal entwickeln
+Vitest prüft gezielt die Fortschritts-/Speicherlogik, Antwortwiederherstellung,
+Passwort-Lernhinweise und URL-Zerlegung. Playwright führt kritische Bedienabläufe
+gegen den gebauten Pages-Stand aus: Chromium bei 1366 × 900 Pixeln und WebKit
+mit einer Touch-Ansicht bei 390 × 844 Pixeln. Das ist keine Prüfung auf einem
+echten iPhone oder Mac. Für einen lokalen Browserlauf nach `build:pages`:
 
 ```bash
-npm ci
-npm run dev
+npx --no-install playwright install --with-deps chromium webkit
+npm run test:e2e
 ```
 
-Für eine Vorschau des lokalen Builds:
+Die Browserinstallation lädt Testbrowser und kann unter Linux Systempakete
+benötigen. Der Testlauf startet seine Vorschau selbst; Port 4173 muss frei
+sein. Fremde Webadressen werden in den Tests blockiert. Fehler-Traces,
+Screenshots und der HTML-Bericht werden in der CI sieben Tage als Artefakt
+aufbewahrt. Ein Trace protokolliert den Testablauf zur Fehlersuche. Die Tests
+verwenden ausschliesslich künstliche Daten.
 
-```bash
-npm run build
-npm start
-```
+Prüfumfang, konkrete Ergebnisse und verbleibende Grenzen stehen in
+[Audit und Abnahme](docs/AUDIT-2026-11-24.md). Tests belegen die geprüften
+Szenarien, nicht sämtliche möglichen Benutzerinteraktionen.
 
----
+### Technik
 
-## ⚙️ CI/CD Prüfpipelines & Repository-Qualität (GitHub Actions)
+React 19, TypeScript, Vite, Tailwind CSS 4, Motion und Lucide. Der URL-Inspector
+verwendet die im festgelegten `tldts`-Paket enthaltene Public Suffix List. Die
+Liste wird nicht zur Laufzeit aus dem Netz nachgeladen; Abhängigkeitsupdates
+halten sie aktuell. Paketversionen werden mit `package-lock.json` reproduziert.
 
-Die [CI-Pipeline](.github/workflows/ci.yml) prüft Pull Requests und Pushes auf
-die dort konfigurierten Branches mit Node.js 22. Sie führt die TypeScript-Prüfung
-und die Vitest-Tests zur Passwortbewertung aus, baut die lokale Fassung und die
-Pages-Trainingsversion und prüft den Inhalt des Pages-Artefakts.
+## Netzwerk und Veröffentlichung
+
+Fortschritt bleibt im Browser. Eingaben des Passwortlabors und URL-Inspectors
+werden vom Anwendungscode nicht übertragen oder dauerhaft gespeichert.
+**Google Fonts und Unsplash liefern weiterhin Schriften beziehungsweise
+App-Icons**; lokale Speicherung bedeutet deshalb nicht, dass die gesamte App
+keine externen Verbindungen aufbaut. Der Service Worker bietet keinen
+Offline-Cache. Es gibt keine Offline-Garantie.
+
+Das [Artefakt-Prüfskript](scripts/check-pages-build.mjs) kontrolliert den
+Repository-Unterpfad, erwartete Medien und erlaubte Dateien. Es sucht nach
+bekannten Schlüsselformaten und blockiert frühere Live-KI-Endpunkte. Das ist
+kein vollständiger Secret-, Schwachstellen- oder Datenschutzscan.
+
+Die CI läuft bei Pull Requests und Pushes auf die konfigurierten Branches.
+Workflow-Aktionen sind auf konkrete Commits festgelegt; der Prüfjob hat nur
+Leserechte. Pages bleibt ein eigener manueller Workflow und veröffentlicht
+ausschliesslich `dist`. Merges allein veröffentlichen nichts.
+
+[Release-Checkliste und Rückfallplan](docs/RELEASE-CHECKLIST.md) ·
+[Intro-Gestaltung und Herkunft](docs/INTRO.md) · [Repository-Lizenz](LICENSE)
+
+## Fachliche Grundlagen
+
+- [NIST SP 800-63B-4: Strength of Passwords](https://pages.nist.gov/800-63-4/sp800-63b/passwords/): Grenzen von Längen-/Komplexitätsheuristiken und unterschiedliche Angriffsbedingungen.
+- [Public Suffix List](https://publicsuffix.org/learn/): Domain-Grenzen sind nicht generell die letzten zwei Bestandteile eines Namens; die Liste ist keine Eigentümer- oder Vertrauensprüfung.
+- [WHATWG URL Standard](https://url.spec.whatwg.org/): Host-Normalisierung und Verarbeitung von URL-Bestandteilen.
